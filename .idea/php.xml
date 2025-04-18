@@ -46,6 +46,14 @@
       <path value="$PROJECT_DIR$/be/vendor/theseer/tokenizer" />
       <path value="$PROJECT_DIR$/be/vendor/phar-io/manifest" />
       <path value="$PROJECT_DIR$/be/vendor/phar-io/version" />
+      <path value="$PROJECT_DIR$/be/vendor/maennchen/zipstream-php" />
+      <path value="$PROJECT_DIR$/be/vendor/phpoffice/phpspreadsheet" />
+      <path value="$PROJECT_DIR$/be/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/be/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/be/vendor/psr/http-client" />
+      <path value="$PROJECT_DIR$/be/vendor/psr/http-factory" />
+      <path value="$PROJECT_DIR$/be/vendor/markbaker/matrix" />
+      <path value="$PROJECT_DIR$/be/vendor/markbaker/complex" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

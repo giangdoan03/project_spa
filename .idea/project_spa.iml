@@ -43,6 +43,14 @@
       <excludeFolder url="file://$MODULE_DIR$/be/vendor/sebastian/version" />
       <excludeFolder url="file://$MODULE_DIR$/be/vendor/symfony/deprecation-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/be/vendor/theseer/tokenizer" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/maennchen/zipstream-php" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/markbaker/complex" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/markbaker/matrix" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/phpoffice/phpspreadsheet" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/psr/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/psr/http-factory" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/be/vendor/psr/simple-cache" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
