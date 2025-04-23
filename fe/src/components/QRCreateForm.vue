@@ -59,7 +59,7 @@
                                     </a-select>
                                 </a-form-item>
                                 <a-form-item label="Màu chấm">
-                                    <a-input type="color" v-model:value="form.settings.dotsOptions.color" />
+                                    <a-input type="color" v-model:value="form.settings.dotsOptions.color" style="max-width: 50px;"/>
                                 </a-form-item>
                             </a-tab-pane>
 
@@ -74,7 +74,7 @@
                                             </a-select>
                                         </a-form-item>
                                         <a-form-item label="Corners Square Color">
-                                            <a-input type="color" v-model:value="form.settings.cornersSquareOptions.color" />
+                                            <a-input type="color" v-model:value="form.settings.cornersSquareOptions.color" style="max-width: 50px;"/>
                                         </a-form-item>
                                     </a-col>
                                     <a-col :span="12">
@@ -85,7 +85,7 @@
                                             </a-select>
                                         </a-form-item>
                                         <a-form-item label="Corners Dot Color">
-                                            <a-input type="color" v-model:value="form.settings.cornersDotOptions.color" />
+                                            <a-input type="color" v-model:value="form.settings.cornersDotOptions.color" style="max-width: 50px;"/>
                                         </a-form-item>
                                     </a-col>
                                 </a-row>
@@ -93,7 +93,7 @@
 
                             <a-tab-pane key="background" tab="Nền & Ảnh">
                                 <a-form-item label="Màu nền">
-                                    <a-input type="color" v-model:value="form.settings.backgroundOptions.color" />
+                                    <a-input type="color" v-model:value="form.settings.backgroundOptions.color" style="max-width: 50px;"/>
                                 </a-form-item>
                                 <a-form-item label="Ẩn chấm nền">
                                     <a-checkbox v-model:checked="form.settings.imageOptions.hideBackgroundDots" />
@@ -133,7 +133,7 @@
                         <div class="preview">
                             <div ref="qrRef"></div>
                         </div>
-                        <a-button type="primary" block @click="handleSubmit">Tạo và lưu QR</a-button>
+                        <a-button type="primary" block @click="handleSubmit" style="max-width: 334px;">Tạo và lưu QR</a-button>
                     </a-card>
                 </a-col>
             </a-row>

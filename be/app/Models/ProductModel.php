@@ -14,7 +14,7 @@ class ProductModel extends Model
     protected $allowedFields = [
         'sku', 'name', 'category_id', 'price', 'price_from', 'price_to',
         'show_contact_price', 'avatar', 'image', 'video', 'certificate_file',
-        'description', 'attributes', 'status', 'created_at', 'updated_at'
+        'description', 'attributes', 'status', 'created_at', 'updated_at', 'display_settings'
     ];
 
     protected $useTimestamps = true;

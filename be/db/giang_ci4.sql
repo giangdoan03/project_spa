@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 18, 2025 at 07:53 AM
+-- Generation Time: Apr 23, 2025 at 08:39 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -63,7 +63,7 @@ CREATE TABLE `businesses` (
 --
 
 INSERT INTO `businesses` (`id`, `name`, `tax_code`, `country`, `city`, `district`, `ward`, `address`, `phone`, `email`, `website`, `description`, `career`, `facebook_link`, `other_links`, `logo`, `cover_image`, `library_images`, `video_intro`, `certificate_file`, `lat`, `lng`, `extra_info`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`) VALUES
-(1, 'xxx', '32423234', 'việt nam', 'ha noi', 'ba đình', 'cống vị ba đình', 'xóm liều', '0387409300', 'doangiang665@gmail.com', 'develop.io.vn', 'xxxxx', '2344324', '2343244', '[]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744901364_01e0837e7292c8a6e61c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744563451_a7117bba3d44cadc3e9b.jpg\",\"http:\\/\\/api.giang.test\\/uploads\\/1744563453_5cb3e6869c526c1da590.jpg\"]', '[\"http://api.giang.test/uploads/1744563491_1962941177516d4bd655.jpg\", \"http://api.giang.test/uploads/1744563751_001ce075d9036bb0f4ca.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744563494_effecb725caa5784e805.jpg\",\"http:\\/\\/api.giang.test\\/uploads\\/1744563496_597fcc3d1397bbec08b8.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744564326_ca1e5be2aa270b600c71.txt\"]', NULL, NULL, '[]', 1, '2025-04-13 16:14:26', '2025-04-17 14:49:27', NULL, 0);
+(1, 'xxx', '32423234', 'việt nam', 'ha noi', 'ba đình', 'cống vị ba đình', 'xóm liều', '0387409300', 'doangiang665@gmail.com', 'develop.io.vn', 'xxxxx', '2344324', '2343244', '[]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030227_a219e8b45e3cc12378d8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030230_ffa313e9284e59d34cdf.jpg\"]', '[\"http://assets.giang.test/image/1745030232_e04bed398cc255350886.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030234_7f855fad911edf3ee922.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030254_d9af1ae6c177f1e36141.xls\"]', NULL, NULL, '[]', 1, '2025-04-13 16:14:26', '2025-04-19 02:37:36', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -149,6 +149,71 @@ CREATE TABLE `events` (
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`id`, `user_id`, `name`, `banner`, `location`, `start_time`, `end_time`, `description`, `created_at`, `updated_at`) VALUES
+(1, 1, 'abc', 'http://assets.giang.test/image/1745034978_48fad943a51bce7d7036.png', 'cfs', '2025-04-18 20:55:14', '2025-04-25 20:55:17', 'xxxxxxxxxxxx', '2025-04-19 03:55:21', '2025-04-19 03:55:21');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `permissions`
+--
+
+CREATE TABLE `permissions` (
+  `id` int NOT NULL,
+  `key_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `permissions`
+--
+
+INSERT INTO `permissions` (`id`, `key_name`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'product.view', 'Xem sản phẩm', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(2, 'product.create', 'Tạo sản phẩm', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(3, 'product.update', 'Cập nhật sản phẩm', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(4, 'product.delete', 'Xoá sản phẩm', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(5, 'category.view', 'Xem danh mục', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(6, 'category.create', 'Tạo danh mục', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(7, 'category.update', 'Cập nhật danh mục', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(8, 'category.delete', 'Xoá danh mục', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(9, 'business.view', 'Xem doanh nghiệp', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(10, 'business.create', 'Tạo doanh nghiệp', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(11, 'business.update', 'Cập nhật doanh nghiệp', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(12, 'business.delete', 'Xoá doanh nghiệp', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(13, 'person.view', 'Xem cá nhân', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(14, 'person.create', 'Tạo cá nhân', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(15, 'person.update', 'Cập nhật cá nhân', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(16, 'person.delete', 'Xoá cá nhân', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(17, 'store.view', 'Xem cửa hàng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(18, 'store.create', 'Tạo cửa hàng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(19, 'store.update', 'Cập nhật cửa hàng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(20, 'store.delete', 'Xoá cửa hàng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(21, 'event.view', 'Xem sự kiện', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(22, 'event.create', 'Tạo sự kiện', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(23, 'event.update', 'Cập nhật sự kiện', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(24, 'event.delete', 'Xoá sự kiện', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(25, 'qr.view', 'Xem QR Code', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(26, 'qr.create', 'Tạo QR Code', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(27, 'qr.update', 'Cập nhật QR Code', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(28, 'qr.delete', 'Xoá QR Code', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(29, 'loyalty.view', 'Xem chương trình loyalty', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(30, 'loyalty.create', 'Tạo chương trình loyalty', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(31, 'loyalty.update', 'Cập nhật chương trình loyalty', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(32, 'loyalty.delete', 'Xoá chương trình loyalty', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(33, 'user.view', 'Xem người dùng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(34, 'user.create', 'Tạo người dùng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(35, 'user.update', 'Cập nhật người dùng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(36, 'user.delete', 'Xoá người dùng', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(37, 'setting.view', 'Xem cấu hình', '2025-04-21 00:15:39', '2025-04-21 00:15:39'),
+(38, 'setting.update', 'Cập nhật cấu hình', '2025-04-21 00:15:39', '2025-04-21 00:15:39');
+
 -- --------------------------------------------------------
 
 --
@@ -158,15 +223,30 @@ CREATE TABLE `events` (
 CREATE TABLE `persons` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
+  `first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `video_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `social_links` text COLLATE utf8mb4_unicode_ci,
   `job_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bio` text COLLATE utf8mb4_unicode_ci,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `persons`
+--
+
+INSERT INTO `persons` (`id`, `user_id`, `first_name`, `last_name`, `name`, `avatar`, `video_url`, `phone`, `email`, `website`, `country`, `address`, `social_links`, `job_title`, `bio`, `created_at`, `updated_at`) VALUES
+(1, 1, NULL, NULL, 'doan van giang', 'http://assets.giang.test/image/1745033455_7720ded752b051b0556a.jpg', NULL, '0387409300', 'doangiang665@gmail.com', NULL, NULL, NULL, NULL, 'dev web', 'dev web', '2025-04-19 03:23:06', '2025-04-19 03:23:06'),
+(2, 1, NULL, NULL, 'chaiel', 'http://assets.giang.test/image/1745033604_a1290dbd357f8d81b784.jpg', NULL, '0387409300', 'chaiel@gmail.com', NULL, NULL, NULL, NULL, 'dev', 'dev', '2025-04-19 03:33:52', '2025-04-19 03:33:52');
 
 -- --------------------------------------------------------
 
@@ -193,17 +273,18 @@ CREATE TABLE `products` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int NOT NULL
+  `user_id` int NOT NULL,
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`) VALUES
-(1, '5424324324', 'demo 1', NULL, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/api.giang.test\\/uploads\\/1744901307_ef9b8ab2b7a716fd23a4.jpg\",\"http:\\/\\/api.giang.test\\/uploads\\/1744901309_dbccd7dfeb8ab820267e.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744901312_16008cea4a1823f6c66a.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744901314_111afb26a2830eb50e44.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"9\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-13 16:57:54\", \"product_id\": \"1\", \"updated_at\": \"2025-04-13 16:57:54\"}]', 1, '2025-04-12 17:20:19', '2025-04-17 14:48:37', NULL, 0),
-(2, '23424244', 'demo sp', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/api.giang.test\\/uploads\\/1744901341_31079794724d15195200.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558201_6c7e1800026888e8502b.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558203_da815204a8c6a37bf756.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\": \"8\", \"name\": \"xl\", \"value\": \"120000\", \"created_at\": \"2025-04-13 15:40:30\", \"product_id\": \"2\", \"updated_at\": \"2025-04-13 15:40:30\"}]', 1, '2025-04-13 14:58:36', '2025-04-17 14:49:03', NULL, 0),
-(3, '43243242', 'demo demo', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/api.giang.test\\/uploads\\/1744901328_11e4a89c1d26b9041222.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557402_1b04c1623180aff1c003.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557404_8f77109b3c2a6fc188cf.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"3\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-13 15:17:23\", \"product_id\": \"3\", \"updated_at\": \"2025-04-13 15:17:23\"}, {\"id\": \"4\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-13 15:17:23\", \"product_id\": \"3\", \"updated_at\": \"2025-04-13 15:17:23\"}]', 1, '2025-04-13 15:17:23', '2025-04-17 14:48:50', NULL, 0);
+INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`) VALUES
+(1, '5424324324', 'demo 1', NULL, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"30\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-20 04:06:33\", \"product_id\": \"1\", \"updated_at\": \"2025-04-20 04:06:33\"}]', 1, '2025-04-12 17:20:19', '2025-04-20 04:09:19', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
+(2, '23424244', 'demo sp', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\": \"18\", \"name\": \"xl\", \"value\": \"120000\", \"created_at\": \"2025-04-19 02:36:29\", \"product_id\": \"2\", \"updated_at\": \"2025-04-19 02:36:29\"}]', 1, '2025-04-13 14:58:36', '2025-04-20 03:45:46', NULL, 0, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
+(3, '43243242', 'demo demo', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 1, '2025-04-13 15:17:23', '2025-04-20 04:09:53', NULL, 0, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}');
 
 -- --------------------------------------------------------
 
@@ -225,10 +306,10 @@ CREATE TABLE `product_attributes` (
 --
 
 INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_at`, `updated_at`) VALUES
-(10, 1, 'XL', '342424324', '2025-04-17 14:48:37', '2025-04-17 14:48:37'),
-(11, 3, 'xl ', '12000', '2025-04-17 14:48:50', '2025-04-17 14:48:50'),
-(12, 3, 'xxl', '20000', '2025-04-17 14:48:50', '2025-04-17 14:48:50'),
-(13, 2, 'xl', '120000', '2025-04-17 14:49:03', '2025-04-17 14:49:03');
+(22, 2, 'xl', '120000', '2025-04-20 03:45:46', '2025-04-20 03:45:46'),
+(31, 1, 'XL', '342424324', '2025-04-20 04:09:19', '2025-04-20 04:09:19'),
+(32, 3, 'xl ', '12000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
+(33, 3, 'xxl', '20000', '2025-04-20 04:09:53', '2025-04-20 04:09:53');
 
 -- --------------------------------------------------------
 
@@ -252,6 +333,55 @@ CREATE TABLE `qr_codes` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` int NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'super admin', 'Toàn quyền', '2025-04-21 00:06:00', '2025-04-21 00:06:00'),
+(2, 'admin', 'Quản trị viên', '2025-04-21 00:06:00', '2025-04-21 00:06:00'),
+(3, 'user', 'Người dùng', '2025-04-21 00:06:00', '2025-04-21 00:06:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `role_permissions`
+--
+
+CREATE TABLE `role_permissions` (
+  `id` int NOT NULL,
+  `role_id` int NOT NULL,
+  `permission_id` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `role_permissions`
+--
+
+INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`, `created_at`) VALUES
+(4, 3, 1, '2025-04-21 00:35:31'),
+(5, 3, 2, '2025-04-21 00:35:31'),
+(6, 3, 3, '2025-04-21 00:35:31'),
+(7, 1, 1, '2025-04-21 21:48:03'),
+(8, 1, 2, '2025-04-21 21:48:03'),
+(9, 1, 7, '2025-04-21 21:48:03'),
+(10, 1, 18, '2025-04-21 21:48:03');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `stores`
 --
 
@@ -266,8 +396,17 @@ CREATE TABLE `stores` (
   `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `status` tinyint(1) DEFAULT '1',
+  `product_ids` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `stores`
+--
+
+INSERT INTO `stores` (`id`, `user_id`, `name`, `logo`, `address`, `phone`, `email`, `website`, `description`, `created_at`, `updated_at`, `status`, `product_ids`) VALUES
+(1, 1, 'cửa hàng thực phẩm sạch', 'http://assets.giang.test/image/1745041561_cfb1a46ffe8605a53362.png', 'acb xyz', '0387409300', 'doangiang665@gmail.com', NULL, '<p>xxxxxxxxxxxxxxxxxxxxxx zzzzzzzzzzzzzzzzzzz</p>', '2025-04-19 04:05:19', '2025-04-19 06:04:58', 1, '[\"1\",\"2\",\"3\"]');
 
 -- --------------------------------------------------------
 
@@ -361,15 +500,17 @@ CREATE TABLE `users` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'user'
+  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'user',
+  `role_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `updated_at`, `name`, `phone`, `avatar`, `role`) VALUES
-(1, 'demo@example.com', '$2y$10$X0AYs8k7Dw8fbMqF9DzxiuBhQzGzu.ehudtC.2SWOjA4tsTZK0sYG', '2025-04-07 18:49:01', '2025-04-07 18:49:52', 'Demo User', '0123456789', 'avatar.png', 'user');
+INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `updated_at`, `name`, `phone`, `avatar`, `role`, `role_id`) VALUES
+(1, 'demo@example.com', '$2y$10$X0AYs8k7Dw8fbMqF9DzxiuBhQzGzu.ehudtC.2SWOjA4tsTZK0sYG', '2025-04-07 18:49:01', '2025-04-20 23:49:00', 'Demo User', '0123456789', 'avatar.png', 'user', 2),
+(3, 'superadmin@example.com', '$2y$10$X0AYs8k7Dw8fbMqF9DzxiuBhQzGzu.ehudtC.2SWOjA4tsTZK0sYG', '2025-04-20 14:02:38', '2025-04-21 00:21:49', 'Super Admin', '0988888888', NULL, 'super admin', 1);
 
 --
 -- Indexes for dumped tables
@@ -401,6 +542,13 @@ ALTER TABLE `events`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `permissions`
+--
+ALTER TABLE `permissions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `key_name` (`key_name`);
+
+--
 -- Indexes for table `persons`
 --
 ALTER TABLE `persons`
@@ -425,6 +573,21 @@ ALTER TABLE `product_attributes`
 --
 ALTER TABLE `qr_codes`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `role_id` (`role_id`,`permission_id`),
+  ADD KEY `permission_id` (`permission_id`);
 
 --
 -- Indexes for table `stores`
@@ -499,13 +662,19 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `permissions`
+--
+ALTER TABLE `permissions`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `persons`
 --
 ALTER TABLE `persons`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -517,7 +686,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `qr_codes`
@@ -526,10 +695,22 @@ ALTER TABLE `qr_codes`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `surveys`
@@ -565,7 +746,7 @@ ALTER TABLE `survey_questions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
@@ -588,6 +769,13 @@ ALTER TABLE `products`
 --
 ALTER TABLE `product_attributes`
   ADD CONSTRAINT `product_attributes_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  ADD CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `survey_answers`

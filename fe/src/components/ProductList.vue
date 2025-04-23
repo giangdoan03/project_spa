@@ -60,11 +60,27 @@ const columns = [
     { title: 'Ảnh đại diện', dataIndex: 'avatar', key: 'avatar' },
     { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name' },
     { title: 'SKU', dataIndex: 'sku', key: 'sku' },
-    { title: 'Giá', dataIndex: 'price', key: 'price' },
-    { title: 'Ngày tạo', dataIndex: 'created_at', key: 'created_at' },
-    { title: 'Ngày cập nhật', dataIndex: 'updated_at', key: 'updated_at' },
+    {
+        title: 'Giá',
+        dataIndex: 'price',
+        key: 'price',
+        customRender: ({ text }) => formatCurrency(text),
+    },
+    {
+        title: 'Ngày tạo',
+        dataIndex: 'created_at',
+        key: 'created_at',
+        customRender: ({ text }) => formatDate(text),
+    },
+    {
+        title: 'Ngày cập nhật',
+        dataIndex: 'updated_at',
+        key: 'updated_at',
+        customRender: ({ text }) => formatDate(text),
+    },
     { title: 'Hành động', key: 'action' },
 ]
+
 
 // Fetch data
 const fetchProducts = async () => {
@@ -113,6 +129,27 @@ const parseJson = (value) => {
     } catch {
         return []
     }
+}
+
+// Format tiền VND
+const formatCurrency = (value) => {
+    if (!value) return ''
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+}
+
+// Format ngày giờ Việt Nam
+const formatDate = (value) => {
+    if (!value) return ''
+    const date = new Date(value)
+    return date.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+    })
 }
 
 // Init

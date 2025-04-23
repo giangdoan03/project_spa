@@ -9,111 +9,120 @@
         @breakpoint="handleBreakpoint"
         @collapse="handleCollapse"
     >
-        <div class="logo" />
+        <div class="logo"/>
         <a-menu
             :selectedKeys="selectedKeys"
             :openKeys="openKeys"
             theme="dark"
             mode="inline"
             @openChange="val => openKeys = val"
+            @select="handleSelect"
         >
-            <a-menu-item key="dashboard" @click="goTo('/dashboard')">
-                <PieChartOutlined />
+            <a-menu-item key="dashboard">
+                <PieChartOutlined/>
                 <span>Tổng quan</span>
             </a-menu-item>
 
             <a-sub-menu key="quan-ly-doi-tuong">
                 <template #title>
           <span>
-            <AppstoreOutlined />
+            <AppstoreOutlined/>
             <span>Quản lý đối tượng</span>
           </span>
                 </template>
 
-                <a-menu-item key="san-pham" @click="goTo('/products')">
-                    <ShoppingOutlined />
+                <a-menu-item key="san-pham">
+                    <ShoppingOutlined/>
                     <span>Sản phẩm</span>
                 </a-menu-item>
 
-                <a-menu-item key="doanh-nghiep-ca-nhan" @click="goTo('/businesses')">
-                    <BankOutlined />
+                <a-menu-item key="doanh-nghiep-ca-nhan">
+                    <BankOutlined/>
                     <span>Doanh nghiệp</span>
                 </a-menu-item>
 
-                <a-menu-item key="ca-nhan" @click="goTo('/persons')">
-                    <UserOutlined />
+                <a-menu-item key="ca-nhan">
+                    <UserOutlined/>
                     <span>Cá nhân</span>
                 </a-menu-item>
 
-                <a-menu-item key="cua-hang" @click="goTo('/stores')">
-                    <ShopOutlined />
+                <a-menu-item key="cua-hang">
+                    <ShopOutlined/>
                     <span>Cửa hàng</span>
                 </a-menu-item>
 
-                <a-menu-item key="su-kien" @click="goTo('/events')">
-                    <CalendarOutlined />
+                <a-menu-item key="su-kien">
+                    <CalendarOutlined/>
                     <span>Sự kiện</span>
                 </a-menu-item>
             </a-sub-menu>
 
-            <a-menu-item key="qr-code-marketing" @click="goTo('/my-qr-codes')">
-                <QrcodeOutlined />
+            <a-menu-item key="qr-code-marketing">
+                <QrcodeOutlined/>
                 <span>QR Code Marketing</span>
             </a-menu-item>
 
             <a-sub-menu key="chuong-trinh-loyalty">
                 <template #title>
           <span>
-            <GiftOutlined />
+            <GiftOutlined/>
             <span>Chương trình loyalty</span>
           </span>
                 </template>
-                <a-menu-item key="chuong-trinh" @click="goTo('/loyalty/programs')">
-                    <TrophyOutlined />
+
+                <a-menu-item key="chuong-trinh">
+                    <TrophyOutlined/>
                     <span>Chương trình</span>
                 </a-menu-item>
-                <a-menu-item key="qua-tang" @click="goTo('/loyalty/gifts')">
-                    <GiftOutlined />
+
+                <a-menu-item key="qua-tang">
+                    <GiftOutlined/>
                     <span>Quà tặng</span>
                 </a-menu-item>
-                <a-menu-item key="goi-voucher" @click="goTo('/loyalty/vouchers')">
-                    <ShoppingCartOutlined />
+
+                <a-menu-item key="goi-voucher">
+                    <ShoppingCartOutlined/>
                     <span>Gói voucher</span>
                 </a-menu-item>
-                <a-menu-item key="lich-su-nguoi-choi" @click="goTo('/loyalty/history')">
-                    <HistoryOutlined />
+
+                <a-menu-item key="lich-su-nguoi-choi">
+                    <HistoryOutlined/>
                     <span>Lịch sử người chơi</span>
                 </a-menu-item>
             </a-sub-menu>
 
-            <a-menu-item key="trang-tu-thiet-ke" @click="goTo('/custom-pages')">
-                <EditOutlined />
+            <a-menu-item key="trang-tu-thiet-ke">
+                <EditOutlined/>
                 <span>Trang tự thiết kế</span>
             </a-menu-item>
 
-            <a-menu-item key="lich-su-quet" @click="goTo('/scan-history')">
-                <SearchOutlined />
+            <a-menu-item key="lich-su-quet">
+                <SearchOutlined/>
                 <span>Lịch sử quét</span>
             </a-menu-item>
 
-            <a-menu-item key="lich-su-checkin" @click="goTo('/checkin-history')">
-                <EnvironmentOutlined />
+            <a-menu-item key="lich-su-checkin">
+                <EnvironmentOutlined/>
                 <span>Lịch sử checkin</span>
             </a-menu-item>
 
-            <a-menu-item key="quan-ly-khach-hang" @click="goTo('/customers')">
-                <TeamOutlined />
+            <a-menu-item key="quan-ly-khach-hang">
+                <TeamOutlined/>
                 <span>Quản lý khách hàng</span>
             </a-menu-item>
 
-            <a-menu-item key="cau-hinh" @click="goTo('/settings')">
-                <SettingOutlined />
+            <a-menu-item key="cau-hinh">
+                <SettingOutlined/>
                 <span>Cấu hình</span>
             </a-menu-item>
 
-            <a-menu-item key="lich-su-mua-goi" @click="goTo('/purchase-history')">
-                <ClockCircleOutlined />
+            <a-menu-item key="lich-su-mua-goi">
+                <ClockCircleOutlined/>
                 <span>Lịch sử mua gói</span>
+            </a-menu-item>
+            <a-menu-item key="quan-ly-user">
+                <TeamOutlined />
+                <span>Quản lý người dùng</span>
             </a-menu-item>
         </a-menu>
     </a-layout-sider>
@@ -127,8 +136,8 @@ import {
     UserOutlined, ShopOutlined, CalendarOutlined
 } from '@ant-design/icons-vue'
 
-import { useRouter, useRoute } from 'vue-router'
-import { ref, watch, onMounted } from 'vue'
+import {useRouter, useRoute} from 'vue-router'
+import {ref, watch, onMounted} from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -159,7 +168,8 @@ const pathToKeyMap = {
     '/checkin-history': 'lich-su-checkin',
     '/customers': 'quan-ly-khach-hang',
     '/settings': 'cau-hinh',
-    '/purchase-history': 'lich-su-mua-goi'
+    '/purchase-history': 'lich-su-mua-goi',
+    '/permissions': 'quan-ly-user'
 }
 
 const keyToParentMap = {
@@ -175,13 +185,31 @@ const keyToParentMap = {
 }
 
 const updateSelectedAndOpenKeys = () => {
-    const key = pathToKeyMap[route.path] || ''
-    selectedKeys.value = [key]
-    openKeys.value = keyToParentMap[key] ? [keyToParentMap[key]] : []
+    const currentPath = route.path
+
+    // Tìm path phù hợp nhất bằng startsWith
+    const matchedEntry = Object.entries(pathToKeyMap).find(([path]) =>
+        currentPath.startsWith(path)
+    )
+
+    const matchedKey = matchedEntry?.[1] || ''
+    selectedKeys.value = [matchedKey]
+
+    const parentKey = keyToParentMap[matchedKey]
+    openKeys.value = parentKey ? [parentKey] : []
 }
 
-watch(() => route.path, updateSelectedAndOpenKeys)
+
 onMounted(updateSelectedAndOpenKeys)
+watch(() => route.path, updateSelectedAndOpenKeys)
+
+const handleSelect = ({key}) => {
+    // Gán selected ngay lập tức để tránh nháy
+    selectedKeys.value = [key]
+
+    const path = Object.entries(pathToKeyMap).find(([path, menuKey]) => menuKey === key)?.[0]
+    if (path) router.push(path)
+}
 
 const handleBreakpoint = (broken) => {
     emit('update:collapsed', broken)
@@ -189,10 +217,6 @@ const handleBreakpoint = (broken) => {
 
 const handleCollapse = (collapsed) => {
     emit('update:collapsed', collapsed)
-}
-
-const goTo = (path) => {
-    router.push(path)
 }
 </script>
 

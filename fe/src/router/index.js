@@ -16,6 +16,18 @@ import BusinessForm from '../components/BusinessForm.vue'
 import MyQRCodes from '../components/MyQRCodes.vue'
 import QRCreateForm from '../components/QRCreateForm.vue'
 
+import PersonList from '../components/PersonList.vue'
+import PersonForm from '../components/PersonForm.vue'
+
+import EventList from '../components/EventList.vue'
+import EventForm from '../components/EventForm.vue'
+
+import StoreList from '../components/StoreList.vue'
+import StoreForm from '../components/StoreForm.vue'
+
+import UserPermissionManager from '../components/UserPermissionManager.vue'
+
+
 const routes = [
     {
         path: '/',
@@ -34,16 +46,29 @@ const routes = [
 
             // QR Codes
             { path: 'my-qr-codes', component: MyQRCodes },
-            { path: 'my-qr-codes/create', component: QRCreateForm }
-        ]
-    },
-    {
-        path: '/businesses',
-        component: Layout,
-        children: [
-            { path: '', component: BusinessList },
-            { path: 'create', component: BusinessForm },
-            { path: ':id/edit', component: BusinessForm }
+            { path: 'my-qr-codes/create', component: QRCreateForm },
+
+            // Businesses
+            { path: 'businesses', component: BusinessList },
+            { path: 'businesses/create', component: BusinessForm },
+            { path: 'businesses/:id/edit', component: BusinessForm },
+
+            // Persons
+            { path: 'persons', component: PersonList },
+            { path: 'persons/create', component: PersonForm },
+            { path: 'persons/:id/edit', component: PersonForm },
+
+            // Events ✅ mới thêm
+            { path: 'events', component: EventList },
+            { path: 'events/create', component: EventForm },
+            { path: 'events/:id/edit', component: EventForm },
+
+            // Stores ✅ mới thêm
+            { path: 'stores', component: StoreList },
+            { path: 'stores/create', component: StoreForm },
+            { path: 'stores/:id/edit', component: StoreForm },
+
+            { path: 'permissions', component: UserPermissionManager }
         ]
     }
 ]

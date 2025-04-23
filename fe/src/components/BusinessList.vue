@@ -51,6 +51,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBusinesses, deleteBusiness as apiDeleteBusiness } from '../api/business'
 import { message } from 'ant-design-vue'
+import { formatDate } from '../utils/formUtils' // hoặc '../utils/date' tùy vào vị trí file
 
 const router = useRouter()
 const businesses = ref([])
@@ -64,8 +65,13 @@ const columns = [
     { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
     { title: 'Trạng thái', dataIndex: 'status', key: 'status' },
     { title: 'Khu vực', dataIndex: 'city', key: 'city' },
-    { title: 'Ngày tạo', dataIndex: 'created_at', key: 'created_at' },
-    { title: 'Thời gian cập nhật', dataIndex: 'updated_at', key: 'updated_at' },
+    {
+        title: 'Ngày tạo',
+        dataIndex: 'created_at',
+        key: 'created_at',
+        customRender: ({ text }) => formatDate(text)
+    },
+    { title: 'Thời gian cập nhật', dataIndex: 'updated_at', key: 'updated_at', customRender: ({ text }) => formatDate(text) },
     { title: 'Hành động', key: 'action' },
 ]
 

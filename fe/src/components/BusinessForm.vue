@@ -126,7 +126,7 @@
             </a-form-item>
 
             <a-form-item label="Mô tả doanh nghiệp">
-                <a-textarea v-model:value="form.description" rows="4" placeholder="Mô tả doanh nghiệp"/>
+                <a-textarea v-model:value="form.description" :rows="4" placeholder="Mô tả doanh nghiệp"/>
             </a-form-item>
 
             <a-form-item label="Nghề nghiệp">
@@ -138,7 +138,7 @@
             </a-form-item>
 
             <a-form-item label="Thêm liên kết">
-                <a-textarea v-model:value="form.other_links" rows="3" placeholder="JSON link liên kết mạng xã hội"/>
+                <a-textarea v-model:value="otherLinksText" :rows="3" placeholder="Mỗi dòng 1 liên kết"/>
             </a-form-item>
 
             <a-form-item label="Trạng thái">
@@ -171,6 +171,7 @@ const router = useRouter()
 const route = useRoute()
 const loading = ref(false)
 const isEditMode = !!route.params.id
+const otherLinksText = ref('')
 
 const form = ref({
     name: '', tax_code: '', country: '', city: '', district: '', ward: '', address: '',
@@ -196,6 +197,10 @@ const fetchBusiness = async () => {
     try {
         const { data } = await getBusiness(route.params.id)
         Object.assign(form.value, data)
+
+        otherLinksText.value = Array.isArray(data.other_links)
+            ? data.other_links.join('\n')
+            : (data.other_links || '')
 
         const loadFileList = (field, list) => {
             let files = typeof list === 'string' ? JSON.parse(list) : list
@@ -264,6 +269,13 @@ const handlePreview = (file) => {
 // Submit form
 const handleSubmit = async () => {
     loading.value = true
+
+    // ✅ Chuyển từ textarea (dạng chuỗi) thành mảng
+    form.value.other_links = otherLinksText.value
+        .split('\n')                   // tách từng dòng
+        .map(s => s.trim())            // xóa khoảng trắng đầu/cuối
+        .filter(Boolean)               // bỏ dòng rỗng
+
     try {
         if (isEditMode) {
             await updateBusiness(route.params.id, form.value)
@@ -279,6 +291,7 @@ const handleSubmit = async () => {
         loading.value = false
     }
 }
+
 
 const goBack = () => router.push('/businesses')
 

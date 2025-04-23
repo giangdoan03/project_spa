@@ -8,37 +8,38 @@ class UploadController extends ResourceController
 {
     public function upload()
     {
+        // Giới hạn chỉ upload từ domain api.giang.test
+        $allowedOrigins = [
+            'http://giang.test:5173',   // Frontend đang chạy local
+            'http://api.giang.test'     // Chính server API của bạn
+        ];
+
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
+
+        if ($origin && !in_array($origin, $allowedOrigins)) {
+            return $this->failForbidden('Không được phép upload từ domain này.');
+        }
         $file = $this->request->getFile('file');
 
         if (!$file || !$file->isValid()) {
             return $this->fail('Không tìm thấy file hoặc file không hợp lệ.');
         }
 
-        // Tạo folder upload nếu chưa có
-        $uploadPath = WRITEPATH . 'uploads/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
+        // Thư mục upload ngoài project
+        $customUploadDir = 'D:/laragon/www/assets/image/';
+        if (!is_dir($customUploadDir)) {
+            mkdir($customUploadDir, 0777, true);
         }
 
-        // Đổi tên file cho đẹp
         $newName = $file->getRandomName();
+        $file->move($customUploadDir, $newName);
 
-        // Move file vào writable/uploads
-        $file->move($uploadPath, $newName);
-
-        // Copy thêm vào public/uploads để browser truy cập được
-        $publicPath = FCPATH . 'uploads/';
-        if (!is_dir($publicPath)) {
-            mkdir($publicPath, 0777, true);
-        }
-        copy($uploadPath . $newName, $publicPath . $newName);
-
-        // Trả về URL public
-        $publicUrl = base_url('uploads/' . $newName);
+        $publicUrl = 'http://assets.giang.test/image/' . $newName;
 
         return $this->respond([
             'url' => $publicUrl
         ]);
     }
+
 
 }

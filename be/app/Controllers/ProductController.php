@@ -96,6 +96,7 @@ class ProductController extends ResourceController
             'status' => !empty($data['status']) ? 1 : 0,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
+            'display_settings' => json_encode($data['display_settings'] ?? []), // ✅ thêm dòng này
         ];
 
         // Encode các field mảng
@@ -158,6 +159,13 @@ class ProductController extends ResourceController
         $arrayFields = ['avatar', 'image', 'video', 'certificate_file', 'attributes'];
         foreach ($arrayFields as $field) {
             $productData[$field] = json_encode($data[$field] ?? []);
+        }
+
+        // ✅ Xử lý display_settings nếu là object thì encode, nếu đã là string thì giữ nguyên
+        if (!empty($data['display_settings'])) {
+            $productData['display_settings'] = is_array($data['display_settings'])
+                ? json_encode($data['display_settings'])
+                : $data['display_settings'];
         }
 
         // Cập nhật sản phẩm
