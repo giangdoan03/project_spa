@@ -4,19 +4,23 @@ namespace App\Controllers;
 
 use App\Models\EventModel;
 use CodeIgniter\RESTful\ResourceController;
+use App\Traits\AuthTrait;
 
 class EventController extends ResourceController
 {
+    use AuthTrait;
+
     protected $modelName = EventModel::class;
     protected $format    = 'json';
 
     public function index()
     {
+        $userId = $this->getUserId();
         $perPage = $this->request->getGet('per_page') ?? 10;
         $page = $this->request->getGet('page') ?? 1;
         $search = $this->request->getGet('search');
 
-        $builder = $this->model;
+        $builder = $this->model->where('user_id', $userId);
 
         if ($search) {
             $builder = $builder->like('name', $search);
@@ -37,18 +41,22 @@ class EventController extends ResourceController
 
     public function show($id = null)
     {
-        $data = $this->model->find($id);
+        $userId = $this->getUserId();
+        $data = $this->model->where('user_id', $userId)->find($id);
         if (!$data) return $this->failNotFound('Không tìm thấy sự kiện');
         return $this->respond($data);
     }
 
     public function create()
     {
+        $userId = $this->getUserId();
         $data = $this->request->getJSON(true);
 
-        if (!isset($data['user_id']) || !isset($data['name'])) {
-            return $this->failValidationErrors('Thiếu user_id hoặc name');
+        if (!isset($data['name'])) {
+            return $this->failValidationErrors('Thiếu name');
         }
+
+        $data['user_id'] = $userId;
 
         $this->model->insert($data);
         $data['id'] = $this->model->getInsertID();
@@ -57,8 +65,10 @@ class EventController extends ResourceController
 
     public function update($id = null)
     {
+        $userId = $this->getUserId();
         $data = $this->request->getJSON(true);
-        $existing = $this->model->find($id);
+        $existing = $this->model->where('user_id', $userId)->find($id);
+
         if (!$existing) return $this->failNotFound('Không tìm thấy sự kiện');
 
         $this->model->update($id, $data);
@@ -67,7 +77,9 @@ class EventController extends ResourceController
 
     public function delete($id = null)
     {
-        $existing = $this->model->find($id);
+        $userId = $this->getUserId();
+        $existing = $this->model->where('user_id', $userId)->find($id);
+
         if (!$existing) return $this->failNotFound('Không tìm thấy sự kiện');
 
         $this->model->delete($id);

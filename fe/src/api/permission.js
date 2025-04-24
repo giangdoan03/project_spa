@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL: 'http://api.giang.test/api'
+    baseURL: 'http://api.giang.test/api',
+    withCredentials: true, // 👈 Bắt buộc để giữ session
 })
 
 // Lấy danh sách vai trò (roles)

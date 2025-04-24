@@ -14,7 +14,7 @@ class BusinessModel extends Model
         'facebook_link', 'other_links', 'logo', 'cover_image',
         'library_images', 'video_intro', 'certificate_file',
         'lat', 'lng', 'extra_info', 'status',
-        'created_at', 'updated_at', 'deleted_at'
+        'created_at', 'updated_at', 'deleted_at', 'user_id'
     ];
 
     protected $useTimestamps = true;

@@ -4,39 +4,51 @@ namespace App\Controllers;
 
 use App\Models\PersonModel;
 use CodeIgniter\RESTful\ResourceController;
+use App\Traits\AuthTrait;
 
 class PersonController extends ResourceController
 {
+    use AuthTrait;
+
     protected $modelName = PersonModel::class;
     protected $format = 'json';
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        $userId = $this->getUserId();
+        $data = $this->model->where('user_id', $userId)->findAll();
+        return $this->respond($data);
     }
 
     public function show($id = null)
     {
-        $data = $this->model->find($id);
+        $userId = $this->getUserId();
+        $data = $this->model->where('user_id', $userId)->find($id);
         return $data ? $this->respond($data) : $this->failNotFound('Không tìm thấy cá nhân');
     }
 
     public function create()
     {
         $data = $this->request->getJSON(true);
+        $userId = $this->getUserId();
 
-        if (!isset($data['user_id']) || !isset($data['name'])) {
-            return $this->failValidationErrors('Thiếu user_id hoặc name');
+        if (!isset($data['name'])) {
+            return $this->failValidationErrors('Thiếu name');
         }
 
+        $data['user_id'] = $userId;
         $id = $this->model->insert($data);
+
         return $this->respondCreated(['id' => $id]);
     }
 
     public function update($id = null)
     {
+        $userId = $this->getUserId();
         $data = $this->request->getJSON(true);
-        if (!$this->model->find($id)) {
+        $person = $this->model->where('user_id', $userId)->find($id);
+
+        if (!$person) {
             return $this->failNotFound('Không tìm thấy cá nhân');
         }
 
@@ -46,7 +58,10 @@ class PersonController extends ResourceController
 
     public function delete($id = null)
     {
-        if (!$this->model->find($id)) {
+        $userId = $this->getUserId();
+        $person = $this->model->where('user_id', $userId)->find($id);
+
+        if (!$person) {
             return $this->failNotFound('Không tìm thấy cá nhân');
         }
 
