@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 24, 2025 at 01:36 AM
+-- Generation Time: Apr 24, 2025 at 02:15 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -285,7 +285,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `id_businesses`, `id_stores`, `id_surveys`, `sku`, `name`, `category_id`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`) VALUES
-(1, NULL, NULL, NULL, '5424324324', 'demo 1', NULL, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"30\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-20 04:06:33\", \"product_id\": \"1\", \"updated_at\": \"2025-04-20 04:06:33\"}]', 1, '2025-04-12 17:20:19', '2025-04-20 04:09:19', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
+(1, NULL, NULL, NULL, '5424324324', 'demo 1', 1, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"30\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-20 04:06:33\", \"product_id\": \"1\", \"updated_at\": \"2025-04-20 04:06:33\"}]', 1, '2025-04-12 17:20:19', '2025-04-24 08:51:20', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
 (2, NULL, NULL, NULL, '23424244', 'demo sp', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\": \"22\", \"name\": \"xl\", \"value\": \"120000\", \"created_at\": \"2025-04-20 03:45:46\", \"product_id\": \"2\", \"updated_at\": \"2025-04-20 03:45:46\"}]', 1, '2025-04-13 14:58:36', '2025-04-23 14:42:04', NULL, 0, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
 (3, NULL, NULL, NULL, '43243242', 'demo demo', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 1, '2025-04-13 15:17:23', '2025-04-20 04:09:53', NULL, 0, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}');
 
@@ -529,8 +529,7 @@ ALTER TABLE `businesses`
 -- Indexes for table `business_extra_info`
 --
 ALTER TABLE `business_extra_info`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `business_id` (`business_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `categories`
@@ -548,8 +547,7 @@ ALTER TABLE `events`
 -- Indexes for table `permissions`
 --
 ALTER TABLE `permissions`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `key_name` (`key_name`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `persons`
@@ -561,8 +559,7 @@ ALTER TABLE `persons`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `category_id` (`category_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `product_attributes`
@@ -581,16 +578,13 @@ ALTER TABLE `qr_codes`
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `role_id` (`role_id`,`permission_id`),
-  ADD KEY `permission_id` (`permission_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `stores`
@@ -608,9 +602,7 @@ ALTER TABLE `surveys`
 -- Indexes for table `survey_answers`
 --
 ALTER TABLE `survey_answers`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `survey_id` (`survey_id`),
-  ADD KEY `question_id` (`question_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `survey_groups`
@@ -622,22 +614,19 @@ ALTER TABLE `survey_groups`
 -- Indexes for table `survey_options`
 --
 ALTER TABLE `survey_options`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `question_id` (`question_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `survey_questions`
 --
 ALTER TABLE `survey_questions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `survey_id` (`survey_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -756,48 +745,10 @@ ALTER TABLE `users`
 --
 
 --
--- Constraints for table `business_extra_info`
---
-ALTER TABLE `business_extra_info`
-  ADD CONSTRAINT `business_extra_info_ibfk_1` FOREIGN KEY (`business_id`) REFERENCES `businesses` (`id`);
-
---
--- Constraints for table `products`
---
-ALTER TABLE `products`
-  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
-
---
 -- Constraints for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
   ADD CONSTRAINT `product_attributes_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
-
---
--- Constraints for table `role_permissions`
---
-ALTER TABLE `role_permissions`
-  ADD CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `survey_answers`
---
-ALTER TABLE `survey_answers`
-  ADD CONSTRAINT `survey_answers_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`),
-  ADD CONSTRAINT `survey_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `survey_questions` (`id`);
-
---
--- Constraints for table `survey_options`
---
-ALTER TABLE `survey_options`
-  ADD CONSTRAINT `survey_options_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `survey_questions` (`id`);
-
---
--- Constraints for table `survey_questions`
---
-ALTER TABLE `survey_questions`
-  ADD CONSTRAINT `survey_questions_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
