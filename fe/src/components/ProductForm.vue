@@ -7,16 +7,16 @@
                     <!-- Ảnh đại diện -->
                     <a-form-item label="Ảnh đại diện của sản phẩm">
                         <a-upload
-                                list-type="picture-card"
-                                :file-list="avatarFileList"
-                                :on-preview="handlePreview"
-                                :on-remove="(file) => handleRemoveFile('avatar', file)"
-                                :before-upload="(file) => handleBeforeUploadMultiple('avatar', file)"
-                                multiple
+                            list-type="picture-card"
+                            :file-list="avatarFileList"
+                            :on-preview="handlePreview"
+                            :on-remove="(file) => handleRemoveFile('avatar', file)"
+                            :before-upload="(file) => handleBeforeUploadSingle('avatar', file)"
+                            :max-count="1"
                         >
-                            <div>
-                                <upload-outlined/>
-                                <div style="margin-top: 8px">Upload</div>
+                            <div v-if="avatarFileList.length === 0">
+                                <upload-outlined />
+                                <div style="margin-top: 8px">Ảnh</div>
                             </div>
                         </a-upload>
                     </a-form-item>
@@ -289,8 +289,14 @@
                                 </div>
                             </div>
                             <div class="iphone-screen">
-                                <component v-if="AsyncTemplate" :is="AsyncTemplate" :title="form.name"
-                                           :description="form.description" :thumbnail="form.image?.[0]"/>
+                                <component
+                                    :is="AsyncTemplate"
+                                    :product="form"
+                                    :business="businessList"
+                                    :store="storeList"
+                                    :all-businesses="allBusinesses"
+                                    :all-stores="allStores"
+                                />
                             </div>
                         </div>
                     </a-col>
@@ -622,6 +628,23 @@
         lists[field]?.value.push(file)
     }
 
+    const handleBeforeUploadSingle = async (field, file) => {
+        const hide = message.loading('Đang tải lên...', 0)
+        try {
+            const response = await uploadFile(file)
+            const url = response.data.url
+            form.value[field] = url // 👈 chỉ gán 1 URL duy nhất cho field
+            updateFileList(field, url)
+            message.success('Tải lên thành công!')
+        } catch (error) {
+            message.error('Tải lên thất bại!')
+        } finally {
+            hide()
+        }
+        return false
+    }
+
+
     const handleBeforeUploadMultiple = async (field, file) => {
         const hide = message.loading('Đang tải lên...', 0)
         try {
@@ -640,15 +663,22 @@
     }
 
     const handleRemoveFile = (field, file) => {
+        if (!Array.isArray(form.value[field])) {
+            form.value[field] = []
+        }
+
         form.value[field] = form.value[field].filter(url => url !== file.url)
+
         const lists = {
             avatar: avatarFileList,
             image: imageFileList,
             video: videoFileList,
             certificate_file: certificateFileList,
         }
+
         lists[field].value = lists[field].value.filter(item => item.url !== file.url)
     }
+
 
     const handlePreview = (file) => {
         previewImage.value = file.url || file.thumbUrl
@@ -732,6 +762,7 @@
         await fetchAllProducts()
         await fetchAllBusinesses()
         await fetchAllStores()
+        await fetchCategories()
 
         await nextTick() // Đảm bảo DOM đã render
 

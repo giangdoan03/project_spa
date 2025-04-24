@@ -17,8 +17,8 @@
             <template #bodyCell="{ column, record }">
                 <!-- Cột ảnh đại diện -->
                 <template v-if="column.key === 'avatar'">
-                    <img v-if="record.avatar && Array.isArray(parseJson(record.avatar)) && parseJson(record.avatar).length"
-                         :src="parseJson(record.avatar)[0]"
+                    <img v-if="getAvatarUrl(record.avatar)"
+                         :src="getAvatarUrl(record.avatar)"
                          alt="Avatar"
                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
                 </template>
@@ -125,6 +125,23 @@ const fetchProducts = async () => {
     } finally {
         loading.value = false
     }
+}
+
+
+const getAvatarUrl = (avatar) => {
+    if (!avatar) return null
+    try {
+        const parsed = JSON.parse(avatar)
+        if (Array.isArray(parsed) && parsed.length) {
+            return parsed[0]
+        } else if (typeof parsed === 'string') {
+            return parsed
+        }
+    } catch {
+        // Nếu không phải JSON, trả về trực tiếp
+        return avatar.replace(/(^"|"$)/g, '') // Loại bỏ dấu nháy nếu có
+    }
+    return null
 }
 
 
