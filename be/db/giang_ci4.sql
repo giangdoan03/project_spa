@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Apr 24, 2025 at 02:15 AM
--- Server version: 8.0.30
--- PHP Version: 8.1.10
+-- Host: 127.0.0.1
+-- Generation Time: Apr 24, 2025 at 06:40 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,34 +28,34 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `businesses` (
-  `id` bigint NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tax_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ward` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `career` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `facebook_link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `other_links` json DEFAULT NULL,
-  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `library_images` json DEFAULT NULL,
-  `video_intro` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `certificate_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `tax_code` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `district` varchar(100) DEFAULT NULL,
+  `ward` varchar(100) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `career` varchar(255) DEFAULT NULL,
+  `facebook_link` varchar(255) DEFAULT NULL,
+  `other_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`other_links`)),
+  `logo` varchar(255) DEFAULT NULL,
+  `cover_image` varchar(255) DEFAULT NULL,
+  `library_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`library_images`)),
+  `video_intro` varchar(255) DEFAULT NULL,
+  `certificate_file` varchar(255) DEFAULT NULL,
   `lat` decimal(10,8) DEFAULT NULL,
   `lng` decimal(11,8) DEFAULT NULL,
-  `extra_info` json DEFAULT NULL,
-  `status` tinyint(1) DEFAULT '1',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extra_info`)),
+  `status` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int NOT NULL
+  `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -72,13 +72,13 @@ INSERT INTO `businesses` (`id`, `name`, `tax_code`, `country`, `city`, `district
 --
 
 CREATE TABLE `business_extra_info` (
-  `id` bigint NOT NULL,
-  `business_id` bigint NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `business_id` bigint(20) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -88,10 +88,10 @@ CREATE TABLE `business_extra_info` (
 --
 
 CREATE TABLE `categories` (
-  `id` bigint NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -137,16 +137,16 @@ INSERT INTO `categories` (`id`, `name`, `created_at`, `updated_at`) VALUES
 --
 
 CREATE TABLE `events` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `banner` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `banner` varchar(255) DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `description` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -163,11 +163,11 @@ INSERT INTO `events` (`id`, `user_id`, `name`, `banner`, `location`, `start_time
 --
 
 CREATE TABLE `permissions` (
-  `id` int NOT NULL,
-  `key_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `key_name` varchar(100) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -221,23 +221,23 @@ INSERT INTO `permissions` (`id`, `key_name`, `description`, `created_at`, `updat
 --
 
 CREATE TABLE `persons` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `video_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `social_links` text COLLATE utf8mb4_unicode_ci,
-  `job_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bio` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `avatar` varchar(255) DEFAULT NULL,
+  `video_url` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `social_links` text DEFAULT NULL,
+  `job_title` varchar(100) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -255,39 +255,40 @@ INSERT INTO `persons` (`id`, `user_id`, `first_name`, `last_name`, `name`, `avat
 --
 
 CREATE TABLE `products` (
-  `id` bigint NOT NULL,
-  `id_businesses` int UNSIGNED DEFAULT NULL,
-  `id_stores` int UNSIGNED DEFAULT NULL,
-  `id_surveys` int UNSIGNED DEFAULT NULL,
-  `sku` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `category_id` bigint DEFAULT NULL,
-  `price` decimal(15,2) DEFAULT '0.00',
-  `price_from` decimal(15,2) DEFAULT '0.00',
-  `price_to` decimal(15,2) DEFAULT '0.00',
-  `show_contact_price` tinyint(1) DEFAULT '0',
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `video` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `certificate_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `attributes` json DEFAULT NULL,
-  `status` tinyint(1) DEFAULT '1',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id` bigint(20) NOT NULL,
+  `id_businesses` int(10) UNSIGNED DEFAULT NULL,
+  `id_stores` int(10) UNSIGNED DEFAULT NULL,
+  `id_surveys` int(10) UNSIGNED DEFAULT NULL,
+  `sku` varchar(100) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `category_id` bigint(20) DEFAULT NULL,
+  `price_mode` varchar(20) DEFAULT 'single',
+  `price` decimal(15,2) DEFAULT 0.00,
+  `price_from` decimal(15,2) DEFAULT 0.00,
+  `price_to` decimal(15,2) DEFAULT 0.00,
+  `show_contact_price` tinyint(1) DEFAULT 0,
+  `avatar` varchar(255) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `video` varchar(255) DEFAULT NULL,
+  `certificate_file` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `attributes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`attributes`)),
+  `status` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int NOT NULL,
-  `display_settings` text COLLATE utf8mb4_unicode_ci
+  `user_id` int(11) NOT NULL,
+  `display_settings` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `id_businesses`, `id_stores`, `id_surveys`, `sku`, `name`, `category_id`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`) VALUES
-(1, NULL, NULL, NULL, '5424324324', 'demo 1', 1, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"30\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-20 04:06:33\", \"product_id\": \"1\", \"updated_at\": \"2025-04-20 04:06:33\"}]', 1, '2025-04-12 17:20:19', '2025-04-24 08:51:20', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
-(2, NULL, NULL, NULL, '23424244', 'demo sp', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\": \"22\", \"name\": \"xl\", \"value\": \"120000\", \"created_at\": \"2025-04-20 03:45:46\", \"product_id\": \"2\", \"updated_at\": \"2025-04-20 03:45:46\"}]', 1, '2025-04-13 14:58:36', '2025-04-23 14:42:04', NULL, 0, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
-(3, NULL, NULL, NULL, '43243242', 'demo demo', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 1, '2025-04-13 15:17:23', '2025-04-20 04:09:53', NULL, 0, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}');
+INSERT INTO `products` (`id`, `id_businesses`, `id_stores`, `id_surveys`, `sku`, `name`, `category_id`, `price_mode`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`) VALUES
+(1, NULL, NULL, NULL, '5424324324kkk', 'demo 1', 1, 'range', 120000.00, 10000.00, 150000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\":\"57\",\"product_id\":\"1\",\"name\":\"XL\",\"value\":\"342424324\",\"created_at\":\"2025-04-24 04:29:54\",\"updated_at\":\"2025-04-24 04:29:54\"}]', 1, '2025-04-12 17:20:19', '2025-04-24 04:34:26', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true}'),
+(2, NULL, NULL, NULL, '23424244', 'demo sp', 1, 'range', 120000.00, 40000.00, 60000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\":\"60\",\"product_id\":\"2\",\"name\":\"xl\",\"value\":\"120000\",\"created_at\":\"2025-04-24 04:35:15\",\"updated_at\":\"2025-04-24 04:35:15\"}]', 1, '2025-04-13 14:58:36', '2025-04-24 04:35:21', NULL, 0, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true}'),
+(3, NULL, NULL, NULL, '43243242', 'demo demo', 1, 'single', 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 1, '2025-04-13 15:17:23', '2025-04-20 04:09:53', NULL, 0, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}');
 
 -- --------------------------------------------------------
 
@@ -296,12 +297,12 @@ INSERT INTO `products` (`id`, `id_businesses`, `id_stores`, `id_surveys`, `sku`,
 --
 
 CREATE TABLE `product_attributes` (
-  `id` bigint NOT NULL,
-  `product_id` bigint NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `product_id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -309,10 +310,10 @@ CREATE TABLE `product_attributes` (
 --
 
 INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_at`, `updated_at`) VALUES
-(31, 1, 'XL', '342424324', '2025-04-20 04:09:19', '2025-04-20 04:09:19'),
 (32, 3, 'xl ', '12000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
 (33, 3, 'xxl', '20000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
-(34, 2, 'xl', '120000', '2025-04-23 14:42:04', '2025-04-23 14:42:04');
+(58, 1, 'XL', '342424324', '2025-04-24 04:34:26', '2025-04-24 04:34:26'),
+(61, 2, 'xl', '120000', '2025-04-24 04:35:21', '2025-04-24 04:35:21');
 
 -- --------------------------------------------------------
 
@@ -321,16 +322,16 @@ INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_
 --
 
 CREATE TABLE `qr_codes` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `target_type` enum('product','store','business','event','person') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `target_id` int NOT NULL,
-  `qr_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `qr_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `scan_count` int DEFAULT '0',
-  `settings_json` json NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `target_type` enum('product','store','business','event','person') NOT NULL,
+  `target_id` int(11) NOT NULL,
+  `qr_name` varchar(255) DEFAULT NULL,
+  `qr_url` varchar(255) NOT NULL,
+  `scan_count` int(11) DEFAULT 0,
+  `settings_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`settings_json`)),
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -340,11 +341,11 @@ CREATE TABLE `qr_codes` (
 --
 
 CREATE TABLE `roles` (
-  `id` int NOT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -363,10 +364,10 @@ INSERT INTO `roles` (`id`, `name`, `description`, `created_at`, `updated_at`) VA
 --
 
 CREATE TABLE `role_permissions` (
-  `id` int NOT NULL,
-  `role_id` int NOT NULL,
-  `permission_id` int NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -389,19 +390,19 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`, `created_at`) 
 --
 
 CREATE TABLE `stores` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `status` tinyint(1) DEFAULT '1',
-  `product_ids` text COLLATE utf8mb4_unicode_ci
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `logo` varchar(255) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `status` tinyint(1) DEFAULT 1,
+  `product_ids` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -418,13 +419,13 @@ INSERT INTO `stores` (`id`, `user_id`, `name`, `logo`, `address`, `phone`, `emai
 --
 
 CREATE TABLE `surveys` (
-  `id` bigint NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `group_id` bigint DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `status` tinyint(1) DEFAULT '1',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `group_id` bigint(20) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `status` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -434,12 +435,12 @@ CREATE TABLE `surveys` (
 --
 
 CREATE TABLE `survey_answers` (
-  `id` bigint NOT NULL,
-  `survey_id` bigint NOT NULL,
-  `question_id` bigint NOT NULL,
-  `user_id` bigint DEFAULT NULL,
-  `answer_text` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `survey_id` bigint(20) NOT NULL,
+  `question_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  `answer_text` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -449,11 +450,11 @@ CREATE TABLE `survey_answers` (
 --
 
 CREATE TABLE `survey_groups` (
-  `id` bigint NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -463,12 +464,12 @@ CREATE TABLE `survey_groups` (
 --
 
 CREATE TABLE `survey_options` (
-  `id` bigint NOT NULL,
-  `question_id` bigint NOT NULL,
-  `option_text` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `order_no` int DEFAULT '0',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `question_id` bigint(20) NOT NULL,
+  `option_text` varchar(255) NOT NULL,
+  `order_no` int(11) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -478,14 +479,14 @@ CREATE TABLE `survey_options` (
 --
 
 CREATE TABLE `survey_questions` (
-  `id` bigint NOT NULL,
-  `survey_id` bigint NOT NULL,
-  `question_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `question_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `required` tinyint(1) DEFAULT '0',
-  `order_no` int DEFAULT '0',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` bigint(20) NOT NULL,
+  `survey_id` bigint(20) NOT NULL,
+  `question_text` text NOT NULL,
+  `question_type` varchar(50) DEFAULT NULL,
+  `required` tinyint(1) DEFAULT 0,
+  `order_no` int(11) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -495,16 +496,16 @@ CREATE TABLE `survey_questions` (
 --
 
 CREATE TABLE `users` (
-  `id` int UNSIGNED NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'user',
-  `role_id` int DEFAULT NULL
+  `id` int(10) UNSIGNED NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `name` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `avatar` varchar(255) DEFAULT NULL,
+  `role` varchar(50) DEFAULT 'user',
+  `role_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -636,109 +637,109 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `businesses`
 --
 ALTER TABLE `businesses`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `business_extra_info`
 --
 ALTER TABLE `business_extra_info`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `persons`
 --
 ALTER TABLE `persons`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `qr_codes`
 --
 ALTER TABLE `qr_codes`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `survey_answers`
 --
 ALTER TABLE `survey_answers`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `survey_groups`
 --
 ALTER TABLE `survey_groups`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `survey_options`
 --
 ALTER TABLE `survey_options`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `survey_questions`
 --
 ALTER TABLE `survey_questions`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
