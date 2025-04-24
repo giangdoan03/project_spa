@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 23, 2025 at 08:39 AM
+-- Generation Time: Apr 24, 2025 at 01:36 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -256,6 +256,9 @@ INSERT INTO `persons` (`id`, `user_id`, `first_name`, `last_name`, `name`, `avat
 
 CREATE TABLE `products` (
   `id` bigint NOT NULL,
+  `id_businesses` int UNSIGNED DEFAULT NULL,
+  `id_stores` int UNSIGNED DEFAULT NULL,
+  `id_surveys` int UNSIGNED DEFAULT NULL,
   `sku` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category_id` bigint DEFAULT NULL,
@@ -281,10 +284,10 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`) VALUES
-(1, '5424324324', 'demo 1', NULL, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"30\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-20 04:06:33\", \"product_id\": \"1\", \"updated_at\": \"2025-04-20 04:06:33\"}]', 1, '2025-04-12 17:20:19', '2025-04-20 04:09:19', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
-(2, '23424244', 'demo sp', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\": \"18\", \"name\": \"xl\", \"value\": \"120000\", \"created_at\": \"2025-04-19 02:36:29\", \"product_id\": \"2\", \"updated_at\": \"2025-04-19 02:36:29\"}]', 1, '2025-04-13 14:58:36', '2025-04-20 03:45:46', NULL, 0, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
-(3, '43243242', 'demo demo', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 1, '2025-04-13 15:17:23', '2025-04-20 04:09:53', NULL, 0, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}');
+INSERT INTO `products` (`id`, `id_businesses`, `id_stores`, `id_surveys`, `sku`, `name`, `category_id`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`) VALUES
+(1, NULL, NULL, NULL, '5424324324', 'demo 1', NULL, 100000.00, 0.00, 0.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', NULL, '[{\"id\": \"30\", \"name\": \"XL\", \"value\": \"342424324\", \"created_at\": \"2025-04-20 04:06:33\", \"product_id\": \"1\", \"updated_at\": \"2025-04-20 04:06:33\"}]', 1, '2025-04-12 17:20:19', '2025-04-20 04:09:19', NULL, 0, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
+(2, NULL, NULL, NULL, '23424244', 'demo sp', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', 'demo demo', '[{\"id\": \"22\", \"name\": \"xl\", \"value\": \"120000\", \"created_at\": \"2025-04-20 03:45:46\", \"product_id\": \"2\", \"updated_at\": \"2025-04-20 03:45:46\"}]', 1, '2025-04-13 14:58:36', '2025-04-23 14:42:04', NULL, 0, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}'),
+(3, NULL, NULL, NULL, '43243242', 'demo demo', 1, 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 1, '2025-04-13 15:17:23', '2025-04-20 04:09:53', NULL, 0, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}');
 
 -- --------------------------------------------------------
 
@@ -306,10 +309,10 @@ CREATE TABLE `product_attributes` (
 --
 
 INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_at`, `updated_at`) VALUES
-(22, 2, 'xl', '120000', '2025-04-20 03:45:46', '2025-04-20 03:45:46'),
 (31, 1, 'XL', '342424324', '2025-04-20 04:09:19', '2025-04-20 04:09:19'),
 (32, 3, 'xl ', '12000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
-(33, 3, 'xxl', '20000', '2025-04-20 04:09:53', '2025-04-20 04:09:53');
+(33, 3, 'xxl', '20000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
+(34, 2, 'xl', '120000', '2025-04-23 14:42:04', '2025-04-23 14:42:04');
 
 -- --------------------------------------------------------
 
@@ -686,7 +689,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `qr_codes`
