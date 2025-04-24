@@ -146,6 +146,7 @@ class ProductController extends ResourceController
             'sku' => $data['sku'] ?? null,
             'name' => $data['name'] ?? null,
             'category_id' => $data['category_id'] ?? null,
+            'price_mode' => $data['price_mode'] ?? 'single', // 👈 THÊM DÒNG NÀY
             'price' => $data['price'] ?? null,
             'price_from' => $data['price_from'] ?? null,
             'price_to' => $data['price_to'] ?? null,

@@ -12,7 +12,7 @@ class ProductModel extends Model
     protected $useSoftDeletes = true;
     protected $deletedField = 'deleted_at';
     protected $allowedFields = [
-        'sku', 'name', 'category_id', 'price', 'price_from', 'price_to',
+        'sku', 'name', 'category_id', 'price', 'price_from', 'price_to','price_mode',
         'show_contact_price', 'avatar', 'image', 'video', 'certificate_file',
         'description', 'attributes', 'status', 'created_at', 'updated_at', 'display_settings'
     ];
