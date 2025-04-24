@@ -19,6 +19,7 @@ export default defineConfig({
         '/api': {
             target: 'http://api.giang.test',
             changeOrigin: true,
+            credentials: true, // 👈 Thêm dòng này
         },
     },
     resolve: {

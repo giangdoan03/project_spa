@@ -11,7 +11,7 @@ class UploadController extends ResourceController
         // Giới hạn chỉ upload từ domain api.giang.test
         $allowedOrigins = [
             'http://giang.test:5173',   // Frontend đang chạy local
-            'http://api.giang.test'     // Chính server API của bạn
+            'http://api.giang.test'     // API chính
         ];
 
         $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
@@ -19,14 +19,15 @@ class UploadController extends ResourceController
         if ($origin && !in_array($origin, $allowedOrigins)) {
             return $this->failForbidden('Không được phép upload từ domain này.');
         }
+
         $file = $this->request->getFile('file');
 
         if (!$file || !$file->isValid()) {
             return $this->fail('Không tìm thấy file hoặc file không hợp lệ.');
         }
 
-        // Thư mục upload ngoài project
-        $customUploadDir = 'D:/laragon/www/assets/image/';
+        // ✅ Lấy upload dir từ .env, fallback mặc định nếu chưa khai báo
+        $customUploadDir = getenv('UPLOAD_DIR') ?: 'C:/php82/htdocs/assets/image/';
         if (!is_dir($customUploadDir)) {
             mkdir($customUploadDir, 0777, true);
         }
@@ -34,12 +35,12 @@ class UploadController extends ResourceController
         $newName = $file->getRandomName();
         $file->move($customUploadDir, $newName);
 
-        $publicUrl = 'http://assets.giang.test/image/' . $newName;
+        // ✅ Lấy domain ảnh public từ .env
+        $assetsDomain = getenv('ASSETS_DOMAIN') ?: 'http://assets.giang.test/image/';
+        $publicUrl = rtrim($assetsDomain, '/') . '/' . $newName;
 
         return $this->respond([
             'url' => $publicUrl
         ]);
     }
-
-
 }

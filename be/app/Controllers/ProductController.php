@@ -9,9 +9,13 @@ use CodeIgniter\RESTful\ResourceController;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+use App\Traits\AuthTrait;
+
 class ProductController extends ResourceController
 {
     protected $format = 'json';
+
+    use AuthTrait; // 👈 Dùng trait
 
     private function validateProduct($data)
     {
@@ -30,17 +34,23 @@ class ProductController extends ResourceController
 
     public function index()
     {
-        $productModel = new ProductModel();
+        $userId = $this->getUserId(); // Dùng được ngay
 
+        log_message('debug', 'SESSION USER_ID in index: ' . $userId);
+
+        $productModel = new ProductModel();
         $perPage = $this->request->getGet('per_page') ?? 10;
         $page = $this->request->getGet('page') ?? 1;
         $search = $this->request->getGet('search');
 
-        $builder = $productModel->where('deleted_at', null);
+        $builder = $productModel->where('deleted_at', null)
+            ->where('user_id', $userId); // 👈 Lọc theo user
 
         if ($search) {
-            $builder->like('name', $search)
-                ->orLike('sku', $search);
+            $builder->groupStart()
+                ->like('name', $search)
+                ->orLike('sku', $search)
+                ->groupEnd();
         }
 
         $products = $builder->paginate($perPage, 'default', $page);
@@ -60,6 +70,8 @@ class ProductController extends ResourceController
 
     public function show($id = null)
     {
+        $userId = $this->getUserId(); // Dùng được ngay
+
         $productModel = new ProductModel();
         $product = $productModel->getProductWithAttributes($id);
 
@@ -67,11 +79,21 @@ class ProductController extends ResourceController
             return $this->failNotFound('Product not found');
         }
 
+        // Kiểm tra quyền sở hữu sản phẩm
+        if ($product['user_id'] != $userId) {
+            return $this->failForbidden('Bạn không có quyền xem sản phẩm này');
+        }
+
         return $this->respond($product);
     }
 
+
     public function create()
     {
+        $userId = $this->getUserId(); // Dùng được ngay
+
+        echo $userId;
+
         $productModel = new ProductModel();
         $attributeModel = new ProductAttributeModel();
 
@@ -96,7 +118,8 @@ class ProductController extends ResourceController
             'status' => !empty($data['status']) ? 1 : 0,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
-            'display_settings' => json_encode($data['display_settings'] ?? []), // ✅ thêm dòng này
+            'display_settings' => json_encode($data['display_settings'] ?? []),
+            'user_id' => $userId, // 👈 Gán user_id vào sản phẩm
         ];
 
         // Encode các field mảng
@@ -123,19 +146,35 @@ class ProductController extends ResourceController
             }
         }
 
-        return $this->respondCreated(['id' => $productId]);
+        $product = $productModel->find($productId);
+        return $this->respondCreated([
+            'status' => 'success',
+            'message' => 'Tạo sản phẩm thành công',
+            'data' => $product
+        ]);
     }
-
 
 
     public function update($id = null)
     {
+        $session = session();
+        $userId = $session->get('user_id'); // 👈 Lấy user_id từ session
+
         $productModel = new ProductModel();
         $attributeModel = new ProductAttributeModel();
 
         $data = $this->request->getJSON(true);
 
-        // Validate
+        // Kiểm tra quyền sở hữu sản phẩm
+        $product = $productModel->find($id);
+        if (!$product) {
+            return $this->failNotFound('Sản phẩm không tồn tại');
+        }
+        if ($product['user_id'] != $userId) {
+            return $this->failForbidden('Bạn không có quyền sửa sản phẩm này');
+        }
+
+        // Validate dữ liệu đầu vào
         $validationResult = $this->validateProduct($data);
         if ($validationResult !== true) {
             return $validationResult;
@@ -146,7 +185,7 @@ class ProductController extends ResourceController
             'sku' => $data['sku'] ?? null,
             'name' => $data['name'] ?? null,
             'category_id' => $data['category_id'] ?? null,
-            'price_mode' => $data['price_mode'] ?? 'single', // 👈 THÊM DÒNG NÀY
+            'price_mode' => $data['price_mode'] ?? 'single',
             'price' => $data['price'] ?? null,
             'price_from' => $data['price_from'] ?? null,
             'price_to' => $data['price_to'] ?? null,
@@ -162,7 +201,6 @@ class ProductController extends ResourceController
             $productData[$field] = json_encode($data[$field] ?? []);
         }
 
-        // ✅ Xử lý display_settings nếu là object thì encode, nếu đã là string thì giữ nguyên
         if (!empty($data['display_settings'])) {
             $productData['display_settings'] = is_array($data['display_settings'])
                 ? json_encode($data['display_settings'])
@@ -172,12 +210,10 @@ class ProductController extends ResourceController
         // Cập nhật sản phẩm
         $productModel->update($id, $productData);
 
-        // Cập nhật attributes
+        // Cập nhật thuộc tính sản phẩm
         if (!empty($data['attributes']) && is_array($data['attributes'])) {
-            // Xoá toàn bộ thuộc tính cũ
             $attributeModel->where('product_id', $id)->delete();
 
-            // Thêm mới attributes
             foreach ($data['attributes'] as $attribute) {
                 if (!empty($attribute['name']) && !empty($attribute['value'])) {
                     $attributeModel->insert([
@@ -191,7 +227,39 @@ class ProductController extends ResourceController
             }
         }
 
-        return $this->respond(['message' => 'Product updated successfully']);
+        return $this->respond(['message' => 'Cập nhật sản phẩm thành công']);
+    }
+
+
+    public function toggleStatus($id = null)
+    {
+        $session = session();
+        $userId = $session->get('user_id'); // 👈 Lấy user_id từ session
+
+        $productModel = new ProductModel();
+        $data = $this->request->getJSON(true);
+
+        // Kiểm tra status hợp lệ
+        if (!isset($data['status'])) {
+            return $this->failValidationErrors('Thiếu trạng thái');
+        }
+
+        // Kiểm tra sản phẩm có tồn tại và thuộc user này không
+        $product = $productModel->find($id);
+        if (!$product) {
+            return $this->failNotFound('Sản phẩm không tồn tại');
+        }
+        if ($product['user_id'] != $userId) {
+            return $this->failForbidden('Bạn không có quyền thay đổi trạng thái sản phẩm này');
+        }
+
+        // Cập nhật trạng thái
+        $productModel->update($id, [
+            'status' => $data['status'] ? 1 : 0,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return $this->respond(['message' => 'Cập nhật trạng thái thành công']);
     }
 
 
@@ -350,9 +418,6 @@ class ProductController extends ResourceController
             ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
             ->setBody($data);
     }
-
-
-
 
 
 }

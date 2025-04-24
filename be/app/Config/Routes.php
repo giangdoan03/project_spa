@@ -16,6 +16,7 @@ $routes->group('api', function ($routes) {
     $routes->get('products-export-pdf', 'ProductController::exportPdf');
     $routes->post('products-restore/(:num)', 'ProductController::restore/$1');
     $routes->post('products-export-selected', 'ProductController::exportSelected');
+    $routes->post('products/(:num)/toggle-status', 'ProductController::toggleStatus/$1');
 
     $routes->resource('categories', ['controller' => 'CategoryController']);
     $routes->resource('businesses', ['controller' => 'BusinessController']);

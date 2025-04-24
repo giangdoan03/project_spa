@@ -17,12 +17,19 @@
             <template #bodyCell="{ column, record }">
                 <!-- Cột ảnh đại diện -->
                 <template v-if="column.key === 'avatar'">
-                    <img
-                        v-if="record.avatar && Array.isArray(parseJson(record.avatar)) && parseJson(record.avatar).length"
-                        :src="parseJson(record.avatar)[0]"
-                        alt="Avatar"
-                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
-                    />
+                    <img v-if="record.avatar && Array.isArray(parseJson(record.avatar)) && parseJson(record.avatar).length"
+                         :src="parseJson(record.avatar)[0]"
+                         alt="Avatar"
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                </template>
+
+                <!-- Cột trạng thái -->
+                <template v-if="column.key === 'status'">
+                    <a-switch
+                            :checked="record.status == 1"
+                            @change="checked => toggleStatus(record, checked)"
+                            checked-children="Bật"
+                            un-checked-children="Tắt" />
                 </template>
 
                 <!-- Cột hành động -->
@@ -35,6 +42,7 @@
                     </a-space>
                 </template>
             </template>
+
         </a-table>
     </div>
 </template>
@@ -42,7 +50,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getProducts, deleteProduct as apiDeleteProduct } from '../api/product'
+import {getProducts, deleteProduct as apiDeleteProduct, updateProduct, updateProductStatus } from '../api/product'
 import { message } from 'ant-design-vue'
 
 // Router
@@ -58,28 +66,37 @@ const pagination = ref({ current: 1, pageSize: 10, total: 0 })
 const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Ảnh đại diện', dataIndex: 'avatar', key: 'avatar' },
-    { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name' },
+    {
+        title: 'Tên sản phẩm',
+        dataIndex: 'name',
+        key: 'name',
+        ellipsis: true,
+        customRender: ({ text }) => text || 'Không có tên'
+    },
     { title: 'SKU', dataIndex: 'sku', key: 'sku' },
     {
         title: 'Giá',
         dataIndex: 'price',
         key: 'price',
-        customRender: ({ text }) => formatCurrency(text),
+        customRender: ({ text }) => text ? formatCurrency(text) : '0 VND'
     },
     {
         title: 'Ngày tạo',
         dataIndex: 'created_at',
         key: 'created_at',
-        customRender: ({ text }) => formatDate(text),
+        customRender: ({ text }) => text ? formatDate(text) : 'N/A'
     },
     {
         title: 'Ngày cập nhật',
         dataIndex: 'updated_at',
         key: 'updated_at',
-        customRender: ({ text }) => formatDate(text),
+        customRender: ({ text }) => text ? formatDate(text) : 'N/A'
     },
-    { title: 'Hành động', key: 'action' },
+    { title: 'Trạng thái', dataIndex: 'status', key: 'status' },
+    { title: 'Hành động', key: 'action' }
 ]
+
+
 
 
 // Fetch data
@@ -91,14 +108,27 @@ const fetchProducts = async () => {
             per_page: pagination.value.pageSize,
             search: search.value,
         })
-        products.value = response.data.data
-        pagination.value.total = response.data.pager.total
+
+        const result = response.data?.data || []
+
+        result.forEach((p, i) => {
+            if (!p) console.warn(`Null product at index ${i}`)
+            if (!p?.price) console.warn(`Missing price at index ${i}`, p)
+        })
+
+        products.value = result.filter(p => p && p.name)
+
+        pagination.value.total = response.data?.pager?.total || 0
     } catch (error) {
         message.error('Lỗi tải sản phẩm')
+        console.error('Fetch Error:', error)
     } finally {
         loading.value = false
     }
 }
+
+
+
 
 // Table change
 const handleTableChange = (paginationParam) => {
@@ -151,6 +181,18 @@ const formatDate = (value) => {
         hour12: false,
     })
 }
+
+const toggleStatus = async (record, checked) => {
+    try {
+        await updateProductStatus(record.id, { status: checked ? 1 : 0 })
+        record.status = checked ? 1 : 0
+        message.success(`Đã ${checked ? 'bật' : 'tắt'} sản phẩm`)
+    } catch (e) {
+        message.error('Không thể cập nhật trạng thái')
+    }
+}
+
+
 
 // Init
 onMounted(fetchProducts)
