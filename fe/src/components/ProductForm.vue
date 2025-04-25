@@ -163,98 +163,113 @@
                             </a-form-item>
 
                             <!-- Sản phẩm liên quan -->
-                            <a-form-item label="Sản phẩm liên quan">
-                                <a-radio-group v-model:value="settings.relatedProducts"
-                                               @change="handleRelatedProductModeChange">
-                                    <a-radio :value="'all'">Tất cả sản phẩm</a-radio>
-                                    <a-radio :value="'selected'">Chọn sản phẩm</a-radio>
-                                </a-radio-group>
-                            </a-form-item>
-                            <div v-if="settings.relatedProducts === 'selected'" style="margin-bottom: 24px">
-                                <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
-                                          placeholder="Chọn sản phẩm" v-model:value="selectedProductIds"
-                                          @change="handleProductSelect">
-                                    <a-select-option v-for="product in allProducts" :key="product.id"
-                                                     :value="product.id">
-                                        {{ product.name }} - {{ product.price }}đ
-                                    </a-select-option>
-                                </a-select>
-                                <a-table :columns="productColumns" :data-source="productList" row-key="id" bordered
-                                         size="small">
-                                    <template #bodyCell="{ column, record }">
-                                        <template v-if="column.key === 'avatar'">
-                                            <img v-if="record.avatar" :src="parseAvatar(record.avatar)" alt="Avatar"
-                                                 style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
-                                        </template>
-                                        <template v-if="column.key === 'action'">
-                                            <a-button type="link" @click="removeProduct(record.id)" danger>Xoá
-                                            </a-button>
-                                        </template>
-                                    </template>
-                                </a-table>
-                            </div>
+                            <a-card title="Sản phẩm liên quan" style="margin-bottom: 24px;">
+                                <a-form-item>
+                                    <a-form-item>
+                                        <a-radio-group v-model:value="settings.relatedProducts"
+                                                       @change="handleRelatedProductModeChange">
+                                            <a-radio :value="'all'">Tất cả sản phẩm</a-radio>
+                                            <a-radio :value="'selected'">Chọn sản phẩm</a-radio>
+                                        </a-radio-group>
+                                    </a-form-item>
+                                    <div v-if="settings.relatedProducts === 'selected'" style="margin-bottom: 24px">
+                                        <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
+                                                  placeholder="Chọn sản phẩm" v-model:value="selectedProductIds"
+                                                  @change="handleProductSelect">
+                                            <a-select-option v-for="product in allProducts" :key="product.id"
+                                                             :value="product.id">
+                                                {{ product.name }} - {{ product.price }}đ
+                                            </a-select-option>
+                                        </a-select>
+                                        <a-table :columns="productColumns" :data-source="productList" row-key="id" bordered
+                                                 size="small">
+                                            <template #bodyCell="{ column, record }">
+                                                <template v-if="column.key === 'avatar'">
+                                                    <img v-if="record.avatar" :src="parseAvatar(record.avatar)" alt="Avatar"
+                                                         style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                                </template>
+                                                <template v-if="column.key === 'action'">
+                                                    <a-button type="link" @click="removeProduct(record.id)" danger>Xoá
+                                                    </a-button>
+                                                </template>
+                                            </template>
+                                        </a-table>
+                                    </div>
+                                </a-form-item>
+                            </a-card>
 
-                            <!-- Công ty -->
-                            <a-form-item label="Công ty liên quan">
-                                <a-radio-group v-model:value="settings.company" @change="handleCompanyModeChange">
-                                    <a-radio :value="'all'">Tất cả công ty</a-radio>
-                                    <a-radio :value="'selected'">Chọn công ty</a-radio>
-                                </a-radio-group>
-                            </a-form-item>
-                            <div v-if="settings.company === 'selected'" style="margin-bottom: 24px">
-                                <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
-                                          placeholder="Chọn công ty" v-model:value="selectedCompanies"
-                                          @change="handleCompanySelect">
-                                    <a-select-option v-for="b in allBusinesses" :key="b.id" :value="b.id">
-                                        {{ b.name }} - {{ b.email }}
-                                    </a-select-option>
-                                </a-select>
+                            <a-card title="Công ty" style="margin-bottom: 24px;">
+                                <!-- Công ty -->
+                                <a-form-item>
+                                    <a-radio-group v-model:value="settings.company" @change="handleCompanyModeChange">
+                                        <a-radio :value="'all'">Tất cả công ty</a-radio>
+                                        <a-radio :value="'selected'">Chọn công ty</a-radio>
+                                    </a-radio-group>
+                                </a-form-item>
+                                <div v-if="settings.company === 'selected'" style="margin-bottom: 24px">
+                                    <a-select
+                                            mode="multiple"
+                                            style="width: 100%; margin-bottom: 12px"
+                                            placeholder="Chọn công ty"
+                                            v-model:value="selectedCompanies"
+                                            @change="handleCompanySelect"
+                                            :key="settings.company"
+                                    >
 
-                                <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered
-                                         size="small">
-                                    <template #bodyCell="{ column, record }">
-                                        <template v-if="column.key === 'logo'">
-                                            <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo"
-                                                 style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                        <a-select-option v-for="b in allBusinesses" :key="b.id" :value="b.id">
+                                            {{ b.name }} - {{ b.email }}
+                                        </a-select-option>
+                                    </a-select>
+
+                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered
+                                             size="small">
+                                        <template #bodyCell="{ column, record }">
+                                            <template v-if="column.key === 'logo'">
+                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo"
+                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                            </template>
+                                            <template v-if="column.key === 'action'">
+                                                <a-button type="link" @click="removeBusiness(record.id)" danger>Xoá
+                                                </a-button>
+                                            </template>
                                         </template>
-                                        <template v-if="column.key === 'action'">
-                                            <a-button type="link" @click="removeBusiness(record.id)" danger>Xoá
-                                            </a-button>
-                                        </template>
-                                    </template>
-                                </a-table>
-                            </div>
+                                    </a-table>
+                                </div>
+                            </a-card>
 
 
-                            <!-- Cửa hàng -->
-                            <a-form-item label="Cửa hàng liên quan">
-                                <a-radio-group v-model:value="settings.store" @change="handleStoreModeChange">
-                                    <a-radio :value="'all'">Tất cả cửa hàng</a-radio>
-                                    <a-radio :value="'selected'">Chọn cửa hàng</a-radio>
-                                </a-radio-group>
-                            </a-form-item>
-                            <div v-if="settings.store === 'selected'" style="margin-bottom: 24px">
-                                <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
-                                          placeholder="Chọn cửa hàng" v-model:value="selectedStores"
-                                          @change="handleStoreSelect">
-                                    <a-select-option v-for="s in allStores" :key="s.id" :value="s.id">
-                                        {{ s.name }} - {{ s.address }}
-                                    </a-select-option>
-                                </a-select>
+                            <a-card title="Cửa hàng" style="margin-bottom: 24px;">
+                                <!-- Cửa hàng -->
+                                <a-form-item>
+                                    <a-radio-group v-model:value="settings.store" @change="handleStoreModeChange">
+                                        <a-radio :value="'all'">Tất cả cửa hàng</a-radio>
+                                        <a-radio :value="'selected'">Chọn cửa hàng</a-radio>
+                                    </a-radio-group>
+                                </a-form-item>
+                                <div v-if="settings.store === 'selected'" style="margin-bottom: 24px">
+                                    <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
+                                              placeholder="Chọn cửa hàng" v-model:value="selectedStores"
+                                              @change="handleStoreSelect">
+                                        <a-select-option v-for="s in allStores" :key="s.id" :value="s.id">
+                                            {{ s.name }} - {{ s.address }}
+                                        </a-select-option>
+                                    </a-select>
 
-                                <a-table :columns="storeColumns" :data-source="storeList" row-key="id" bordered
-                                         size="small">
-                                    <template #bodyCell="{ column, record }">
-                                        <template v-if="column.key === 'logo'">
-                                            <img v-if="record.logo" :src="record.logo" alt="Logo"
-                                                 style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                    <a-table :columns="storeColumns" :data-source="storeList" row-key="id" bordered
+                                             size="small">
+                                        <template #bodyCell="{ column, record }">
+                                            <template v-if="column.key === 'logo'">
+                                                <img v-if="record.logo" :src="record.logo" alt="Logo"
+                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                            </template>
+                                            <template v-if="column.key === 'action'">
+                                                <a-button type="link" @click="removeStore(record.id)" danger>Xoá</a-button>
+                                            </template>
                                         </template>
-                                        <template v-if="column.key === 'action'">
-                                            <a-button type="link" @click="removeStore(record.id)" danger>Xoá</a-button>
-                                        </template>
-                                    </template>
-                                </a-table>
-                            </div>
+                                    </a-table>
+                                </div>
+                            </a-card>
+
 
 
                             <!-- Khảo sát + nút đặt hàng -->
@@ -422,7 +437,7 @@
     // Gọi API sản phẩm
     const fetchAllProducts = async () => {
         try {
-            const response = await getProducts({per_page: 1000});
+            const response = await getProducts({ per_page: 1000 });
             allProducts.value = response.data.data;
         } catch (err) {
             message.error('Lỗi tải danh sách sản phẩm');
@@ -465,7 +480,7 @@
 
     // Gọi API doanh nghiệp
     const fetchAllBusinesses = async () => {
-        const res = await getBusinesses({per_page: 1000});
+        const res = await getBusinesses({ per_page: 1000 });
         allBusinesses.value = res.data.data;
     };
 
@@ -481,21 +496,30 @@
         businessList.value = businessList.value.filter(b => b.id !== id);
     };
 
-    // Khi đổi mode doanh nghiệp liên quan
-    const handleCompanyModeChange = async (value) => {
-        if (value === 'selected' && allBusinesses.value.length === 0) {
-            await fetchAllBusinesses();
+    const handleCompanyModeChange = async (input) => {
+        const value = typeof input === 'string' ? input : input?.target?.value;
+        if (!value) {
+            console.warn('Giá trị không hợp lệ:', input);
+            return;
+        }
+
+        if (value === 'selected') {
+            if (allBusinesses.value.length === 0) await fetchAllBusinesses();
             selectedCompanies.value = [];
+            businessList.value = [];
         } else if (value === 'all') {
             await fetchAllBusinesses();
             selectedCompanies.value = allBusinesses.value.map(b => b.id);
+            businessList.value = [...allBusinesses.value];
         }
     };
 
 
+
+
     // Gọi API cửa hàng
     const fetchAllStores = async () => {
-        const res = await getStores({per_page: 1000});
+        const res = await getStores({ per_page: 1000 });
         allStores.value = res.data.data;
     };
 
@@ -512,13 +536,21 @@
     };
 
     // Khi đổi mode cửa hàng liên quan
-    const handleStoreModeChange = async (value) => {
-        if (value === 'selected' && allStores.value.length === 0) {
-            await fetchAllStores();
+    const handleStoreModeChange = async (input) => {
+        const value = typeof input === 'string' ? input : input?.target?.value;
+        if (!value) {
+            console.warn('Giá trị không hợp lệ:', input);
+            return;
+        }
+
+        if (value === 'selected') {
+            if (allStores.value.length === 0) await fetchAllStores();
             selectedStores.value = [];
+            storeList.value = [];
         } else if (value === 'all') {
             await fetchAllStores();
             selectedStores.value = allStores.value.map(s => s.id);
+            storeList.value = [...allStores.value];
         }
     };
 
