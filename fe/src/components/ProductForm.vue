@@ -7,15 +7,15 @@
                     <!-- Ảnh đại diện -->
                     <a-form-item label="Ảnh đại diện của sản phẩm">
                         <a-upload
-                            list-type="picture-card"
-                            :file-list="avatarFileList"
-                            :on-preview="handlePreview"
-                            :on-remove="(file) => handleRemoveFile('avatar', file)"
-                            :before-upload="(file) => handleBeforeUploadSingle('avatar', file)"
-                            :max-count="1"
+                                list-type="picture-card"
+                                :file-list="avatarFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('avatar', file)"
+                                :before-upload="(file) => handleBeforeUploadSingle('avatar', file)"
+                                :max-count="1"
                         >
                             <div v-if="avatarFileList.length === 0">
-                                <upload-outlined />
+                                <upload-outlined/>
                                 <div style="margin-top: 8px">Ảnh</div>
                             </div>
                         </a-upload>
@@ -126,9 +126,9 @@
                     </a-form-item>
 
                     <!-- Trạng thái -->
-<!--                    <a-form-item label="Trạng thái">-->
-<!--                        <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt"/>-->
-<!--                    </a-form-item>-->
+                    <!--                    <a-form-item label="Trạng thái">-->
+                    <!--                        <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt"/>-->
+                    <!--                    </a-form-item>-->
 
                     <!-- Nút hành động -->
                     <a-form-item>
@@ -259,18 +259,22 @@
 
                             <!-- Khảo sát + nút đặt hàng -->
                             <a-form-item label="Khảo sát">
-                                <a-switch v-model:checked="settings.enableSurvey" disabled class="custom-disabled-switch"/>
+                                <a-switch v-model:checked="settings.enableSurvey" disabled
+                                          class="custom-disabled-switch"/>
                             </a-form-item>
 
                             <a-form-item label="Link bán hàng trên sàn">
-                                <a-switch v-model:checked="settings.enableOrderButton" @change="handleOrderButtonToggle" />
+                                <a-switch v-model:checked="settings.enableOrderButton"
+                                          @change="handleOrderButtonToggle"/>
 
                                 <!-- Hiển thị nếu bật -->
                                 <div class="link-list-wrapper">
-                                    <div v-for="(link, index) in settings.productLinks" :key="index" style="display: flex; gap: 8px; margin-bottom: 8px;">
-                                        <a-input v-model:value="link.url" :placeholder="link.platform + ' Link'" style="flex: 1;" />
+                                    <div v-for="(link, index) in settings.productLinks" :key="index"
+                                         style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <a-input v-model:value="link.url" :placeholder="link.platform + ' Link'"
+                                                 style="flex: 1;"/>
                                         <a-button type="text" danger @click="removeProductLink(index)">
-                                            <delete-outlined />
+                                            <delete-outlined/>
                                         </a-button>
                                     </div>
                                 </div>
@@ -290,12 +294,12 @@
                             </div>
                             <div class="iphone-screen">
                                 <component
-                                    :is="AsyncTemplate"
-                                    :product="form"
-                                    :business="businessList"
-                                    :store="storeList"
-                                    :all-businesses="allBusinesses"
-                                    :all-stores="allStores"
+                                        :is="AsyncTemplate"
+                                        :product="form"
+                                        :business="businessList"
+                                        :store="storeList"
+                                        :all-businesses="allBusinesses"
+                                        :all-stores="allStores"
                                 />
                             </div>
                         </div>
@@ -415,98 +419,108 @@
         }
     }
 
-    // Gọi API khi đổi mode
-    const handleRelatedProductModeChange = async (input) => {
-        const value = typeof input === 'string' ? input : input?.target?.value
-        if (!value) {
-            console.warn('Giá trị không hợp lệ:', input)
-            return
+    // Gọi API sản phẩm
+    const fetchAllProducts = async () => {
+        try {
+            const response = await getProducts({per_page: 1000});
+            allProducts.value = response.data.data;
+        } catch (err) {
+            message.error('Lỗi tải danh sách sản phẩm');
         }
-
-        if (value === 'selected') {
-            if (allProducts.value.length === 0) await fetchAllProducts()
-            selectedProductIds.value = []
-            productList.value = []
-        } else if (value === 'all') {
-            const res = await getProducts({per_page: 1000})
-            allProducts.value = res.data.data
-            productList.value = allProducts.value
-            selectedProductIds.value = allProducts.value.map(p => p.id)
-        }
-    }
-
+    };
 
     // Chọn sản phẩm từ select box
     const handleProductSelect = (ids) => {
-        productList.value = allProducts.value.filter(p => ids.includes(p.id))
-        settings.value.selectedProducts = ids
-    }
+        productList.value = allProducts.value.filter(p => ids.includes(p.id));
+        selectedProductIds.value = ids;
+        settings.value.selectedProducts = ids;
+    };
 
+    // Xoá sản phẩm đã chọn
     const removeProduct = (id) => {
-        selectedProductIds.value = selectedProductIds.value.filter(pid => pid !== id)
-        productList.value = productList.value.filter(p => p.id !== id)
-        settings.value.selectedProducts = [...selectedProductIds.value]
-    }
+        selectedProductIds.value = selectedProductIds.value.filter(pid => pid !== id);
+        productList.value = productList.value.filter(p => p.id !== id);
+        settings.value.selectedProducts = [...selectedProductIds.value];
+    };
 
-    // Load danh sách sản phẩm (chỉ gọi khi cần)
-    const fetchAllProducts = async () => {
-        try {
-            const response = await getProducts({per_page: 1000})
-            allProducts.value = response.data.data
-        } catch (err) {
-            message.error('Lỗi tải danh sách sản phẩm')
+    // Khi đổi mode sản phẩm liên quan
+    const handleRelatedProductModeChange = async (input) => {
+        const value = typeof input === 'string' ? input : input?.target?.value;
+        if (!value) {
+            console.warn('Giá trị không hợp lệ:', input);
+            return;
         }
-    }
+
+        if (value === 'selected') {
+            if (allProducts.value.length === 0) await fetchAllProducts();
+            selectedProductIds.value = [];
+            productList.value = [];
+        } else if (value === 'all') {
+            await fetchAllProducts();
+            productList.value = allProducts.value;
+            selectedProductIds.value = allProducts.value.map(p => p.id);
+        }
+    };
 
 
+    // Gọi API doanh nghiệp
+    const fetchAllBusinesses = async () => {
+        const res = await getBusinesses({per_page: 1000});
+        allBusinesses.value = res.data.data;
+    };
+
+    // Chọn doanh nghiệp từ select box
+    const handleCompanySelect = (ids) => {
+        businessList.value = allBusinesses.value.filter(b => ids.includes(b.id));
+        selectedCompanies.value = ids;
+    };
+
+    // Xoá doanh nghiệp đã chọn
+    const removeBusiness = (id) => {
+        selectedCompanies.value = selectedCompanies.value.filter(bid => bid !== id);
+        businessList.value = businessList.value.filter(b => b.id !== id);
+    };
+
+    // Khi đổi mode doanh nghiệp liên quan
     const handleCompanyModeChange = async (value) => {
         if (value === 'selected' && allBusinesses.value.length === 0) {
-            await fetchAllBusinesses()
-            selectedCompanies.value = []
+            await fetchAllBusinesses();
+            selectedCompanies.value = [];
         } else if (value === 'all') {
-            const res = await getBusinesses({per_page: 1000})
-            allBusinesses.value = res.data.data
-            selectedCompanies.value = allBusinesses.value.map(b => b.id)
+            await fetchAllBusinesses();
+            selectedCompanies.value = allBusinesses.value.map(b => b.id);
         }
-    }
-    const handleCompanySelect = (ids) => {
-        businessList.value = allBusinesses.value.filter(b => ids.includes(b.id))
-        selectedCompanies.value = ids
-    }
-
-    const removeBusiness = (id) => {
-        selectedCompanies.value = selectedCompanies.value.filter(bid => bid !== id)
-        businessList.value = businessList.value.filter(b => b.id !== id)
-    }
+    };
 
 
-    const fetchAllBusinesses = async () => {
-        const res = await getBusinesses({per_page: 1000})
-        allBusinesses.value = res.data.data
-    }
+    // Gọi API cửa hàng
+    const fetchAllStores = async () => {
+        const res = await getStores({per_page: 1000});
+        allStores.value = res.data.data;
+    };
 
+    // Chọn cửa hàng từ select box
+    const handleStoreSelect = (ids) => {
+        storeList.value = allStores.value.filter(s => ids.includes(s.id));
+        selectedStores.value = ids;
+    };
+
+    // Xoá cửa hàng đã chọn
+    const removeStore = (id) => {
+        selectedStores.value = selectedStores.value.filter(sid => sid !== id);
+        storeList.value = storeList.value.filter(s => s.id !== id);
+    };
+
+    // Khi đổi mode cửa hàng liên quan
     const handleStoreModeChange = async (value) => {
         if (value === 'selected' && allStores.value.length === 0) {
-            await fetchAllStores()
-            selectedStores.value = []
+            await fetchAllStores();
+            selectedStores.value = [];
         } else if (value === 'all') {
-            const res = await getStores({per_page: 1000})
-            allStores.value = res.data.data
-            selectedStores.value = allStores.value.map(s => s.id)
+            await fetchAllStores();
+            selectedStores.value = allStores.value.map(s => s.id);
         }
-    }
-    const handleStoreSelect = (ids) => {
-        storeList.value = allStores.value.filter(s => ids.includes(s.id))
-        selectedStores.value = ids
-    }
-    const removeStore = (id) => {
-        selectedStores.value = selectedStores.value.filter(sid => sid !== id)
-        storeList.value = storeList.value.filter(s => s.id !== id)
-    }
-    const fetchAllStores = async () => {
-        const res = await getStores({per_page: 1000})
-        allStores.value = res.data.data
-    }
+    };
 
 
     const settings = ref({
@@ -688,16 +702,27 @@
 
     const resetForm = () => {
         form.value = {
-            name: '', sku: '', category_id: null,
-            price: null, price_from: null, price_to: null,
+            name: '',
+            sku: '',
+            category_id: null,
+            price: null,
+            price_from: null,
+            price_to: null,
             show_contact_price: false,
-            avatar: [], image: [], video: [], certificate_file: [],
-            description: '', attributes: [], status: true,
+            avatar: [],
+            image: [],
+            video: [],
+            certificate_file: [],
+            description: '',
+            attributes: [],
+            status: true,
         }
         settings.value = {
-            selectedTemplate: 'tpl-1', relatedProducts: 'all',
+            selectedTemplate: 'tpl-1',
+            relatedProducts: 'all',
             company: 'all', store: 'all',
-            enableSurvey: true, enableOrderButton: true
+            enableSurvey: true,
+            enableOrderButton: true
         }
         avatarFileList.value = []
         imageFileList.value = []
@@ -710,6 +735,27 @@
             message.error('Vui lòng upload ít nhất 1 ảnh sản phẩm!')
             return
         }
+
+        if (settings.value.relatedProducts === 'selected' && !selectedProductIds.value.length) {
+            message.error('Vui lòng chọn ít nhất 1 sản phẩm liên quan!')
+            return
+        }
+
+        if (settings.value.company === 'selected' && !selectedCompanies.value.length) {
+            message.error('Vui lòng chọn ít nhất 1 doanh nghiệp!')
+            return
+        }
+
+        if (settings.value.store === 'selected' && !selectedStores.value.length) {
+            message.error('Vui lòng chọn ít nhất 1 cửa hàng!')
+            return
+        }
+
+        // Nếu surveys cũng bắt buộc
+        // if (!selectedSurveys.value.length) {
+        //     message.error('Vui lòng chọn ít nhất 1 khảo sát!')
+        //     return
+        // }
 
         // 👇 Gán mô tả từ Quill vào form
         if (quillInstance.value) {
@@ -801,7 +847,6 @@
         }
 
 
-
         if (editorRef.value) {
             quillInstance.value = new Quill(editorRef.value, {
                 theme: 'snow',
@@ -809,8 +854,8 @@
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline', 'strike'],
-                        [{ list: 'ordered' }, { list: 'bullet' }],
-                        [{ header: [1, 2, false] }],
+                        [{list: 'ordered'}, {list: 'bullet'}],
+                        [{header: [1, 2, false]}],
                         ['link', 'image'],
                         ['clean']
                     ]
@@ -847,9 +892,9 @@
         // Nếu muốn khi bật lại mà không có link thì thêm mặc định
         if (checked && settings.value.productLinks.length === 0) {
             settings.value.productLinks = [
-                { platform: 'Shopee', url: '' },
-                { platform: 'Lazada', url: '' },
-                { platform: 'Tiki', url: '' }
+                {platform: 'Shopee', url: ''},
+                {platform: 'Lazada', url: ''},
+                {platform: 'Tiki', url: ''}
             ]
         }
         // Nếu không muốn thêm mặc định khi bật lại, xoá phần trên.
