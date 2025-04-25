@@ -77,12 +77,20 @@ class BusinessController extends ResourceController
         $businessData = $this->cleanBusinessData($data);
         $businessData['user_id'] = $userId;
 
+        // 👉 Encode display_settings nếu có
+        if (!empty($data['display_settings'])) {
+            $businessData['display_settings'] = is_array($data['display_settings'])
+                ? json_encode($data['display_settings'])
+                : $data['display_settings'];
+        }
+
         $businessId = $model->insert($businessData);
 
         $this->saveExtraInfo($businessId, $data['extra_info'] ?? []);
 
         return $this->respondCreated(['id' => $businessId]);
     }
+
 
     public function update($id = null)
     {
@@ -102,6 +110,14 @@ class BusinessController extends ResourceController
         }
 
         $businessData = $this->cleanBusinessData($data);
+
+        // 👉 Encode display_settings nếu có
+        if (!empty($data['display_settings'])) {
+            $businessData['display_settings'] = is_array($data['display_settings'])
+                ? json_encode($data['display_settings'])
+                : $data['display_settings'];
+        }
+
         $model->update($id, $businessData);
 
         $extraInfoModel->where('business_id', $id)->delete();

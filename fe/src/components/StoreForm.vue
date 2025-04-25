@@ -3,84 +3,86 @@
         <a-button @click="goBack" style="margin-bottom: 16px">Quay lại</a-button>
 
         <a-form :model="form" layout="vertical" @finish="handleSubmit">
-            <a-form-item label="Tên cửa hàng" required>
-                <a-input v-model:value="form.name" placeholder="Nhập tên cửa hàng" />
-            </a-form-item>
+            <a-card style="margin-bottom: 24px">
+                <a-form-item label="Tên cửa hàng" required>
+                    <a-input v-model:value="form.name" placeholder="Nhập tên cửa hàng" />
+                </a-form-item>
 
-            <a-form-item label="Email">
-                <a-input v-model:value="form.email" placeholder="example@mail.com" />
-            </a-form-item>
+                <a-form-item label="Email">
+                    <a-input v-model:value="form.email" placeholder="example@mail.com" />
+                </a-form-item>
 
-            <a-form-item label="Số điện thoại">
-                <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại" />
-            </a-form-item>
+                <a-form-item label="Số điện thoại">
+                    <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại" />
+                </a-form-item>
 
-            <a-form-item label="Địa chỉ">
-                <a-input v-model:value="form.address" placeholder="Nhập địa chỉ" />
-            </a-form-item>
+                <a-form-item label="Địa chỉ">
+                    <a-input v-model:value="form.address" placeholder="Nhập địa chỉ" />
+                </a-form-item>
 
-            <a-form-item label="Mô tả ngắn gọn">
-                <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 8px;" />
-            </a-form-item>
+                <a-form-item label="Mô tả ngắn gọn">
+                    <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 8px;" />
+                </a-form-item>
 
-            <a-form-item label="Logo">
-                <a-upload
-                    list-type="picture-card"
-                    :file-list="logoFileList"
-                    :on-preview="handlePreview"
-                    :on-remove="handleRemoveFile"
-                    :before-upload="handleBeforeUpload"
-                >
-                    <div>
-                        <upload-outlined />
-                        <div style="margin-top: 8px">Upload</div>
-                    </div>
-                </a-upload>
-            </a-form-item>
+                <a-form-item label="Logo">
+                    <a-upload
+                            list-type="picture-card"
+                            :file-list="logoFileList"
+                            :on-preview="handlePreview"
+                            :on-remove="handleRemoveFile"
+                            :before-upload="handleBeforeUpload"
+                    >
+                        <div>
+                            <upload-outlined />
+                            <div style="margin-top: 8px">Upload</div>
+                        </div>
+                    </a-upload>
+                </a-form-item>
 
-            <a-form-item>
-                <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt" />
-            </a-form-item>
+                <a-form-item>
+                    <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt" />
+                </a-form-item>
 
-            <a-form-item label="Thêm sản phẩm vào cửa hàng">
-                <a-switch v-model:checked="enableAddProduct" />
-            </a-form-item>
+                <a-form-item label="Thêm sản phẩm vào cửa hàng">
+                    <a-switch v-model:checked="enableAddProduct" />
+                </a-form-item>
 
-            <div v-if="enableAddProduct" style="margin-bottom: 24px">
-                <a-select
-                    mode="multiple"
-                    style="width: 100%; margin-bottom: 12px"
-                    placeholder="Chọn sản phẩm"
-                    v-model:value="selectedProductIds"
-                    @change="handleProductSelect"
-                >
-                    <a-select-option v-for="product in allProducts" :key="product.id" :value="product.id">
-                        {{ product.name }} - {{ product.price }}đ
-                    </a-select-option>
-                </a-select>
+                <div v-if="enableAddProduct" style="margin-bottom: 24px">
+                    <a-select
+                            mode="multiple"
+                            style="width: 100%; margin-bottom: 12px"
+                            placeholder="Chọn sản phẩm"
+                            v-model:value="selectedProductIds"
+                            @change="handleProductSelect"
+                    >
+                        <a-select-option v-for="product in allProducts" :key="product.id" :value="product.id">
+                            {{ product.name }} - {{ product.price }}đ
+                        </a-select-option>
+                    </a-select>
 
-                <a-table
-                    :columns="productColumns"
-                    :data-source="productList"
-                    row-key="id"
-                    bordered
-                    size="small"
-                >
-                    <template #bodyCell="{ column, record }">
-                        <template v-if="column.key === 'avatar'">
-                            <img
-                                v-if="record.avatar"
-                                :src="parseAvatar(record.avatar)"
-                                alt="Avatar"
-                                style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"
-                            />
+                    <a-table
+                            :columns="productColumns"
+                            :data-source="productList"
+                            row-key="id"
+                            bordered
+                            size="small"
+                    >
+                        <template #bodyCell="{ column, record }">
+                            <template v-if="column.key === 'avatar'">
+                                <img
+                                        v-if="record.avatar"
+                                        :src="parseAvatar(record.avatar)"
+                                        alt="Avatar"
+                                        style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"
+                                />
+                            </template>
+                            <template v-if="column.key === 'action'">
+                                <a-button type="link" @click="removeProduct(record.id)" danger>Xoá</a-button>
+                            </template>
                         </template>
-                        <template v-if="column.key === 'action'">
-                            <a-button type="link" @click="removeProduct(record.id)" danger>Xoá</a-button>
-                        </template>
-                    </template>
-                </a-table>
-            </div>
+                    </a-table>
+                </div>
+            </a-card>
 
             <a-form-item>
                 <a-button type="primary" html-type="submit">Lưu</a-button>

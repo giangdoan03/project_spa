@@ -11,21 +11,16 @@
                     @finish="onFinish"
                     @finishFailed="onFinishFailed"
             >
-                <a-form-item
-                        label="Email"
-                        name="email"
-                        :rules="[
-            { required: true, message: 'Please input your email!' },
-            { type: 'email', message: 'Invalid email format!' }]"
+                <a-form-item label="Email" name="email" :rules="[
+                    { required: true, message: 'Please input your email!' },
+                    { type: 'email', message: 'Invalid email format!' }
+                ]"
                 >
                     <a-input v-model:value="formState.email" placeholder="Enter your email"/>
                 </a-form-item>
 
-                <a-form-item
-                        label="Password"
-                        name="password"
-                        :rules="[{ required: true, message: 'Please input your password!' }]"
-                >
+                <a-form-item label="Password" name="password"
+                             :rules="[{ required: true, message: 'Please input your password!' }]">
                     <a-input-password v-model:value="formState.password" placeholder="Enter your password"/>
                 </a-form-item>
 
@@ -34,12 +29,7 @@
                 </a-form-item>
 
                 <a-form-item>
-                    <a-button
-                            type="primary"
-                            html-type="submit"
-                            block
-                            :loading="loading"
-                    >
+                    <a-button type="primary" html-type="submit" block :loading="loading">
                         Login
                     </a-button>
                 </a-form-item>

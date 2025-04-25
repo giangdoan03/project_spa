@@ -4,139 +4,142 @@
         <a-tabs default-active-key="info">
             <a-tab-pane key="info" tab="Thông tin sản phẩm">
                 <a-form :model="form" layout="vertical" @finish="handleSubmit">
-                    <!-- Ảnh đại diện -->
-                    <a-form-item label="Ảnh đại diện của sản phẩm">
-                        <a-upload
-                                list-type="picture-card"
-                                :file-list="avatarFileList"
-                                :on-preview="handlePreview"
-                                :on-remove="(file) => handleRemoveFile('avatar', file)"
-                                :before-upload="(file) => handleBeforeUploadSingle('avatar', file)"
-                                :max-count="1"
-                        >
-                            <div v-if="avatarFileList.length === 0">
-                                <upload-outlined/>
-                                <div style="margin-top: 8px">Ảnh</div>
+                    <a-card title="Chọn giao diện mẫu" style="margin-bottom: 24px;">
+                        <!-- Ảnh đại diện -->
+                        <a-form-item label="Ảnh đại diện của sản phẩm">
+                            <a-upload
+                                    list-type="picture-card"
+                                    :file-list="avatarFileList"
+                                    :on-preview="handlePreview"
+                                    :on-remove="(file) => handleRemoveFile('avatar', file)"
+                                    :before-upload="(file) => handleBeforeUploadSingle('avatar', file)"
+                                    :max-count="1"
+                            >
+                                <div v-if="avatarFileList.length === 0">
+                                    <upload-outlined/>
+                                    <div style="margin-top: 8px">Ảnh</div>
+                                </div>
+                            </a-upload>
+                        </a-form-item>
+
+                        <!-- Ảnh sản phẩm -->
+                        <a-form-item label="Ảnh sản phẩm">
+                            <a-upload
+                                    list-type="picture-card"
+                                    :file-list="imageFileList"
+                                    :on-preview="handlePreview"
+                                    :on-remove="(file) => handleRemoveFile('image', file)"
+                                    :before-upload="(file) => handleBeforeUploadMultiple('image', file)"
+                                    multiple
+                            >
+                                <div>
+                                    <upload-outlined/>
+                                    <div style="margin-top: 8px">Upload</div>
+                                </div>
+                            </a-upload>
+                        </a-form-item>
+
+                        <!-- Video sản phẩm -->
+                        <a-form-item label="Video giới thiệu sản phẩm">
+                            <a-upload
+                                    list-type="picture-card"
+                                    :file-list="videoFileList"
+                                    :on-preview="handlePreview"
+                                    :on-remove="(file) => handleRemoveFile('video', file)"
+                                    :before-upload="(file) => handleBeforeUploadMultiple('video', file)"
+                                    multiple
+                            >
+                                <div>
+                                    <upload-outlined/>
+                                    <div style="margin-top: 8px">Upload</div>
+                                </div>
+                            </a-upload>
+                        </a-form-item>
+
+                        <!-- Chứng chỉ -->
+                        <a-form-item label="Chứng chỉ, chứng nhận">
+                            <a-upload
+                                    :file-list="certificateFileList"
+                                    :on-preview="handlePreview"
+                                    :on-remove="(file) => handleRemoveFile('certificate_file', file)"
+                                    :before-upload="(file) => handleBeforeUploadMultiple('certificate_file', file)"
+                                    multiple
+                            >
+                                <a-button>Upload</a-button>
+                            </a-upload>
+                        </a-form-item>
+                    </a-card>
+                    <a-card title="Thông tin" style="margin-bottom: 24px;">
+                        <!-- SKU -->
+                        <a-form-item label="Mã sản phẩm (SKU)">
+                            <a-input v-model:value="form.sku" placeholder="Mã sản phẩm (SKU)"/>
+                        </a-form-item>
+
+                        <!-- Tên sản phẩm -->
+                        <a-form-item label="Tên sản phẩm" :rules="[{ required: true, message: 'Nhập tên sản phẩm' }]">
+                            <a-input v-model:value="form.name" placeholder="Tên sản phẩm"/>
+                        </a-form-item>
+
+                        <!-- Danh mục -->
+                        <a-form-item label="Danh mục">
+                            <a-select v-model:value="form.category_id" placeholder="Chọn danh mục">
+                                <a-select-option v-for="category in categories" :key="category.id" :value="category.id">
+                                    {{ category.name }}
+                                </a-select-option>
+                            </a-select>
+                        </a-form-item>
+
+                        <!-- Giá bán -->
+                        <a-form-item label="Giá bán">
+                            <a-radio-group v-model:value="form.price_mode">
+                                <a-radio :value="'single'">Nhập 1 giá</a-radio>
+                                <a-radio :value="'range'">Nhập khoảng giá</a-radio>
+                            </a-radio-group>
+
+                            <div v-if="form.price_mode === 'single'" style="margin-top: 10px;">
+                                <a-input-number v-model:value="form.price" style="width: 100%" placeholder="Nhập giá bán"/>
                             </div>
-                        </a-upload>
-                    </a-form-item>
 
-                    <!-- Ảnh sản phẩm -->
-                    <a-form-item label="Ảnh sản phẩm">
-                        <a-upload
-                                list-type="picture-card"
-                                :file-list="imageFileList"
-                                :on-preview="handlePreview"
-                                :on-remove="(file) => handleRemoveFile('image', file)"
-                                :before-upload="(file) => handleBeforeUploadMultiple('image', file)"
-                                multiple
-                        >
-                            <div>
-                                <upload-outlined/>
-                                <div style="margin-top: 8px">Upload</div>
+                            <div v-if="form.price_mode === 'range'" style="margin-top: 10px; display: flex; gap: 8px;">
+                                <a-input-number v-model:value="form.price_from" style="width: 100%" placeholder="Giá từ"/>
+                                <a-input-number v-model:value="form.price_to" style="width: 100%" placeholder="Giá đến"/>
                             </div>
-                        </a-upload>
-                    </a-form-item>
 
-                    <!-- Video sản phẩm -->
-                    <a-form-item label="Video giới thiệu sản phẩm">
-                        <a-upload
-                                list-type="picture-card"
-                                :file-list="videoFileList"
-                                :on-preview="handlePreview"
-                                :on-remove="(file) => handleRemoveFile('video', file)"
-                                :before-upload="(file) => handleBeforeUploadMultiple('video', file)"
-                                multiple
-                        >
-                            <div>
-                                <upload-outlined/>
-                                <div style="margin-top: 8px">Upload</div>
+                            <a-checkbox v-model:checked="form.show_contact_price" style="margin-top: 10px;">
+                                Hiển thị 'Liên hệ báo giá' nếu không có thông tin giá bán
+                            </a-checkbox>
+                        </a-form-item>
+
+
+                        <!-- Mô tả sản phẩm -->
+                        <a-form-item label="Mô tả sản phẩm">
+                            <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; padding: 8px;"/>
+                        </a-form-item>
+
+                        <!-- Thuộc tính sản phẩm -->
+                        <a-form-item label="Tiêu đề thuộc tính">
+                            <div v-for="(attr, index) in form.attributes" :key="index"
+                                 style="margin-bottom: 8px; display: flex;">
+                                <a-input v-model:value="attr.name" placeholder="Tên thuộc tính" style="margin-right: 8px;"/>
+                                <a-input v-model:value="attr.value" placeholder="Giá trị" style="margin-right: 8px;"/>
+                                <a-button type="link" danger @click="removeAttribute(index)">Xoá</a-button>
                             </div>
-                        </a-upload>
-                    </a-form-item>
+                            <a-button type="dashed" block @click="addAttribute">Thêm thuộc tính</a-button>
+                        </a-form-item>
 
-                    <!-- Chứng chỉ -->
-                    <a-form-item label="Chứng chỉ, chứng nhận">
-                        <a-upload
-                                :file-list="certificateFileList"
-                                :on-preview="handlePreview"
-                                :on-remove="(file) => handleRemoveFile('certificate_file', file)"
-                                :before-upload="(file) => handleBeforeUploadMultiple('certificate_file', file)"
-                                multiple
-                        >
-                            <a-button>Upload</a-button>
-                        </a-upload>
-                    </a-form-item>
+                        <!-- Trạng thái -->
+                        <!--                    <a-form-item label="Trạng thái">-->
+                        <!--                        <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt"/>-->
+                        <!--                    </a-form-item>-->
 
-                    <!-- SKU -->
-                    <a-form-item label="Mã sản phẩm (SKU)">
-                        <a-input v-model:value="form.sku" placeholder="Mã sản phẩm (SKU)"/>
-                    </a-form-item>
-
-                    <!-- Tên sản phẩm -->
-                    <a-form-item label="Tên sản phẩm" :rules="[{ required: true, message: 'Nhập tên sản phẩm' }]">
-                        <a-input v-model:value="form.name" placeholder="Tên sản phẩm"/>
-                    </a-form-item>
-
-                    <!-- Danh mục -->
-                    <a-form-item label="Danh mục">
-                        <a-select v-model:value="form.category_id" placeholder="Chọn danh mục">
-                            <a-select-option v-for="category in categories" :key="category.id" :value="category.id">
-                                {{ category.name }}
-                            </a-select-option>
-                        </a-select>
-                    </a-form-item>
-
-                    <!-- Giá bán -->
-                    <a-form-item label="Giá bán">
-                        <a-radio-group v-model:value="form.price_mode">
-                            <a-radio :value="'single'">Nhập 1 giá</a-radio>
-                            <a-radio :value="'range'">Nhập khoảng giá</a-radio>
-                        </a-radio-group>
-
-                        <div v-if="form.price_mode === 'single'" style="margin-top: 10px;">
-                            <a-input-number v-model:value="form.price" style="width: 100%" placeholder="Nhập giá bán"/>
-                        </div>
-
-                        <div v-if="form.price_mode === 'range'" style="margin-top: 10px; display: flex; gap: 8px;">
-                            <a-input-number v-model:value="form.price_from" style="width: 100%" placeholder="Giá từ"/>
-                            <a-input-number v-model:value="form.price_to" style="width: 100%" placeholder="Giá đến"/>
-                        </div>
-
-                        <a-checkbox v-model:checked="form.show_contact_price" style="margin-top: 10px;">
-                            Hiển thị 'Liên hệ báo giá' nếu không có thông tin giá bán
-                        </a-checkbox>
-                    </a-form-item>
-
-
-                    <!-- Mô tả sản phẩm -->
-                    <a-form-item label="Mô tả sản phẩm">
-                        <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; padding: 8px;"/>
-                    </a-form-item>
-
-                    <!-- Thuộc tính sản phẩm -->
-                    <a-form-item label="Tiêu đề thuộc tính">
-                        <div v-for="(attr, index) in form.attributes" :key="index"
-                             style="margin-bottom: 8px; display: flex;">
-                            <a-input v-model:value="attr.name" placeholder="Tên thuộc tính" style="margin-right: 8px;"/>
-                            <a-input v-model:value="attr.value" placeholder="Giá trị" style="margin-right: 8px;"/>
-                            <a-button type="link" danger @click="removeAttribute(index)">Xoá</a-button>
-                        </div>
-                        <a-button type="dashed" block @click="addAttribute">Thêm thuộc tính</a-button>
-                    </a-form-item>
-
-                    <!-- Trạng thái -->
-                    <!--                    <a-form-item label="Trạng thái">-->
-                    <!--                        <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt"/>-->
-                    <!--                    </a-form-item>-->
-
-                    <!-- Nút hành động -->
-                    <a-form-item>
-                        <a-space>
-                            <a-button type="primary" html-type="submit" :loading="loading">Lưu</a-button>
-                            <a-button @click="goBack">Huỷ</a-button>
-                        </a-space>
-                    </a-form-item>
+                        <!-- Nút hành động -->
+                        <a-form-item>
+                            <a-space>
+                                <a-button type="primary" html-type="submit" :loading="loading">Lưu</a-button>
+                                <a-button @click="goBack">Huỷ</a-button>
+                            </a-space>
+                        </a-form-item>
+                    </a-card>
                 </a-form>
             </a-tab-pane>
 
@@ -145,23 +148,24 @@
                     <a-col :span="16">
                         <a-form layout="vertical">
                             <!-- Giao diện mẫu -->
-                            <a-form-item label="Chọn giao diện mẫu">
-                                <a-row :gutter="16">
-                                    <a-col v-for="tpl in templateOptions" :key="tpl.id" :xs="24" :sm="12" :md="8"
-                                           :lg="8" style="margin-bottom: 16px">
-                                        <a-card hoverable
-                                                :class="{ 'selected-card': settings.selectedTemplate === tpl.id, 'active-card': isActiveTemplate(tpl.id) }"
-                                                @click="selectTemplate(tpl)">
-                                            <template #cover>
-                                                <img :src="tpl.thumbnail" alt="template"
-                                                     style="height: 200px; object-fit: cover"/>
-                                            </template>
-                                            <a-card-meta :title="tpl.title" :description="tpl.description"/>
-                                        </a-card>
-                                    </a-col>
-                                </a-row>
-                            </a-form-item>
-
+                            <a-card title="Chọn giao diện mẫu" style="margin-bottom: 24px;">
+                                <a-form-item>
+                                    <a-row :gutter="16">
+                                        <a-col v-for="tpl in templateOptions" :key="tpl.id" :xs="24" :sm="12" :md="8"
+                                               :lg="8" style="margin-bottom: 16px">
+                                            <a-card hoverable
+                                                    :class="{ 'selected-card': settings.selectedTemplate === tpl.id, 'active-card': isActiveTemplate(tpl.id) }"
+                                                    @click="selectTemplate(tpl)">
+                                                <template #cover>
+                                                    <img :src="tpl.thumbnail" alt="template"
+                                                         style="height: 200px; object-fit: cover"/>
+                                                </template>
+                                                <a-card-meta :title="tpl.title" :description="tpl.description"/>
+                                            </a-card>
+                                        </a-col>
+                                    </a-row>
+                                </a-form-item>
+                            </a-card>
                             <!-- Sản phẩm liên quan -->
                             <a-card title="Sản phẩm liên quan" style="margin-bottom: 24px;">
                                 <a-form-item>
@@ -273,28 +277,31 @@
 
 
                             <!-- Khảo sát + nút đặt hàng -->
-                            <a-form-item label="Khảo sát">
-                                <a-switch v-model:checked="settings.enableSurvey" disabled
-                                          class="custom-disabled-switch"/>
-                            </a-form-item>
+                            <a-card title="Khảo sát" style="margin-bottom: 24px;">
+                                <a-form-item>
+                                    <a-switch v-model:checked="settings.enableSurvey" disabled
+                                              class="custom-disabled-switch"/>
+                                </a-form-item>
+                            </a-card>
 
-                            <a-form-item label="Link bán hàng trên sàn">
-                                <a-switch v-model:checked="settings.enableOrderButton"
-                                          @change="handleOrderButtonToggle"/>
+                            <a-card title="Link liên kết" style="margin-bottom: 24px;">
+                                <a-form-item label="Link bán hàng trên sàn">
+                                    <a-switch v-model:checked="settings.enableOrderButton"
+                                              @change="handleOrderButtonToggle"/>
 
-                                <!-- Hiển thị nếu bật -->
-                                <div class="link-list-wrapper">
-                                    <div v-for="(link, index) in settings.productLinks" :key="index"
-                                         style="display: flex; gap: 8px; margin-bottom: 8px;">
-                                        <a-input v-model:value="link.url" :placeholder="link.platform + ' Link'"
-                                                 style="flex: 1;"/>
-                                        <a-button type="text" danger @click="removeProductLink(index)">
-                                            <delete-outlined/>
-                                        </a-button>
+                                    <!-- Hiển thị nếu bật -->
+                                    <div class="link-list-wrapper">
+                                        <div v-for="(link, index) in settings.productLinks" :key="index"
+                                             style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <a-input v-model:value="link.url" :placeholder="link.platform + ' Link'"
+                                                     style="flex: 1;"/>
+                                            <a-button type="text" danger @click="removeProductLink(index)">
+                                                <delete-outlined/>
+                                            </a-button>
+                                        </div>
                                     </div>
-                                </div>
-                            </a-form-item>
-
+                                </a-form-item>
+                            </a-card>
                             <a-form-item>
                                 <a-button type="primary" @click="handleSubmit" :loading="loading">Lưu</a-button>
                             </a-form-item>
@@ -346,7 +353,7 @@
     import {uploadFile} from '../api/product'
     import {defineAsyncComponent} from 'vue'
     import {normalizeProductData} from '../utils/formUtils'
-    import templateOptions from '@/components/templates'
+    import templateOptions from '@/components/templates/products'
     import Quill from 'quill'
     import 'quill/dist/quill.snow.css'
 

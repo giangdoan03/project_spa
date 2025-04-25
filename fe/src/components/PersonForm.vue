@@ -5,47 +5,48 @@
             Quay lại danh sách
         </a-button>
         <a-form :model="form" layout="vertical" @finish="handleSubmit">
-            <!-- Ảnh đại diện -->
-            <a-form-item label="Ảnh đại diện">
-                <a-upload
-                    list-type="picture-card"
-                    :file-list="avatarFileList"
-                    :on-preview="handlePreview"
-                    :on-remove="(file) => handleRemoveFile('avatar', file)"
-                    :before-upload="(file) => handleBeforeUpload('avatar', file)"
-                >
-                    <div>
-                        <upload-outlined />
-                        <div style="margin-top: 8px">Upload</div>
-                    </div>
-                </a-upload>
-            </a-form-item>
+            <a-card style="margin-bottom: 24px">
+                <!-- Ảnh đại diện -->
+                <a-form-item label="Ảnh đại diện">
+                    <a-upload
+                            list-type="picture-card"
+                            :file-list="avatarFileList"
+                            :on-preview="handlePreview"
+                            :on-remove="(file) => handleRemoveFile('avatar', file)"
+                            :before-upload="(file) => handleBeforeUpload('avatar', file)"
+                    >
+                        <div>
+                            <upload-outlined />
+                            <div style="margin-top: 8px">Upload</div>
+                        </div>
+                    </a-upload>
+                </a-form-item>
 
-            <!-- Họ tên -->
-            <a-form-item label="Họ và tên" required>
-                <a-input v-model:value="form.name" placeholder="Nhập họ tên" />
-            </a-form-item>
+                <!-- Họ tên -->
+                <a-form-item label="Họ và tên" required>
+                    <a-input v-model:value="form.name" placeholder="Nhập họ tên" />
+                </a-form-item>
 
-            <!-- Email -->
-            <a-form-item label="Email">
-                <a-input v-model:value="form.email" placeholder="example@mail.com" />
-            </a-form-item>
+                <!-- Email -->
+                <a-form-item label="Email">
+                    <a-input v-model:value="form.email" placeholder="example@mail.com" />
+                </a-form-item>
 
-            <!-- Số điện thoại -->
-            <a-form-item label="Số điện thoại">
-                <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại" />
-            </a-form-item>
+                <!-- Số điện thoại -->
+                <a-form-item label="Số điện thoại">
+                    <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại" />
+                </a-form-item>
 
-            <!-- Chức danh -->
-            <a-form-item label="Chức danh">
-                <a-input v-model:value="form.job_title" placeholder="VD: Giám đốc Marketing" />
-            </a-form-item>
+                <!-- Chức danh -->
+                <a-form-item label="Chức danh">
+                    <a-input v-model:value="form.job_title" placeholder="VD: Giám đốc Marketing" />
+                </a-form-item>
 
-            <!-- Tiểu sử -->
-            <a-form-item label="Tiểu sử">
-                <a-textarea v-model:value="form.bio" :rows="4" placeholder="Giới thiệu ngắn gọn về cá nhân..." />
-            </a-form-item>
-
+                <!-- Tiểu sử -->
+                <a-form-item label="Tiểu sử">
+                    <a-textarea v-model:value="form.bio" :rows="4" placeholder="Giới thiệu ngắn gọn về cá nhân..." />
+                </a-form-item>
+            </a-card>
             <!-- Nút hành động -->
             <a-form-item>
                 <a-space>

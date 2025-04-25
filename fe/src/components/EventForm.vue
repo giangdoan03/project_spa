@@ -6,44 +6,46 @@
         </a-button>
 
         <a-form :model="form" layout="vertical" @finish="handleSubmit">
-            <!-- Banner -->
-            <a-form-item label="Ảnh banner">
-                <a-upload
-                    list-type="picture-card"
-                    :file-list="bannerFileList"
-                    :on-preview="handlePreview"
-                    :on-remove="(file) => handleRemoveFile('banner', file)"
-                    :before-upload="(file) => handleBeforeUpload('banner', file)"
-                >
-                    <div>
-                        <upload-outlined />
-                        <div style="margin-top: 8px">Upload</div>
-                    </div>
-                </a-upload>
-            </a-form-item>
+            <a-card style="margin-bottom: 24px">
+                <!-- Banner -->
+                <a-form-item label="Ảnh banner">
+                    <a-upload
+                            list-type="picture-card"
+                            :file-list="bannerFileList"
+                            :on-preview="handlePreview"
+                            :on-remove="(file) => handleRemoveFile('banner', file)"
+                            :before-upload="(file) => handleBeforeUpload('banner', file)"
+                    >
+                        <div>
+                            <upload-outlined />
+                            <div style="margin-top: 8px">Upload</div>
+                        </div>
+                    </a-upload>
+                </a-form-item>
 
-            <!-- Tên sự kiện -->
-            <a-form-item label="Tên sự kiện" required>
-                <a-input v-model:value="form.name" placeholder="Nhập tên sự kiện" />
-            </a-form-item>
+                <!-- Tên sự kiện -->
+                <a-form-item label="Tên sự kiện" required>
+                    <a-input v-model:value="form.name" placeholder="Nhập tên sự kiện" />
+                </a-form-item>
 
-            <!-- Địa điểm -->
-            <a-form-item label="Địa điểm">
-                <a-input v-model:value="form.location" placeholder="Nhập địa điểm tổ chức" />
-            </a-form-item>
+                <!-- Địa điểm -->
+                <a-form-item label="Địa điểm">
+                    <a-input v-model:value="form.location" placeholder="Nhập địa điểm tổ chức" />
+                </a-form-item>
 
-            <!-- Thời gian -->
-            <a-form-item label="Thời gian bắt đầu">
-                <a-date-picker show-time v-model:value="form.start_time" style="width: 100%" />
-            </a-form-item>
-            <a-form-item label="Thời gian kết thúc">
-                <a-date-picker show-time v-model:value="form.end_time" style="width: 100%" />
-            </a-form-item>
+                <!-- Thời gian -->
+                <a-form-item label="Thời gian bắt đầu">
+                    <a-date-picker show-time v-model:value="form.start_time" style="width: 100%" />
+                </a-form-item>
+                <a-form-item label="Thời gian kết thúc">
+                    <a-date-picker show-time v-model:value="form.end_time" style="width: 100%" />
+                </a-form-item>
 
-            <!-- Mô tả -->
-            <a-form-item label="Mô tả sự kiện">
-                <a-textarea v-model:value="form.description" :rows="4" placeholder="Mô tả chi tiết về sự kiện..." />
-            </a-form-item>
+                <!-- Mô tả -->
+                <a-form-item label="Mô tả sự kiện">
+                    <a-textarea v-model:value="form.description" :rows="4" placeholder="Mô tả chi tiết về sự kiện..." />
+                </a-form-item>
+            </a-card>
 
             <!-- Nút hành động -->
             <a-form-item>
