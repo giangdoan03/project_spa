@@ -9,12 +9,12 @@
                         <!-- Ảnh đại diện / Logo (chỉ 1 ảnh) -->
                         <a-form-item label="Ảnh đại diện / Ảnh logo">
                             <a-upload
-                                    list-type="picture-card"
-                                    :file-list="logoFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('logo', file)"
-                                    :before-upload="(file) => handleBeforeUploadSingle('logo', file)"
-                                    :max-count="1"
+                                list-type="picture-card"
+                                :file-list="logoFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('logo', file)"
+                                :before-upload="(file) => handleBeforeUploadSingle('logo', file)"
+                                :max-count="1"
                             >
                                 <div v-if="logoFileList.length === 0">
                                     <upload-outlined/>
@@ -26,12 +26,12 @@
                         <!-- Ảnh bìa -->
                         <a-form-item label="Ảnh bìa">
                             <a-upload
-                                    list-type="picture-card"
-                                    :file-list="coverFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('cover_image', file)"
-                                    :before-upload="(file) => handleBeforeUploadMultiple('cover_image', file)"
-                                    multiple
+                                list-type="picture-card"
+                                :file-list="coverFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('cover_image', file)"
+                                :before-upload="(file) => handleBeforeUploadMultiple('cover_image', file)"
+                                multiple
                             >
                                 <div>
                                     <upload-outlined/>
@@ -43,12 +43,12 @@
                         <!-- Thư viện ảnh -->
                         <a-form-item label="Thư viện ảnh">
                             <a-upload
-                                    list-type="picture-card"
-                                    :file-list="libraryFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('library_images', file)"
-                                    :before-upload="(file) => handleBeforeUploadMultiple('library_images', file)"
-                                    multiple
+                                list-type="picture-card"
+                                :file-list="libraryFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('library_images', file)"
+                                :before-upload="(file) => handleBeforeUploadMultiple('library_images', file)"
+                                multiple
                             >
                                 <div>
                                     <upload-outlined/>
@@ -60,12 +60,12 @@
                         <!-- Video giới thiệu -->
                         <a-form-item label="Video giới thiệu">
                             <a-upload
-                                    list-type="picture-card"
-                                    :file-list="videoFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('video_intro', file)"
-                                    :before-upload="(file) => handleBeforeUploadMultiple('video_intro', file)"
-                                    multiple
+                                list-type="picture-card"
+                                :file-list="videoFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('video_intro', file)"
+                                :before-upload="(file) => handleBeforeUploadMultiple('video_intro', file)"
+                                multiple
                             >
                                 <div>
                                     <upload-outlined/>
@@ -77,11 +77,11 @@
                         <!-- Chứng chỉ -->
                         <a-form-item label="Chứng chỉ, chứng nhận">
                             <a-upload
-                                    :file-list="certificateFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('certificate_file', file)"
-                                    :before-upload="(file) => handleBeforeUploadMultiple('certificate_file', file)"
-                                    multiple
+                                :file-list="certificateFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('certificate_file', file)"
+                                :before-upload="(file) => handleBeforeUploadMultiple('certificate_file', file)"
+                                multiple
                             >
                                 <a-button>Tải lên</a-button>
                             </a-upload>
@@ -186,7 +186,8 @@
                             <!-- Sản phẩm liên quan -->
                             <a-card title="Sản phẩm" style="margin-bottom: 24px;">
                                 <a-form-item>
-                                    <a-radio-group v-model:value="settings.relatedProducts" @change="handleRelatedProductModeChange">
+                                    <a-radio-group v-model:value="settings.relatedProducts"
+                                                   @change="handleRelatedProductModeChange">
                                         <a-radio :value="'all'">Tất cả sản phẩm</a-radio>
                                         <a-radio :value="'selected'">Chọn sản phẩm</a-radio>
                                     </a-radio-group>
@@ -196,19 +197,22 @@
                                     <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
                                               placeholder="Chọn sản phẩm" v-model:value="selectedProductIds"
                                               @change="handleProductSelect">
-                                        <a-select-option v-for="product in allProducts" :key="product.id" :value="product.id">
+                                        <a-select-option v-for="product in allProducts" :key="product.id"
+                                                         :value="product.id">
                                             {{ product.name }} - {{ product.price }}đ
                                         </a-select-option>
                                     </a-select>
 
-                                    <a-table :columns="productColumns" :data-source="productList" row-key="id" bordered size="small">
+                                    <a-table :columns="productColumns" :data-source="productList" row-key="id" bordered
+                                             size="small">
                                         <template #bodyCell="{ column, record }">
                                             <template v-if="column.key === 'avatar'">
                                                 <img v-if="record.avatar" :src="parseAvatar(record.avatar)" alt="Avatar"
                                                      style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
                                             </template>
                                             <template v-if="column.key === 'action'">
-                                                <a-button type="link" @click="removeProduct(record.id)" danger>Xoá</a-button>
+                                                <a-button type="link" @click="removeProduct(record.id)" danger>Xoá
+                                                </a-button>
                                             </template>
                                         </template>
                                     </a-table>
@@ -241,7 +245,8 @@
                                                      style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
                                             </template>
                                             <template v-if="column.key === 'action'">
-                                                <a-button type="link" @click="removeStore(record.id)" danger>Xoá</a-button>
+                                                <a-button type="link" @click="removeStore(record.id)" danger>Xoá
+                                                </a-button>
                                             </template>
                                         </template>
                                     </a-table>
@@ -266,12 +271,12 @@
                             </div>
                             <div class="iphone-screen">
                                 <component
-                                        :is="AsyncTemplate"
-                                        :product="form"
-                                        :business="businessList"
-                                        :store="storeList"
-                                        :all-businesses="allBusinesses"
-                                        :all-stores="allStores"
+                                    :is="AsyncTemplate"
+                                    :product="form"
+                                    :business="businessList"
+                                    :store="storeList"
+                                    :all-businesses="allBusinesses"
+                                    :all-stores="allStores"
                                 />
                             </div>
                         </div>
@@ -288,480 +293,476 @@
 </template>
 
 <script setup>
-    import {ref, onMounted, computed, defineAsyncComponent} from 'vue'
-    import {useRoute, useRouter} from 'vue-router'
-    import {createBusiness, getBusiness, updateBusiness} from '../api/business'
-    import {createProduct, getProduct, getProducts, updateProduct, uploadFile} from '../api/product'
-    import {getStores} from '../api/store'
-    import {message} from 'ant-design-vue'
-    import {UploadOutlined} from '@ant-design/icons-vue'
+import {ref, onMounted, computed, defineAsyncComponent} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {createBusiness, getBusiness, updateBusiness} from '../api/business'
+import {createProduct, getProduct, getProducts, updateProduct, uploadFile} from '../api/product'
+import {getStores} from '../api/store'
+import {message} from 'ant-design-vue'
+import {UploadOutlined} from '@ant-design/icons-vue'
 
-    import templateOptions from '@/components/templates/businesses'
-    import Quill from 'quill'
-    import 'quill/dist/quill.snow.css'
+import templateOptions from '@/components/templates/businesses'
+import Quill from 'quill'
+import 'quill/dist/quill.snow.css'
 
-    const router = useRouter()
-    const route = useRoute()
-    const loading = ref(false)
-    const otherLinksText = ref('')
-    const isIslandExpanded = ref(false)
-    const businessList = ref([])
-    const storeList = ref([])
+const router = useRouter()
+const route = useRoute()
+const loading = ref(false)
+const otherLinksText = ref('')
+const isIslandExpanded = ref(false)
+const businessList = ref([])
+const storeList = ref([])
 
-    const allProducts = ref([])
-    const productList = ref([])
-    const allBusinesses = ref([])
-    const allStores = ref([])
-    const selectedProductIds = ref([]);
-    const selectedStores = ref([])
-
-
-    const form = ref({
-        name: '', tax_code: '', country: '', city: '', district: '', ward: '', address: '',
-        phone: '', email: '', website: '', description: '', career: '', facebook_link: '',
-        other_links: '', logo: [], cover_image: [], library_images: [], video_intro: [],
-        certificate_file: [], status: true,
-    });
+const allProducts = ref([])
+const productList = ref([])
+const allBusinesses = ref([])
+const allStores = ref([])
+const selectedProductIds = ref([]);
+const selectedStores = ref([])
 
 
-    const productColumns = [
-        { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name' },
-        { title: 'Hình ảnh', key: 'avatar', dataIndex: 'avatar' },
-        { title: 'Giá', dataIndex: 'price', key: 'price' },
-        { title: 'Hành động', key: 'action' }
-    ];
-
-    const storeColumns = [
-        {title: 'ID', dataIndex: 'id', key: 'id'},
-        {title: 'Logo', dataIndex: 'logo', key: 'logo'},
-        {title: 'Tên cửa hàng', dataIndex: 'name', key: 'name'},
-        {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
-        {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
-        {title: 'Email', dataIndex: 'email', key: 'email'},
-        {title: 'Hành động', key: 'action'}
-    ]
+const form = ref({
+    name: '', tax_code: '', country: '', city: '', district: '', ward: '', address: '',
+    phone: '', email: '', website: '', description: '', career: '', facebook_link: '',
+    other_links: '', logo: [], cover_image: [], library_images: [], video_intro: [],
+    certificate_file: [], status: true,
+});
 
 
-    // File lists
-    const logoFileList = ref([]);
-    const coverFileList = ref([]);
-    const libraryFileList = ref([]);
-    const videoFileList = ref([]);
-    const certificateFileList = ref([]);
+const productColumns = [
+    {title: 'Tên sản phẩm', dataIndex: 'name', key: 'name'},
+    {title: 'Hình ảnh', key: 'avatar', dataIndex: 'avatar'},
+    {title: 'Giá', dataIndex: 'price', key: 'price'},
+    {title: 'Hành động', key: 'action'}
+];
 
-    // Modal preview
-    const previewImage = ref('');
-    const previewVisible = ref(false);
-    const previewTitle = ref('');
+const storeColumns = [
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Logo', dataIndex: 'logo', key: 'logo'},
+    {title: 'Tên cửa hàng', dataIndex: 'name', key: 'name'},
+    {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
+    {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
+    {title: 'Email', dataIndex: 'email', key: 'email'},
+    {title: 'Hành động', key: 'action'}
+]
 
-    const isEditMode = computed(() => !!route.params.id);
 
-    const selectedTemplateData = computed(() =>
-        templateOptions.find(t => t.id === settings.value.selectedTemplate)
-    )
+// File lists
+const logoFileList = ref([]);
+const coverFileList = ref([]);
+const libraryFileList = ref([]);
+const videoFileList = ref([]);
+const certificateFileList = ref([]);
 
-    const AsyncTemplate = computed(() => {
-        return selectedTemplateData.value?.component ? defineAsyncComponent(selectedTemplateData.value.component) : null
-    })
+// Modal preview
+const previewImage = ref('');
+const previewVisible = ref(false);
+const previewTitle = ref('');
 
-    const selectTemplate = (tpl) => {
-        settings.value.selectedTemplate = tpl.id;
+const isEditMode = computed(() => !!route.params.id);
+
+const selectedTemplateData = computed(() =>
+    templateOptions.find(t => t.id === settings.value.selectedTemplate)
+)
+
+const AsyncTemplate = computed(() => {
+    return selectedTemplateData.value?.component ? defineAsyncComponent(selectedTemplateData.value.component) : null
+})
+
+const selectTemplate = (tpl) => {
+    settings.value.selectedTemplate = tpl.id;
+}
+
+const isActiveTemplate = (tplId) => {
+    return settings.value.selectedTemplate === tplId;
+}
+
+
+const parseAvatar = (avatar) => {
+    try {
+        const parsed = JSON.parse(avatar);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : ''
+    } catch {
+        return ''
+    }
+}
+
+// Fetch data if edit mode
+const fetchBusiness = async () => {
+    try {
+        const {data} = await getBusiness(route.params.id);
+        Object.assign(form.value, data);
+
+        otherLinksText.value = Array.isArray(data.other_links)
+            ? data.other_links.join('\n')
+            : (data.other_links || '')
+
+        const loadFileList = (field, list) => {
+            let files = typeof list === 'string' ? JSON.parse(list) : list
+            if (!Array.isArray(files)) files = [files]
+            files.forEach(url => updateFileList(field, url))
+        }
+
+        ['logo', 'cover_image', 'library_images', 'video_intro', 'certificate_file'].forEach(field => {
+            if (form.value[field]) loadFileList(field, form.value[field])
+        })
+
+    } catch (error) {
+        message.error('Không tìm thấy doanh nghiệp')
+    }
+}
+
+// Update file list
+const updateFileList = (field, url) => {
+    const file = {uid: Date.now() + Math.random(), name: url.split('/').pop(), status: 'done', url}
+    switch (field) {
+        case 'logo':
+            logoFileList.value = [file];
+            break
+        case 'cover_image':
+            coverFileList.value.push(file);
+            break
+        case 'library_images':
+            libraryFileList.value.push(file);
+            break
+        case 'video_intro':
+            videoFileList.value.push(file);
+            break
+        case 'certificate_file':
+            certificateFileList.value.push(file);
+            break
+    }
+}
+
+// Upload handler for single file (logo)
+const handleBeforeUploadSingle = async (field, file) => {
+    const {data} = await uploadFile(file)
+    form.value[field] = [data.url]
+    updateFileList(field, data.url)
+    return false
+}
+
+// Upload handler for multiple files
+const handleBeforeUploadMultiple = async (field, file) => {
+    const {data} = await uploadFile(file)
+    if (!Array.isArray(form.value[field])) form.value[field] = []
+    form.value[field].push(data.url)
+    updateFileList(field, data.url)
+    return false
+}
+
+// Remove file handler
+const handleRemoveFile = (field, file) => {
+    form.value[field] = form.value[field].filter(url => url !== file.url)
+    const updateList = list => list.value = list.value.filter(item => item.url !== file.url)
+    switch (field) {
+        case 'logo':
+            updateList(logoFileList);
+            break
+        case 'cover_image':
+            updateList(coverFileList);
+            break
+        case 'library_images':
+            updateList(libraryFileList);
+            break
+        case 'video_intro':
+            updateList(videoFileList);
+            break
+        case 'certificate_file':
+            updateList(certificateFileList);
+            break
+    }
+}
+
+// Preview modal
+const handlePreview = (file) => {
+    previewImage.value = file.url || file.thumbUrl
+    previewVisible.value = true
+    previewTitle.value = file.name || ''
+}
+
+
+const settings = ref({
+    selectedTemplate: 'tpl-1',         // Template hiển thị
+
+    company: 'all',                    // 'all' hoặc 'selected'
+    selectedCompanies: [],             // ID công ty được chọn khi company = 'selected'
+
+    store: 'all',                      // 'all' hoặc 'selected'
+    selectedStores: [],                // ID cửa hàng được chọn khi store = 'selected'
+
+});
+
+// Gọi API sản phẩm
+const fetchAllProducts = async () => {
+    try {
+        const response = await getProducts({per_page: 1000});
+        allProducts.value = response.data.data;
+    } catch (err) {
+        message.error('Lỗi tải danh sách sản phẩm');
+    }
+};
+
+// Chọn sản phẩm từ select box
+const handleProductSelect = (ids) => {
+    productList.value = allProducts.value.filter(p => ids.includes(p.id));
+    selectedProductIds.value = ids;
+    settings.value.selectedProducts = ids;
+};
+
+// Xoá sản phẩm đã chọn
+const removeProduct = (id) => {
+    selectedProductIds.value = selectedProductIds.value.filter(pid => pid !== id);
+    productList.value = productList.value.filter(p => p.id !== id);
+    settings.value.selectedProducts = [...selectedProductIds.value];
+};
+
+// Khi đổi mode sản phẩm liên quan
+const handleRelatedProductModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
     }
 
-    const isActiveTemplate = (tplId) => {
-        return settings.value.selectedTemplate === tplId;
-    }
-
-
-    const parseAvatar = (avatar) => {
-        try {
-            const parsed = JSON.parse(avatar);
-            return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : ''
-        } catch {
-            return ''
-        }
-    }
-
-    // Fetch data if edit mode
-    const fetchBusiness = async () => {
-        try {
-            const {data} = await getBusiness(route.params.id);
-            Object.assign(form.value, data);
-
-            otherLinksText.value = Array.isArray(data.other_links)
-                ? data.other_links.join('\n')
-                : (data.other_links || '')
-
-            const loadFileList = (field, list) => {
-                let files = typeof list === 'string' ? JSON.parse(list) : list
-                if (!Array.isArray(files)) files = [files]
-                files.forEach(url => updateFileList(field, url))
-            }
-
-            ['logo', 'cover_image', 'library_images', 'video_intro', 'certificate_file'].forEach(field => {
-                if (form.value[field]) loadFileList(field, form.value[field])
-            })
-
-        } catch (error) {
-            message.error('Không tìm thấy doanh nghiệp')
-        }
-    }
-
-    // Update file list
-    const updateFileList = (field, url) => {
-        const file = {uid: Date.now() + Math.random(), name: url.split('/').pop(), status: 'done', url}
-        switch (field) {
-            case 'logo':
-                logoFileList.value = [file];
-                break
-            case 'cover_image':
-                coverFileList.value.push(file);
-                break
-            case 'library_images':
-                libraryFileList.value.push(file);
-                break
-            case 'video_intro':
-                videoFileList.value.push(file);
-                break
-            case 'certificate_file':
-                certificateFileList.value.push(file);
-                break
-        }
-    }
-
-    // Upload handler for single file (logo)
-    const handleBeforeUploadSingle = async (field, file) => {
-        const {data} = await uploadFile(file)
-        form.value[field] = [data.url]
-        updateFileList(field, data.url)
-        return false
-    }
-
-    // Upload handler for multiple files
-    const handleBeforeUploadMultiple = async (field, file) => {
-        const {data} = await uploadFile(file)
-        if (!Array.isArray(form.value[field])) form.value[field] = []
-        form.value[field].push(data.url)
-        updateFileList(field, data.url)
-        return false
-    }
-
-    // Remove file handler
-    const handleRemoveFile = (field, file) => {
-        form.value[field] = form.value[field].filter(url => url !== file.url)
-        const updateList = list => list.value = list.value.filter(item => item.url !== file.url)
-        switch (field) {
-            case 'logo':
-                updateList(logoFileList);
-                break
-            case 'cover_image':
-                updateList(coverFileList);
-                break
-            case 'library_images':
-                updateList(libraryFileList);
-                break
-            case 'video_intro':
-                updateList(videoFileList);
-                break
-            case 'certificate_file':
-                updateList(certificateFileList);
-                break
-        }
-    }
-
-    // Preview modal
-    const handlePreview = (file) => {
-        previewImage.value = file.url || file.thumbUrl
-        previewVisible.value = true
-        previewTitle.value = file.name || ''
-    }
-
-
-
-    const settings = ref({
-        selectedTemplate: 'tpl-1',         // Template hiển thị
-
-        company: 'all',                    // 'all' hoặc 'selected'
-        selectedCompanies: [],             // ID công ty được chọn khi company = 'selected'
-
-        store: 'all',                      // 'all' hoặc 'selected'
-        selectedStores: [],                // ID cửa hàng được chọn khi store = 'selected'
-
-    });
-
-    // Gọi API sản phẩm
-    const fetchAllProducts = async () => {
-        try {
-            const response = await getProducts({ per_page: 1000 });
-            allProducts.value = response.data.data;
-        } catch (err) {
-            message.error('Lỗi tải danh sách sản phẩm');
-        }
-    };
-
-    // Chọn sản phẩm từ select box
-    const handleProductSelect = (ids) => {
-        productList.value = allProducts.value.filter(p => ids.includes(p.id));
-        selectedProductIds.value = ids;
-        settings.value.selectedProducts = ids;
-    };
-
-    // Xoá sản phẩm đã chọn
-    const removeProduct = (id) => {
-        selectedProductIds.value = selectedProductIds.value.filter(pid => pid !== id);
-        productList.value = productList.value.filter(p => p.id !== id);
-        settings.value.selectedProducts = [...selectedProductIds.value];
-    };
-
-    // Khi đổi mode sản phẩm liên quan
-    const handleRelatedProductModeChange = async (input) => {
-        const value = typeof input === 'string' ? input : input?.target?.value;
-        if (!value) {
-            console.warn('Giá trị không hợp lệ:', input);
-            return;
-        }
-
-        if (value === 'selected') {
-            if (allProducts.value.length === 0) await fetchAllProducts();
-            selectedProductIds.value = [];
-            productList.value = [];
-        } else if (value === 'all') {
-            await fetchAllProducts();
-            productList.value = allProducts.value;
-            selectedProductIds.value = allProducts.value.map(p => p.id);
-        }
-    };
-
-
-    // Gọi API doanh nghiệp
-    const fetchAllBusinesses = async () => {
-        const res = await getBusinesses({ per_page: 1000 });
-        allBusinesses.value = res.data.data;
-    };
-
-    // Chọn doanh nghiệp từ select box
-    const handleCompanySelect = (ids) => {
-        businessList.value = allBusinesses.value.filter(b => ids.includes(b.id));
-        selectedCompanies.value = ids;
-    };
-
-    // Xoá doanh nghiệp đã chọn
-    const removeBusiness = (id) => {
-        selectedCompanies.value = selectedCompanies.value.filter(bid => bid !== id);
-        businessList.value = businessList.value.filter(b => b.id !== id);
-    };
-
-    const handleCompanyModeChange = async (input) => {
-        const value = typeof input === 'string' ? input : input?.target?.value;
-        if (!value) {
-            console.warn('Giá trị không hợp lệ:', input);
-            return;
-        }
-
-        if (value === 'selected') {
-            if (allBusinesses.value.length === 0) await fetchAllBusinesses();
-            selectedCompanies.value = [];
-            businessList.value = [];
-        } else if (value === 'all') {
-            await fetchAllBusinesses();
-            selectedCompanies.value = allBusinesses.value.map(b => b.id);
-            businessList.value = [...allBusinesses.value];
-        }
-    };
-
-
-
-
-    // Gọi API cửa hàng
-    const fetchAllStores = async () => {
-        const res = await getStores({ per_page: 1000 });
-        allStores.value = res.data.data;
-    };
-
-    // Chọn cửa hàng từ select box
-    const handleStoreSelect = (ids) => {
-        storeList.value = allStores.value.filter(s => ids.includes(s.id));
-        selectedStores.value = ids;
-    };
-
-    // Xoá cửa hàng đã chọn
-    const removeStore = (id) => {
-        selectedStores.value = selectedStores.value.filter(sid => sid !== id);
-        storeList.value = storeList.value.filter(s => s.id !== id);
-    };
-
-    // Khi đổi mode cửa hàng liên quan
-    const handleStoreModeChange = async (input) => {
-        const value = typeof input === 'string' ? input : input?.target?.value;
-        if (!value) {
-            console.warn('Giá trị không hợp lệ:', input);
-            return;
-        }
-
-        if (value === 'selected') {
-            if (allStores.value.length === 0) await fetchAllStores();
-            selectedStores.value = [];
-            storeList.value = [];
-        } else if (value === 'all') {
-            await fetchAllStores();
-            selectedStores.value = allStores.value.map(s => s.id);
-            storeList.value = [...allStores.value];
-        }
-    };
-
-
-
-    // Submit form
-    const handleSubmit = async () => {
-        loading.value = true
-
-        // ✅ Chuyển từ textarea (dạng chuỗi) thành mảng
-        form.value.other_links = otherLinksText.value
-            .split('\n')                   // tách từng dòng
-            .map(s => s.trim())            // xóa khoảng trắng đầu/cuối
-            .filter(Boolean)               // bỏ dòng rỗng
-
-        try {
-            if (isEditMode) {
-                await updateBusiness(route.params.id, form.value)
-                message.success('Cập nhật thành công')
-            } else {
-                await createBusiness(form.value)
-                message.success('Tạo mới thành công')
-            }
-            router.push('/businesses')
-        } catch (error) {
-            message.error('Lỗi lưu doanh nghiệp')
-        } finally {
-            loading.value = false
-        }
-    }
-
-
-    const goBack = () => router.push('/businesses')
-
-    onMounted(async () => {
+    if (value === 'selected') {
+        if (allProducts.value.length === 0) await fetchAllProducts();
+        selectedProductIds.value = [];
+        productList.value = [];
+    } else if (value === 'all') {
         await fetchAllProducts();
-        if (isEditMode) await fetchBusiness()
-    })
+        productList.value = allProducts.value;
+        selectedProductIds.value = allProducts.value.map(p => p.id);
+    }
+};
+
+
+// Gọi API doanh nghiệp
+const fetchAllBusinesses = async () => {
+    const res = await getBusinesses({per_page: 1000});
+    allBusinesses.value = res.data.data;
+};
+
+// Chọn doanh nghiệp từ select box
+const handleCompanySelect = (ids) => {
+    businessList.value = allBusinesses.value.filter(b => ids.includes(b.id));
+    selectedCompanies.value = ids;
+};
+
+// Xoá doanh nghiệp đã chọn
+const removeBusiness = (id) => {
+    selectedCompanies.value = selectedCompanies.value.filter(bid => bid !== id);
+    businessList.value = businessList.value.filter(b => b.id !== id);
+};
+
+const handleCompanyModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
+    }
+
+    if (value === 'selected') {
+        if (allBusinesses.value.length === 0) await fetchAllBusinesses();
+        selectedCompanies.value = [];
+        businessList.value = [];
+    } else if (value === 'all') {
+        await fetchAllBusinesses();
+        selectedCompanies.value = allBusinesses.value.map(b => b.id);
+        businessList.value = [...allBusinesses.value];
+    }
+};
+
+
+// Gọi API cửa hàng
+const fetchAllStores = async () => {
+    const res = await getStores({per_page: 1000});
+    allStores.value = res.data.data;
+};
+
+// Chọn cửa hàng từ select box
+const handleStoreSelect = (ids) => {
+    storeList.value = allStores.value.filter(s => ids.includes(s.id));
+    selectedStores.value = ids;
+};
+
+// Xoá cửa hàng đã chọn
+const removeStore = (id) => {
+    selectedStores.value = selectedStores.value.filter(sid => sid !== id);
+    storeList.value = storeList.value.filter(s => s.id !== id);
+};
+
+// Khi đổi mode cửa hàng liên quan
+const handleStoreModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
+    }
+
+    if (value === 'selected') {
+        if (allStores.value.length === 0) await fetchAllStores();
+        selectedStores.value = [];
+        storeList.value = [];
+    } else if (value === 'all') {
+        await fetchAllStores();
+        selectedStores.value = allStores.value.map(s => s.id);
+        storeList.value = [...allStores.value];
+    }
+};
+
+
+// Submit form
+const handleSubmit = async () => {
+    loading.value = true
+
+    // ✅ Chuyển từ textarea (dạng chuỗi) thành mảng
+    form.value.other_links = otherLinksText.value
+        .split('\n')                   // tách từng dòng
+        .map(s => s.trim())            // xóa khoảng trắng đầu/cuối
+        .filter(Boolean)               // bỏ dòng rỗng
+
+    try {
+        if (isEditMode) {
+            await updateBusiness(route.params.id, form.value)
+            message.success('Cập nhật thành công')
+        } else {
+            await createBusiness(form.value)
+            message.success('Tạo mới thành công')
+        }
+        router.push('/businesses')
+    } catch (error) {
+        message.error('Lỗi lưu doanh nghiệp')
+    } finally {
+        loading.value = false
+    }
+}
+
+
+const goBack = () => router.push('/businesses')
+
+onMounted(async () => {
+    await fetchAllProducts();
+    if (isEditMode) await fetchBusiness()
+})
 </script>
 
 <style scoped>
 
-    .custom-disabled-switch.ant-switch-disabled {
-        background: #d9d9d9 !important; /* Màu xám */
-        border-color: #d9d9d9 !important;
-    }
+.custom-disabled-switch.ant-switch-disabled {
+    background: #d9d9d9 !important; /* Màu xám */
+    border-color: #d9d9d9 !important;
+}
 
-    .link-list-wrapper {
-        margin-top: 20px;
-    }
+.link-list-wrapper {
+    margin-top: 20px;
+}
 
-    .iphone-mockup {
-        width: 310px;
-        height: 640px;
-        margin: 0 auto;
-        border: 10px solid #1c1c1e;
-        border-radius: 48px;
-        background: #000;
-        position: relative;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        overflow: hidden;
-    }
+.iphone-mockup {
+    width: 310px;
+    height: 640px;
+    margin: 0 auto;
+    border: 10px solid #1c1c1e;
+    border-radius: 48px;
+    background: #000;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
 
-    /* Notch */
-    .notch {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 150px;
-        height: 30px;
-        background: #000;
-        border-bottom-left-radius: 16px;
-        border-bottom-right-radius: 16px;
-        z-index: 2;
-    }
+/* Notch */
+.notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 30px;
+    background: #000;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    z-index: 2;
+}
 
-    /* Inner screen */
-    .iphone-screen {
-        width: 100%;
-        height: 100%;
-        background: #fff;
-        border-radius: 36px;
-        overflow-y: auto;
-        padding-bottom: 12px;
-        box-sizing: border-box;
-        position: relative;
-        z-index: 1;
-    }
+/* Inner screen */
+.iphone-screen {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 36px;
+    overflow-y: auto;
+    padding-bottom: 12px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
 
-    /* Image and info inside screen */
-    .screen-img {
-        width: 100%;
-        height: auto;
-        border-radius: 0;
-        object-fit: cover;
-    }
+/* Image and info inside screen */
+.screen-img {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    object-fit: cover;
+}
 
-    .info {
-        padding: 12px;
-        font-size: 14px;
-        text-align: center;
-    }
+.info {
+    padding: 12px;
+    font-size: 14px;
+    text-align: center;
+}
 
-    .dynamic-island {
-        position: absolute;
-        top: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 110px;
-        height: 30px;
-        background: #000;
-        border-radius: 20px;
-        z-index: 2;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        padding: 0 8px;
-    }
+.dynamic-island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 30px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0 8px;
+}
 
-    .dynamic-island.expanded {
-        width: 180px;
-        height: 40px;
-        border-radius: 24px;
-    }
+.dynamic-island.expanded {
+    width: 180px;
+    height: 40px;
+    border-radius: 24px;
+}
 
-    .marquee {
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        position: relative;
-    }
+.marquee {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
 
-    .marquee-content {
-        display: inline-block;
-        padding-left: 100%;
-        animation: scrollText 10s linear infinite;
-        color: #fff;
-        font-size: 12px;
-        opacity: 0.8;
-    }
+.marquee-content {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scrollText 10s linear infinite;
+    color: #fff;
+    font-size: 12px;
+    opacity: 0.8;
+}
 
-    .active-card {
-        box-shadow: 0 0 8px #52c41a;
-    }
+.active-card {
+    box-shadow: 0 0 8px #52c41a;
+}
 
-    @keyframes scrollText {
-        0% {
-            transform: translateX(0);
-        }
-        100% {
-            transform: translateX(-100%);
-        }
+@keyframes scrollText {
+    0% {
+        transform: translateX(0);
     }
+    100% {
+        transform: translateX(-100%);
+    }
+}
 
 </style>
