@@ -83,7 +83,17 @@ const fetchBusinesses = async () => {
             per_page: pagination.value.pageSize,
             search: search.value,
         })
-        businesses.value = response.data.data
+        businesses.value = response.data.data.map(item => {
+            if (typeof item.logo === 'string') {
+                try {
+                    const parsed = JSON.parse(item.logo)
+                    item.logo = Array.isArray(parsed) ? parsed : []
+                } catch (e) {
+                    item.logo = []
+                }
+            }
+            return item
+        })
         pagination.value.total = response.data.pager.total
     } catch (error) {
         message.error('Lỗi tải doanh nghiệp')
@@ -91,6 +101,7 @@ const fetchBusinesses = async () => {
         loading.value = false
     }
 }
+
 
 const handleTableChange = (paginationParam) => {
     pagination.value.current = paginationParam.current

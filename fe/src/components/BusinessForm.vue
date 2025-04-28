@@ -344,6 +344,7 @@ import {UploadOutlined} from '@ant-design/icons-vue'
 import templateOptions from '@/components/templates/businesses'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
+import { parseFieldsForList } from '@/utils/formUtils'
 
 const router = useRouter()
 const route = useRoute()
@@ -749,14 +750,16 @@ onMounted(async () => {
             productList.value = allProducts.value
         }
 
-
-        // 👇 Công ty liên quan
         if (settings.value.company === 'selected') {
             selectedCompanies.value = settings.value.selectedCompanies || []
-            businessList.value = allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id))
+            businessList.value = parseFieldsForList(
+                allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id)),
+                ['logo']
+            )
         } else if (settings.value.company === 'all') {
-            businessList.value = allBusinesses.value
+            businessList.value = parseFieldsForList(allBusinesses.value, ['logo'])
         }
+
 
         // 👇 Cửa hàng liên quan
         if (settings.value.store === 'selected') {

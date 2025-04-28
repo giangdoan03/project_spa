@@ -42,3 +42,21 @@ export const formatDate = (value) => {
         hour12: false
     })
 }
+
+
+export const parseFieldsForList = (list, fields = ['logo']) => {
+    return list.map(item => {
+        fields.forEach(field => {
+            const value = item[field]
+            if (typeof value === 'string') {
+                try {
+                    const parsed = JSON.parse(value)
+                    item[field] = Array.isArray(parsed) ? parsed : []
+                } catch (e) {
+                    item[field] = []
+                }
+            }
+        })
+        return item
+    })
+}

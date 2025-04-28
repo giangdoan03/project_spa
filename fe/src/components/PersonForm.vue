@@ -11,11 +11,11 @@
                         <!-- Ảnh đại diện -->
                         <a-form-item label="Ảnh đại diện">
                             <a-upload
-                                    list-type="picture-card"
-                                    :file-list="avatarFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('avatar', file)"
-                                    :before-upload="(file) => handleBeforeUpload('avatar', file)"
+                                list-type="picture-card"
+                                :file-list="avatarFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="(file) => handleRemoveFile('avatar', file)"
+                                :before-upload="(file) => handleBeforeUpload('avatar', file)"
                             >
                                 <div>
                                     <upload-outlined/>
@@ -130,12 +130,12 @@
                                 </a-form-item>
                                 <div v-if="settings.company === 'selected'" style="margin-bottom: 24px">
                                     <a-select
-                                            mode="multiple"
-                                            style="width: 100%; margin-bottom: 12px"
-                                            placeholder="Chọn công ty"
-                                            v-model:value="selectedCompanies"
-                                            @change="handleCompanySelect"
-                                            :key="settings.company"
+                                        mode="multiple"
+                                        style="width: 100%; margin-bottom: 12px"
+                                        placeholder="Chọn công ty"
+                                        v-model:value="selectedCompanies"
+                                        @change="handleCompanySelect"
+                                        :key="settings.company"
                                     >
 
                                         <a-select-option v-for="b in allBusinesses" :key="b.id" :value="b.id">
@@ -212,12 +212,12 @@
                             </div>
                             <div class="iphone-screen">
                                 <component
-                                        :is="AsyncTemplate"
-                                        :product="form"
-                                        :business="businessList"
-                                        :store="storeList"
-                                        :all-businesses="allBusinesses"
-                                        :all-stores="allStores"
+                                    :is="AsyncTemplate"
+                                    :product="form"
+                                    :business="businessList"
+                                    :store="storeList"
+                                    :all-businesses="allBusinesses"
+                                    :all-stores="allStores"
                                 />
                             </div>
                         </div>
@@ -234,162 +234,406 @@
 </template>
 
 <script setup>
-    import {ref, onMounted, computed, defineAsyncComponent} from 'vue'
-    import {useRoute, useRouter} from 'vue-router'
-    import {createPerson, updatePerson, getPerson} from '../api/person'
-    import {uploadFile} from '../api/product'
-    import {message} from 'ant-design-vue'
-    import templateOptions from '@/components/templates/persons'
-    import {UploadOutlined} from '@ant-design/icons-vue'
+import {ref, onMounted, computed, defineAsyncComponent, nextTick} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {createPerson, updatePerson, getPerson} from '../api/person'
+import {createBusiness, getBusinesses, getBusiness, updateBusiness} from '../api/business'
+import {createProduct, getProduct, getProducts, updateProduct, uploadFile} from '../api/product'
+import {getStores} from '../api/store'
+import {message} from 'ant-design-vue'
+import {UploadOutlined} from '@ant-design/icons-vue'
 
-    import {useUserStore} from '../stores/user'
+import templateOptions from '@/components/templates/persons'
+import {parseFieldsForList} from '@/utils/formUtils'
 
-    const userStore = useUserStore()
+import {useUserStore} from '../stores/user'
 
-    const route = useRoute()
-    const router = useRouter()
+const userStore = useUserStore()
 
-    const form = ref({
-        user_id: null, // 👈 Thêm dòng này
-        name: '',
-        email: '',
-        phone: '',
-        job_title: '',
-        bio: '',
-        avatar: ''
-    })
+const route = useRoute()
+const router = useRouter()
 
-    const avatarFileList = ref([])
-    const previewImage = ref('')
-    const previewVisible = ref(false)
-    const previewTitle = ref('')
+const form = ref({
+    user_id: null, // 👈 Thêm dòng này
+    name: '',
+    email: '',
+    phone: '',
+    job_title: '',
+    bio: '',
+    avatar: ''
+})
 
 
-    const selectedCompanies = ref([])
-    const selectedSurveys = ref([])
+const productColumns = [
+    {title: 'Tên sản phẩm', dataIndex: 'name', key: 'name'},
+    {title: 'Hình ảnh', key: 'avatar', dataIndex: 'avatar'},
+    {title: 'Giá', dataIndex: 'price', key: 'price'},
+    {title: 'Hành động', key: 'action'}
+];
 
-    const isEditMode = computed(() => !!route.params.id);
 
-    const selectedTemplateData = computed(() =>
-        templateOptions.find(t => t.id === settings.value.selectedTemplate)
-    )
+const businessColumns = [
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Logo', dataIndex: 'logo', key: 'logo'},
+    {title: 'Tên công ty', dataIndex: 'name', key: 'name'},
+    {title: 'Email', dataIndex: 'email', key: 'email'},
+    {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
+    {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
+    {title: 'Hành động', key: 'action'}
+]
 
-    const AsyncTemplate = computed(() => {
-        return selectedTemplateData.value?.component ? defineAsyncComponent(selectedTemplateData.value.component) : null
-    })
 
-    const selectTemplate = (tpl) => {
-        settings.value.selectedTemplate = tpl.id;
+const storeColumns = [
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Logo', dataIndex: 'logo', key: 'logo'},
+    {title: 'Tên cửa hàng', dataIndex: 'name', key: 'name'},
+    {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
+    {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
+    {title: 'Email', dataIndex: 'email', key: 'email'},
+    {title: 'Hành động', key: 'action'}
+]
+
+
+const avatarFileList = ref([])
+const previewImage = ref('')
+const previewVisible = ref(false)
+const previewTitle = ref('')
+
+
+const loading = ref(false)
+const isIslandExpanded = ref(false)
+const businessList = ref([])
+const storeList = ref([])
+
+
+const allProducts = ref([])
+const productList = ref([])
+const allBusinesses = ref([])
+const allStores = ref([])
+const selectedProductIds = ref([]);
+const selectedStores = ref([])
+const otherLinksText = ref('')
+
+
+const selectedCompanies = ref([])
+const selectedSurveys = ref([])
+
+const isEditMode = computed(() => !!route.params.id);
+
+const selectedTemplateData = computed(() =>
+    templateOptions.find(t => t.id === settings.value.selectedTemplate)
+)
+
+const AsyncTemplate = computed(() => {
+    return selectedTemplateData.value?.component ? defineAsyncComponent(selectedTemplateData.value.component) : null
+})
+
+const selectTemplate = (tpl) => {
+    settings.value.selectedTemplate = tpl.id;
+}
+
+const isActiveTemplate = (tplId) => {
+    return settings.value.selectedTemplate === tplId;
+}
+
+const settings = ref({
+    selectedTemplate: 'tpl-1',         // Template hiển thị
+
+    relatedProducts: 'all',            // 'all' hoặc 'selected'
+    selectedProducts: [],              // ID sản phẩm được chọn khi relatedProducts = 'selected'
+
+    company: 'all',                    // 'all' hoặc 'selected'
+    selectedCompanies: [],             // ID công ty được chọn khi company = 'selected'
+
+    store: 'all',                      // 'all' hoặc 'selected'
+    selectedStores: [],                // ID cửa hàng được chọn khi store = 'selected'
+
+});
+
+
+// Gọi API sản phẩm
+const fetchAllProducts = async () => {
+    try {
+        const response = await getProducts({per_page: 1000});
+        allProducts.value = response.data.data;
+    } catch (err) {
+        message.error('Lỗi tải danh sách sản phẩm');
+    }
+};
+
+// Chọn sản phẩm từ select box
+const handleProductSelect = (ids) => {
+    productList.value = allProducts.value.filter(p => ids.includes(p.id));
+    selectedProductIds.value = ids;
+    settings.value.selectedProducts = ids;
+};
+
+// Xoá sản phẩm đã chọn
+const removeProduct = (id) => {
+    selectedProductIds.value = selectedProductIds.value.filter(pid => pid !== id);
+    productList.value = productList.value.filter(p => p.id !== id);
+    settings.value.selectedProducts = [...selectedProductIds.value];
+};
+
+// Khi đổi mode sản phẩm liên quan
+const handleRelatedProductModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
     }
 
-    const isActiveTemplate = (tplId) => {
-        return settings.value.selectedTemplate === tplId;
+    if (value === 'selected') {
+        if (allProducts.value.length === 0) await fetchAllProducts();
+        selectedProductIds.value = [];
+        productList.value = [];
+    } else if (value === 'all') {
+        await fetchAllProducts();
+        productList.value = allProducts.value;
+        selectedProductIds.value = allProducts.value.map(p => p.id);
+    }
+};
+
+
+// Gọi API doanh nghiệp
+const fetchAllBusinesses = async () => {
+    const res = await getBusinesses({per_page: 1000});
+    allBusinesses.value = res.data.data;
+};
+
+// Chọn doanh nghiệp từ select box
+const handleCompanySelect = (ids) => {
+    businessList.value = allBusinesses.value.filter(b => ids.includes(b.id));
+    selectedCompanies.value = ids;
+};
+
+// Xoá doanh nghiệp đã chọn
+const removeBusiness = (id) => {
+    selectedCompanies.value = selectedCompanies.value.filter(bid => bid !== id);
+    businessList.value = businessList.value.filter(b => b.id !== id);
+};
+
+const handleCompanyModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
     }
 
-    const settings = ref({
-        selectedTemplate: 'tpl-1',         // Template hiển thị
-
-        relatedProducts: 'all',            // 'all' hoặc 'selected'
-        selectedProducts: [],              // ID sản phẩm được chọn khi relatedProducts = 'selected'
-
-        company: 'all',                    // 'all' hoặc 'selected'
-        selectedCompanies: [],             // ID công ty được chọn khi company = 'selected'
-
-        store: 'all',                      // 'all' hoặc 'selected'
-        selectedStores: [],                // ID cửa hàng được chọn khi store = 'selected'
-
-    });
+    if (value === 'selected') {
+        if (allBusinesses.value.length === 0) await fetchAllBusinesses();
+        selectedCompanies.value = [];
+        businessList.value = [];
+    } else if (value === 'all') {
+        await fetchAllBusinesses();
+        selectedCompanies.value = allBusinesses.value.map(b => b.id);
+        businessList.value = [...allBusinesses.value];
+    }
+};
 
 
-    const parseAvatar = (avatar) => {
-        try {
-            const parsed = JSON.parse(avatar);
-            return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : ''
-        } catch {
-            return ''
-        }
+// Gọi API cửa hàng
+const fetchAllStores = async () => {
+    const res = await getStores({per_page: 1000});
+    allStores.value = res.data.data;
+};
+
+// Chọn cửa hàng từ select box
+const handleStoreSelect = (ids) => {
+    storeList.value = allStores.value.filter(s => ids.includes(s.id));
+    selectedStores.value = ids;
+};
+
+// Xoá cửa hàng đã chọn
+const removeStore = (id) => {
+    selectedStores.value = selectedStores.value.filter(sid => sid !== id);
+    storeList.value = storeList.value.filter(s => s.id !== id);
+};
+
+// Khi đổi mode cửa hàng liên quan
+const handleStoreModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
     }
 
-    const fetchPerson = async () => {
-        try {
-            const response = await getPerson(route.params.id)
-            Object.assign(form.value, response.data)
-
-            if (form.value.avatar) {
-                avatarFileList.value = [
-                    {
-                        uid: '1',
-                        name: 'avatar.jpg',
-                        status: 'done',
-                        url: form.value.avatar
-                    }
-                ]
-            }
-        } catch (error) {
-            message.error('Không tìm thấy thông tin cá nhân')
-        }
+    if (value === 'selected') {
+        if (allStores.value.length === 0) await fetchAllStores();
+        selectedStores.value = [];
+        storeList.value = [];
+    } else if (value === 'all') {
+        await fetchAllStores();
+        selectedStores.value = allStores.value.map(s => s.id);
+        storeList.value = [...allStores.value];
     }
+};
 
-    const handleSubmit = async () => {
-        try {
-            form.value.user_id = userStore.user?.id // 👈 Lấy user_id trước khi gửi
 
-            if (isEditMode) {
-                await updatePerson(route.params.id, form.value)
-                message.success('Cập nhật thành công')
-            } else {
-                await createPerson(form.value)
-                message.success('Tạo mới thành công')
-            }
-
-            router.push('/persons')
-        } catch (error) {
-            message.error('Có lỗi xảy ra')
-        }
+const parseAvatar = (avatar) => {
+    try {
+        const parsed = JSON.parse(avatar);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : ''
+    } catch {
+        return ''
     }
+}
 
+const fetchPerson = async () => {
+    try {
+        const response = await getPerson(route.params.id)
+        Object.assign(form.value, response.data)
 
-    const handlePreview = (file) => {
-        previewImage.value = file.url || file.thumbUrl
-        previewVisible.value = true
-        previewTitle.value = file.name || ''
-    }
-
-    const handleBeforeUpload = async (field, file) => {
-        const hide = message.loading('Đang tải lên...', 0)
-        try {
-            const response = await uploadFile(file)
-            const url = response.data.url
-            form.value.avatar = url
+        if (form.value.avatar) {
             avatarFileList.value = [
                 {
-                    uid: Date.now(),
-                    name: file.name,
+                    uid: '1',
+                    name: 'avatar.jpg',
                     status: 'done',
-                    url
+                    url: form.value.avatar
                 }
             ]
-            message.success('Upload thành công')
-        } catch (error) {
-            message.error('Upload thất bại')
-        } finally {
-            hide()
         }
-        return false
+    } catch (error) {
+        message.error('Không tìm thấy thông tin cá nhân')
     }
+}
 
-    const handleRemoveFile = () => {
-        form.value.avatar = ''
-        avatarFileList.value = []
-    }
+const handleSubmit = async () => {
+    try {
+        loading.value = true
 
-    const goBack = () => router.push('/persons')
+        // ✅ Chuyển từ textarea (nếu có) thành mảng
+        if (otherLinksText.value !== undefined) {
+            form.value.other_links = otherLinksText.value
+                .split('\n')
+                .map(s => s.trim())
+                .filter(Boolean)
+        }
 
-    onMounted(() => {
+        // 👇 Đồng bộ selections vào settings
+        settings.value.selectedCompanies = selectedCompanies.value
+        settings.value.selectedStores = selectedStores.value
+        settings.value.selectedProducts = selectedProductIds.value
+
+        // 👇 Gán settings vào display_settings
+        form.value.display_settings = JSON.stringify(settings.value)
+
+        // 👇 Gán user_id nếu cần
+        form.value.user_id = userStore.user?.id
+
+        // 👇 Gọi API
         if (isEditMode) {
-            fetchPerson()
+            await updatePerson(route.params.id, form.value)
+            message.success('Cập nhật cá nhân thành công')
+        } else {
+            await createPerson(form.value)
+            message.success('Tạo mới cá nhân thành công')
         }
-    })
+
+        router.push('/persons')
+    } catch (error) {
+        console.error('Lỗi:', error)
+        message.error('Có lỗi xảy ra')
+    } finally {
+        loading.value = false
+    }
+}
+
+
+const handlePreview = (file) => {
+    previewImage.value = file.url || file.thumbUrl
+    previewVisible.value = true
+    previewTitle.value = file.name || ''
+}
+
+const handleBeforeUpload = async (field, file) => {
+    const hide = message.loading('Đang tải lên...', 0)
+    try {
+        const response = await uploadFile(file)
+        const url = response.data.url
+        form.value.avatar = url
+        avatarFileList.value = [
+            {
+                uid: Date.now(),
+                name: file.name,
+                status: 'done',
+                url
+            }
+        ]
+        message.success('Upload thành công')
+    } catch (error) {
+        message.error('Upload thất bại')
+    } finally {
+        hide()
+    }
+    return false
+}
+
+const handleRemoveFile = () => {
+    form.value.avatar = ''
+    avatarFileList.value = []
+}
+
+const goBack = () => router.push('/persons')
+
+onMounted(async () => {
+    await fetchPerson();
+    await fetchAllProducts()
+    await fetchAllBusinesses()
+    await fetchAllStores()
+
+    await nextTick() // Đảm bảo DOM đã render xong
+
+    if (isEditMode.value) {
+        // await fetchBusiness()
+
+        // 👇 Nếu có display_settings thì parse vào settings
+        if (form.value.display_settings) {
+            try {
+                const ds = form.value.display_settings
+
+                if (typeof ds === 'string') {
+                    const parsedSettings = JSON.parse(ds)
+                    Object.assign(settings.value, parsedSettings)
+                } else if (typeof ds === 'object') {
+                    Object.assign(settings.value, ds)
+                }
+            } catch (e) {
+                console.warn('⚠️ Lỗi parse display_settings:', e)
+            }
+        }
+
+
+        // 👇 Sản phẩm liên quan
+        if (settings.value.relatedProducts === 'selected') {
+            selectedProductIds.value = settings.value.selectedProducts || []
+            productList.value = allProducts.value.filter(p => selectedProductIds.value.includes(p.id))
+        } else if (settings.value.relatedProducts === 'all') {
+            productList.value = allProducts.value
+        }
+
+
+        if (settings.value.company === 'selected') {
+            selectedCompanies.value = settings.value.selectedCompanies || []
+            businessList.value = parseFieldsForList(
+                allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id)),
+                ['logo']  // 👈 Có thể thêm 'cover_image', 'library_images' nếu cần
+            )
+        } else if (settings.value.company === 'all') {
+            businessList.value = parseFieldsForList(allBusinesses.value, ['logo'])
+        }
+
+
+        // 👇 Cửa hàng liên quan
+        if (settings.value.store === 'selected') {
+            selectedStores.value = settings.value.selectedStores || []
+            storeList.value = allStores.value.filter(s => selectedStores.value.includes(s.id))
+        } else if (settings.value.store === 'all') {
+            storeList.value = allStores.value
+        }
+    }
+})
 </script>
 
 <style scoped></style>

@@ -356,6 +356,7 @@
     import templateOptions from '@/components/templates/products'
     import Quill from 'quill'
     import 'quill/dist/quill.snow.css'
+    import {parseFieldsForList} from '@/utils/formUtils'
 
     const editorRef = ref(null)
     const quillInstance = ref(null)
@@ -871,10 +872,13 @@
             // 👇 Công ty liên quan
             if (settings.value.company === 'selected') {
                 selectedCompanies.value = settings.value.selectedCompanies || []
-                businessList.value = allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id))
+                businessList.value = parseFieldsForList(
+                    allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id))
+                )
             } else if (settings.value.company === 'all') {
-                businessList.value = allBusinesses.value
+                businessList.value = parseFieldsForList(allBusinesses.value)
             }
+
 
             // 👇 Cửa hàng liên quan
             if (settings.value.store === 'selected') {

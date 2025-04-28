@@ -2,93 +2,282 @@
     <div>
         <a-button @click="goBack" style="margin-bottom: 16px">Quay lại</a-button>
 
-        <a-form :model="form" layout="vertical" @finish="handleSubmit">
-            <a-card style="margin-bottom: 24px">
-                <a-form-item label="Tên cửa hàng" required>
-                    <a-input v-model:value="form.name" placeholder="Nhập tên cửa hàng" />
-                </a-form-item>
+        <a-tabs default-active-key="info">
+            <a-tab-pane key="info" tab="Thông tin cửa hàng">
+                <a-form :model="form" layout="vertical" @finish="handleSubmit">
+                    <a-card style="margin-bottom: 24px">
+                        <a-form-item label="Tên cửa hàng" required>
+                            <a-input v-model:value="form.name" placeholder="Nhập tên cửa hàng" />
+                        </a-form-item>
 
-                <a-form-item label="Email">
-                    <a-input v-model:value="form.email" placeholder="example@mail.com" />
-                </a-form-item>
+                        <a-form-item label="Email">
+                            <a-input v-model:value="form.email" placeholder="example@mail.com" />
+                        </a-form-item>
 
-                <a-form-item label="Số điện thoại">
-                    <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại" />
-                </a-form-item>
+                        <a-form-item label="Số điện thoại">
+                            <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại" />
+                        </a-form-item>
 
-                <a-form-item label="Địa chỉ">
-                    <a-input v-model:value="form.address" placeholder="Nhập địa chỉ" />
-                </a-form-item>
+                        <a-form-item label="Địa chỉ">
+                            <a-input v-model:value="form.address" placeholder="Nhập địa chỉ" />
+                        </a-form-item>
 
-                <a-form-item label="Mô tả ngắn gọn">
-                    <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 8px;" />
-                </a-form-item>
+                        <a-form-item label="Mô tả ngắn gọn">
+                            <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 8px;" />
+                        </a-form-item>
 
-                <a-form-item label="Logo">
-                    <a-upload
-                            list-type="picture-card"
-                            :file-list="logoFileList"
-                            :on-preview="handlePreview"
-                            :on-remove="handleRemoveFile"
-                            :before-upload="handleBeforeUpload"
-                    >
-                        <div>
-                            <upload-outlined />
-                            <div style="margin-top: 8px">Upload</div>
+                        <a-form-item label="Logo">
+                            <a-upload
+                                list-type="picture-card"
+                                :file-list="logoFileList"
+                                :on-preview="handlePreview"
+                                :on-remove="handleRemoveFile"
+                                :before-upload="handleBeforeUpload"
+                            >
+                                <div>
+                                    <upload-outlined />
+                                    <div style="margin-top: 8px">Upload</div>
+                                </div>
+                            </a-upload>
+                        </a-form-item>
+
+                        <a-form-item>
+                            <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt" />
+                        </a-form-item>
+
+                        <a-form-item label="Thêm sản phẩm vào cửa hàng">
+                            <a-switch v-model:checked="enableAddProduct" />
+                        </a-form-item>
+
+                        <div v-if="enableAddProduct" style="margin-bottom: 24px">
+                            <a-select
+                                mode="multiple"
+                                style="width: 100%; margin-bottom: 12px"
+                                placeholder="Chọn sản phẩm"
+                                v-model:value="selectedProductIds"
+                                @change="handleProductSelect"
+                            >
+                                <a-select-option v-for="product in allProducts" :key="product.id" :value="product.id">
+                                    {{ product.name }} - {{ product.price }}đ
+                                </a-select-option>
+                            </a-select>
+
+                            <a-table
+                                :columns="productColumns"
+                                :data-source="productList"
+                                row-key="id"
+                                bordered
+                                size="small"
+                            >
+                                <template #bodyCell="{ column, record }">
+                                    <template v-if="column.key === 'avatar'">
+                                        <img
+                                            v-if="record.avatar"
+                                            :src="parseAvatar(record.avatar)"
+                                            alt="Avatar"
+                                            style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"
+                                        />
+                                    </template>
+                                    <template v-if="column.key === 'action'">
+                                        <a-button type="link" @click="removeProduct(record.id)" danger>Xoá</a-button>
+                                    </template>
+                                </template>
+                            </a-table>
                         </div>
-                    </a-upload>
-                </a-form-item>
+                    </a-card>
 
-                <a-form-item>
-                    <a-switch v-model:checked="form.status" checked-children="Bật" un-checked-children="Tắt" />
-                </a-form-item>
+                    <a-form-item>
+                        <a-button type="primary" html-type="submit">Lưu</a-button>
+                        <a-button @click="goBack">Huỷ</a-button>
+                    </a-form-item>
+                </a-form>
+            </a-tab-pane>
+            <a-tab-pane key="settings" tab="Cài đặt hiển thị">
+                <a-row :gutter="24">
+                    <a-col :span="16">
+                        <a-form layout="vertical">
+                            <!-- Giao diện mẫu -->
+                            <a-card title="Chọn giao diện mẫu" style="margin-bottom: 24px;">
+                                <a-form-item>
+                                    <a-row :gutter="16">
+                                        <a-col v-for="tpl in templateOptions" :key="tpl.id" :xs="24" :sm="12" :md="8"
+                                               :lg="8" style="margin-bottom: 16px">
+                                            <a-card hoverable
+                                                    :class="{ 'selected-card': settings.selectedTemplate === tpl.id, 'active-card': isActiveTemplate(tpl.id) }"
+                                                    @click="selectTemplate(tpl)">
+                                                <template #cover>
+                                                    <img :src="tpl.thumbnail" alt="template"
+                                                         style="height: 200px; object-fit: cover"/>
+                                                </template>
+                                                <a-card-meta :title="tpl.title" :description="tpl.description"/>
+                                            </a-card>
+                                        </a-col>
+                                    </a-row>
+                                </a-form-item>
+                            </a-card>
+                            <!-- Sản phẩm liên quan -->
+                            <a-card title="Sản phẩm liên quan" style="margin-bottom: 24px;">
+                                <a-form-item>
+                                    <a-form-item>
+                                        <a-radio-group v-model:value="settings.relatedProducts"
+                                                       @change="handleRelatedProductModeChange">
+                                            <a-radio :value="'all'">Tất cả sản phẩm</a-radio>
+                                            <a-radio :value="'selected'">Chọn sản phẩm</a-radio>
+                                        </a-radio-group>
+                                    </a-form-item>
+                                    <div v-if="settings.relatedProducts === 'selected'" style="margin-bottom: 24px">
+                                        <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
+                                                  placeholder="Chọn sản phẩm" v-model:value="selectedProductIds"
+                                                  @change="handleProductSelect">
+                                            <a-select-option v-for="product in allProducts" :key="product.id"
+                                                             :value="product.id">
+                                                {{ product.name }} - {{ product.price }}đ
+                                            </a-select-option>
+                                        </a-select>
+                                        <a-table :columns="productColumns" :data-source="productList" row-key="id" bordered
+                                                 size="small">
+                                            <template #bodyCell="{ column, record }">
+                                                <template v-if="column.key === 'avatar'">
+                                                    <img v-if="record.avatar" :src="parseAvatar(record.avatar)" alt="Avatar"
+                                                         style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                                </template>
+                                                <template v-if="column.key === 'action'">
+                                                    <a-button type="link" @click="removeProduct(record.id)" danger>Xoá
+                                                    </a-button>
+                                                </template>
+                                            </template>
+                                        </a-table>
+                                    </div>
+                                </a-form-item>
+                            </a-card>
 
-                <a-form-item label="Thêm sản phẩm vào cửa hàng">
-                    <a-switch v-model:checked="enableAddProduct" />
-                </a-form-item>
+                            <a-card title="Công ty" style="margin-bottom: 24px;">
+                                <!-- Công ty -->
+                                <a-form-item>
+                                    <a-radio-group v-model:value="settings.company" @change="handleCompanyModeChange">
+                                        <a-radio :value="'all'">Tất cả công ty</a-radio>
+                                        <a-radio :value="'selected'">Chọn công ty</a-radio>
+                                    </a-radio-group>
+                                </a-form-item>
+                                <div v-if="settings.company === 'selected'" style="margin-bottom: 24px">
+                                    <a-select
+                                        mode="multiple"
+                                        style="width: 100%; margin-bottom: 12px"
+                                        placeholder="Chọn công ty"
+                                        v-model:value="selectedCompanies"
+                                        @change="handleCompanySelect"
+                                        :key="settings.company"
+                                    >
 
-                <div v-if="enableAddProduct" style="margin-bottom: 24px">
-                    <a-select
-                            mode="multiple"
-                            style="width: 100%; margin-bottom: 12px"
-                            placeholder="Chọn sản phẩm"
-                            v-model:value="selectedProductIds"
-                            @change="handleProductSelect"
-                    >
-                        <a-select-option v-for="product in allProducts" :key="product.id" :value="product.id">
-                            {{ product.name }} - {{ product.price }}đ
-                        </a-select-option>
-                    </a-select>
+                                        <a-select-option v-for="b in allBusinesses" :key="b.id" :value="b.id">
+                                            {{ b.name }} - {{ b.email }}
+                                        </a-select-option>
+                                    </a-select>
 
-                    <a-table
-                            :columns="productColumns"
-                            :data-source="productList"
-                            row-key="id"
-                            bordered
-                            size="small"
-                    >
-                        <template #bodyCell="{ column, record }">
-                            <template v-if="column.key === 'avatar'">
-                                <img
-                                        v-if="record.avatar"
-                                        :src="parseAvatar(record.avatar)"
-                                        alt="Avatar"
-                                        style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"
+                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered
+                                             size="small">
+                                        <template #bodyCell="{ column, record }">
+                                            <template v-if="column.key === 'logo'">
+                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo"
+                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                            </template>
+                                            <template v-if="column.key === 'action'">
+                                                <a-button type="link" @click="removeBusiness(record.id)" danger>Xoá
+                                                </a-button>
+                                            </template>
+                                        </template>
+                                    </a-table>
+                                </div>
+                            </a-card>
+
+
+                            <a-card title="Cửa hàng" style="margin-bottom: 24px;">
+                                <!-- Cửa hàng -->
+                                <a-form-item>
+                                    <a-radio-group v-model:value="settings.store" @change="handleStoreModeChange">
+                                        <a-radio :value="'all'">Tất cả cửa hàng</a-radio>
+                                        <a-radio :value="'selected'">Chọn cửa hàng</a-radio>
+                                    </a-radio-group>
+                                </a-form-item>
+                                <div v-if="settings.store === 'selected'" style="margin-bottom: 24px">
+                                    <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
+                                              placeholder="Chọn cửa hàng" v-model:value="selectedStores"
+                                              @change="handleStoreSelect">
+                                        <a-select-option v-for="s in allStores" :key="s.id" :value="s.id">
+                                            {{ s.name }} - {{ s.address }}
+                                        </a-select-option>
+                                    </a-select>
+
+                                    <a-table :columns="storeColumns" :data-source="storeList" row-key="id" bordered
+                                             size="small">
+                                        <template #bodyCell="{ column, record }">
+                                            <template v-if="column.key === 'logo'">
+                                                <img v-if="record.logo" :src="record.logo" alt="Logo"
+                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                            </template>
+                                            <template v-if="column.key === 'action'">
+                                                <a-button type="link" @click="removeStore(record.id)" danger>Xoá</a-button>
+                                            </template>
+                                        </template>
+                                    </a-table>
+                                </div>
+                            </a-card>
+
+
+
+                            <!-- Khảo sát + nút đặt hàng -->
+                            <a-card title="Khảo sát" style="margin-bottom: 24px;">
+                                <a-form-item>
+                                    <a-switch v-model:checked="settings.enableSurvey" disabled
+                                              class="custom-disabled-switch"/>
+                                </a-form-item>
+                            </a-card>
+
+                            <a-card title="Link liên kết" style="margin-bottom: 24px;">
+                                <a-form-item label="Link bán hàng trên sàn">
+                                    <a-switch v-model:checked="settings.enableOrderButton"
+                                              @change="handleOrderButtonToggle"/>
+
+                                    <!-- Hiển thị nếu bật -->
+                                    <div class="link-list-wrapper">
+                                        <div v-for="(link, index) in settings.productLinks" :key="index"
+                                             style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                            <a-input v-model:value="link.url" :placeholder="link.platform + ' Link'"
+                                                     style="flex: 1;"/>
+                                            <a-button type="text" danger @click="removeProductLink(index)">
+                                                <delete-outlined/>
+                                            </a-button>
+                                        </div>
+                                    </div>
+                                </a-form-item>
+                            </a-card>
+                            <a-form-item>
+                                <a-button type="primary" @click="handleSubmit" :loading="loading">Lưu</a-button>
+                            </a-form-item>
+                        </a-form>
+                    </a-col>
+                    <a-col :xs="24" :md="8">
+                        <div class="iphone-mockup">
+                            <div :class="['dynamic-island', { expanded: isIslandExpanded }]">
+                                <div class="marquee">
+                                    <div class="marquee-content">{{ selectedTemplateData?.title }}</div>
+                                </div>
+                            </div>
+                            <div class="iphone-screen">
+                                <component
+                                    :is="AsyncTemplate"
+                                    :product="form"
+                                    :business="businessList"
+                                    :store="storeList"
+                                    :all-businesses="allBusinesses"
+                                    :all-stores="allStores"
                                 />
-                            </template>
-                            <template v-if="column.key === 'action'">
-                                <a-button type="link" @click="removeProduct(record.id)" danger>Xoá</a-button>
-                            </template>
-                        </template>
-                    </a-table>
-                </div>
-            </a-card>
-
-            <a-form-item>
-                <a-button type="primary" html-type="submit">Lưu</a-button>
-                <a-button @click="goBack">Huỷ</a-button>
-            </a-form-item>
-        </a-form>
+                            </div>
+                        </div>
+                    </a-col>
+                </a-row>
+            </a-tab-pane>
+        </a-tabs>
 
         <a-modal v-model:open="previewVisible" :title="previewTitle" footer={null}>
             <img :src="previewImage" style="width: 100%" />
@@ -97,20 +286,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import {ref, onMounted, nextTick, computed, defineAsyncComponent} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getStore, createStore, updateStore } from '../api/store'
-import { getProducts, uploadFile } from '../api/product'
+import {getStore, createStore, updateStore, getStores} from '../api/store'
+import {getProduct, getProducts, uploadFile} from '../api/product'
 import { useUserStore } from '../stores/user'
 import { message } from 'ant-design-vue'
-import { UploadOutlined } from '@ant-design/icons-vue'
+import {DeleteOutlined, UploadOutlined} from '@ant-design/icons-vue'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
+import templateOptions from "@/components/templates/products/index.js";
+import {getBusinesses} from "@/api/business.js";
+import {getCategories} from "@/api/category.js";
+import {normalizeProductData} from "@/utils/formUtils.js";
 
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
 const isEditMode = !!route.params.id
+
+const loading = ref(false)
+const isIslandExpanded = ref(false)
 
 const editorRef = ref(null)
 let quillInstance = null
@@ -127,10 +323,240 @@ const form = ref({
     product_ids: []
 })
 
-const enableAddProduct = ref(false)
-const productList = ref([])
 const selectedProductIds = ref([])
+const selectedCompanies = ref([])
+const selectedStores = ref([])
+const selectedSurveys = ref([])
+
 const allProducts = ref([])
+const productList = ref([])
+
+const allBusinesses = ref([])
+const allStores = ref([])
+
+
+const businessList = ref([])
+
+const storeList = ref([])
+
+const storeColumns = [
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Logo', dataIndex: 'logo', key: 'logo'},
+    {title: 'Tên cửa hàng', dataIndex: 'name', key: 'name'},
+    {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
+    {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
+    {title: 'Email', dataIndex: 'email', key: 'email'},
+    {title: 'Hành động', key: 'action'}
+]
+
+
+const businessColumns = [
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Logo', dataIndex: 'logo', key: 'logo'},
+    {title: 'Tên công ty', dataIndex: 'name', key: 'name'},
+    {title: 'Email', dataIndex: 'email', key: 'email'},
+    {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
+    {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
+    {title: 'Hành động', key: 'action'}
+]
+
+
+// Gọi API sản phẩm
+const fetchAllProducts = async () => {
+    try {
+        const response = await getProducts({ per_page: 1000 });
+        allProducts.value = response.data.data;
+    } catch (err) {
+        message.error('Lỗi tải danh sách sản phẩm');
+    }
+};
+
+
+
+// Khi đổi mode sản phẩm liên quan
+const handleRelatedProductModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
+    }
+
+    if (value === 'selected') {
+        if (allProducts.value.length === 0) await fetchAllProducts();
+        selectedProductIds.value = [];
+        productList.value = [];
+    } else if (value === 'all') {
+        await fetchAllProducts();
+        productList.value = allProducts.value;
+        selectedProductIds.value = allProducts.value.map(p => p.id);
+    }
+};
+
+
+// Gọi API doanh nghiệp
+const fetchAllBusinesses = async () => {
+    const res = await getBusinesses({ per_page: 1000 });
+    allBusinesses.value = res.data.data;
+};
+
+// Chọn doanh nghiệp từ select box
+const handleCompanySelect = (ids) => {
+    businessList.value = allBusinesses.value.filter(b => ids.includes(b.id));
+    selectedCompanies.value = ids;
+};
+
+// Xoá doanh nghiệp đã chọn
+const removeBusiness = (id) => {
+    selectedCompanies.value = selectedCompanies.value.filter(bid => bid !== id);
+    businessList.value = businessList.value.filter(b => b.id !== id);
+};
+
+const handleCompanyModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
+    }
+
+    if (value === 'selected') {
+        if (allBusinesses.value.length === 0) await fetchAllBusinesses();
+        selectedCompanies.value = [];
+        businessList.value = [];
+    } else if (value === 'all') {
+        await fetchAllBusinesses();
+        selectedCompanies.value = allBusinesses.value.map(b => b.id);
+        businessList.value = [...allBusinesses.value];
+    }
+};
+
+
+// Gọi API cửa hàng
+const fetchAllStores = async () => {
+    const res = await getStores({ per_page: 1000 });
+    allStores.value = res.data.data;
+};
+
+// Chọn cửa hàng từ select box
+const handleStoreSelect = (ids) => {
+    storeList.value = allStores.value.filter(s => ids.includes(s.id));
+    selectedStores.value = ids;
+};
+
+// Xoá cửa hàng đã chọn
+const removeStore = (id) => {
+    selectedStores.value = selectedStores.value.filter(sid => sid !== id);
+    storeList.value = storeList.value.filter(s => s.id !== id);
+};
+
+// Khi đổi mode cửa hàng liên quan
+const handleStoreModeChange = async (input) => {
+    const value = typeof input === 'string' ? input : input?.target?.value;
+    if (!value) {
+        console.warn('Giá trị không hợp lệ:', input);
+        return;
+    }
+
+    if (value === 'selected') {
+        if (allStores.value.length === 0) await fetchAllStores();
+        selectedStores.value = [];
+        storeList.value = [];
+    } else if (value === 'all') {
+        await fetchAllStores();
+        selectedStores.value = allStores.value.map(s => s.id);
+        storeList.value = [...allStores.value];
+    }
+};
+
+
+const settings = ref({
+    selectedTemplate: 'tpl-1',// Template hiển thị
+
+    relatedProducts: 'all',            // 'all' hoặc 'selected'
+    selectedProducts: [],              // ID sản phẩm được chọn khi relatedProducts = 'selected'
+
+    company: 'all',                    // 'all' hoặc 'selected'
+    selectedCompanies: [],             // ID công ty được chọn khi company = 'selected'
+
+    store: 'all',                      // 'all' hoặc 'selected'
+    selectedStores: [],                // ID cửa hàng được chọn khi store = 'selected'
+
+    enableSurvey: false,                // Bật khảo sát
+    selectedSurveys: [],               // ID khảo sát được chọn khi enableSurvey = true
+
+    enableOrderButton: true,         // Hiển thị nút đặt hàng
+
+    productLinks: [
+        {platform: 'Shopee', url: ''},
+        {platform: 'Lazada', url: ''},
+        {platform: 'Tiki', url: ''}
+    ]
+})
+
+const selectedTemplateData = computed(() =>
+    templateOptions.find(t => t.id === settings.value.selectedTemplate)
+)
+
+const AsyncTemplate = computed(() => {
+    return selectedTemplateData.value?.component ? defineAsyncComponent(selectedTemplateData.value.component) : null
+})
+
+const selectTemplate = (tpl) => {
+    settings.value.selectedTemplate = tpl.id
+}
+
+const isActiveTemplate = (tplId) => {
+    return settings.value.selectedTemplate === tplId
+}
+
+const fetchCategories = async () => {
+    try {
+        const response = await getCategories()
+        categories.value = response.data
+    } catch (e) {
+        message.error('Không tải được danh mục')
+    }
+}
+
+const fetchProduct = async () => {
+    try {
+        const response = await getProduct(route.params.id)
+        const data = normalizeProductData(response.data)
+
+        console.log('Dữ liệu sản phẩm:', data) // 👈 Xem rõ ở đây
+
+        Object.assign(form.value, data)
+
+        form.value.price_mode = data.price_mode || 'single'  // fallback nếu null
+        form.value.show_contact_price = data.show_contact_price === '1'
+
+        if (typeof data.display_settings === 'string') {
+            try {
+                const parsedSettings = JSON.parse(data.display_settings)
+                settings.value = {...settings.value, ...parsedSettings}
+
+                // Nếu không có productLinks, đảm bảo là mảng rỗng
+                if (!settings.value.productLinks) {
+                    settings.value.productLinks = []
+                }
+
+            } catch (e) {
+                console.warn('display_settings không hợp lệ:', e)
+            }
+        } else if (typeof data.display_settings === 'object') {
+            settings.value = {...settings.value, ...data.display_settings}
+        }
+
+        const fields = ['avatar', 'image', 'video', 'certificate_file']
+        fields.forEach(field => {
+            const fileUrls = form.value[field] || []
+            fileUrls.forEach(url => updateFileList(field, url))
+        })
+    } catch (error) {
+        message.error('Không tìm thấy sản phẩm')
+    }
+}
+
+const enableAddProduct = ref(false)
 
 const logoFileList = ref([])
 const previewImage = ref('')
@@ -262,6 +688,20 @@ const handlePreview = (file) => {
     previewVisible.value = true
     previewTitle.value = file.name || ''
 }
+
+const handleOrderButtonToggle = (checked) => {
+    // Không reset gì cả, chỉ dùng switch để điều khiển hiển thị
+    // Nếu muốn khi bật lại mà không có link thì thêm mặc định
+    if (checked && settings.value.productLinks.length === 0) {
+        settings.value.productLinks = [
+            {platform: 'Shopee', url: ''},
+            {platform: 'Lazada', url: ''},
+            {platform: 'Tiki', url: ''}
+        ]
+    }
+    // Nếu không muốn thêm mặc định khi bật lại, xoá phần trên.
+}
+
 
 const goBack = () => router.push('/stores')
 
