@@ -563,7 +563,8 @@
 
 
     const settings = ref({
-        selectedTemplate: 'tpl-1',         // Template hiển thị
+        selectedTemplate: 'tpl-1',// Template hiển thị
+
         relatedProducts: 'all',            // 'all' hoặc 'selected'
         selectedProducts: [],              // ID sản phẩm được chọn khi relatedProducts = 'selected'
 

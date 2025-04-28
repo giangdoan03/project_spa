@@ -220,6 +220,46 @@
                             </a-card>
 
 
+                            <a-card title="Công ty" style="margin-bottom: 24px;">
+                                <!-- Công ty -->
+                                <a-form-item>
+                                    <a-radio-group v-model:value="settings.company" @change="handleCompanyModeChange">
+                                        <a-radio :value="'all'">Tất cả công ty</a-radio>
+                                        <a-radio :value="'selected'">Chọn công ty</a-radio>
+                                    </a-radio-group>
+                                </a-form-item>
+                                <div v-if="settings.company === 'selected'" style="margin-bottom: 24px">
+                                    <a-select
+                                            mode="multiple"
+                                            style="width: 100%; margin-bottom: 12px"
+                                            placeholder="Chọn công ty"
+                                            v-model:value="selectedCompanies"
+                                            @change="handleCompanySelect"
+                                            :key="settings.company"
+                                    >
+
+                                        <a-select-option v-for="b in allBusinesses" :key="b.id" :value="b.id">
+                                            {{ b.name }} - {{ b.email }}
+                                        </a-select-option>
+                                    </a-select>
+
+                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered
+                                             size="small">
+                                        <template #bodyCell="{ column, record }">
+                                            <template v-if="column.key === 'logo'">
+                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo"
+                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                            </template>
+                                            <template v-if="column.key === 'action'">
+                                                <a-button type="link" @click="removeBusiness(record.id)" danger>Xoá
+                                                </a-button>
+                                            </template>
+                                        </template>
+                                    </a-table>
+                                </div>
+                            </a-card>
+
+
                             <a-card title="Cửa hàng" style="margin-bottom: 24px;">
                                 <!-- Cửa hàng -->
                                 <a-form-item>
@@ -293,9 +333,9 @@
 </template>
 
 <script setup>
-import {ref, onMounted, computed, defineAsyncComponent} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {createBusiness, getBusiness, updateBusiness} from '../api/business'
+import { ref, onMounted, computed, defineAsyncComponent, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import {createBusiness, getBusinesses, getBusiness, updateBusiness} from '../api/business'
 import {createProduct, getProduct, getProducts, updateProduct, uploadFile} from '../api/product'
 import {getStores} from '../api/store'
 import {message} from 'ant-design-vue'
@@ -336,6 +376,18 @@ const productColumns = [
     {title: 'Hành động', key: 'action'}
 ];
 
+
+const businessColumns = [
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Logo', dataIndex: 'logo', key: 'logo'},
+    {title: 'Tên công ty', dataIndex: 'name', key: 'name'},
+    {title: 'Email', dataIndex: 'email', key: 'email'},
+    {title: 'SĐT', dataIndex: 'phone', key: 'phone'},
+    {title: 'Địa chỉ', dataIndex: 'address', key: 'address'},
+    {title: 'Hành động', key: 'action'}
+]
+
+
 const storeColumns = [
     {title: 'ID', dataIndex: 'id', key: 'id'},
     {title: 'Logo', dataIndex: 'logo', key: 'logo'},
@@ -358,6 +410,9 @@ const certificateFileList = ref([]);
 const previewImage = ref('');
 const previewVisible = ref(false);
 const previewTitle = ref('');
+
+const selectedCompanies = ref([])
+const selectedSurveys = ref([])
 
 const isEditMode = computed(() => !!route.params.id);
 
@@ -386,31 +441,45 @@ const parseAvatar = (avatar) => {
         return ''
     }
 }
-
-// Fetch data if edit mode
 const fetchBusiness = async () => {
     try {
-        const {data} = await getBusiness(route.params.id);
-        Object.assign(form.value, data);
+        const response = await getBusiness(route.params.id)
+        const data = response.data
 
+        console.log('Dữ liệu doanh nghiệp:', data) // 👈 Debug rõ hơn
+
+        Object.assign(form.value, data)
+
+        // Parse other_links từ mảng về textarea
         otherLinksText.value = Array.isArray(data.other_links)
             ? data.other_links.join('\n')
             : (data.other_links || '')
 
-        const loadFileList = (field, list) => {
-            let files = typeof list === 'string' ? JSON.parse(list) : list
-            if (!Array.isArray(files)) files = [files]
-            files.forEach(url => updateFileList(field, url))
+        // 👇 Parse display_settings nếu có
+        if (typeof data.display_settings === 'string') {
+            try {
+                const parsedSettings = JSON.parse(data.display_settings)
+                settings.value = { ...settings.value, ...parsedSettings }
+            } catch (e) {
+                console.warn('display_settings không hợp lệ:', e)
+            }
+        } else if (typeof data.display_settings === 'object') {
+            settings.value = { ...settings.value, ...data.display_settings }
         }
 
-        ['logo', 'cover_image', 'library_images', 'video_intro', 'certificate_file'].forEach(field => {
-            if (form.value[field]) loadFileList(field, form.value[field])
+        // Load file list giống như Product
+        const fields = ['logo', 'cover_image', 'library_images', 'video_intro', 'certificate_file']
+        fields.forEach(field => {
+            const fileUrls = form.value[field] || []
+            fileUrls.forEach(url => updateFileList(field, url))
         })
 
     } catch (error) {
+        console.error('Lỗi khi fetchBusiness:', error)
         message.error('Không tìm thấy doanh nghiệp')
     }
 }
+
 
 // Update file list
 const updateFileList = (field, url) => {
@@ -484,6 +553,9 @@ const handlePreview = (file) => {
 
 const settings = ref({
     selectedTemplate: 'tpl-1',         // Template hiển thị
+
+    relatedProducts: 'all',            // 'all' hoặc 'selected'
+    selectedProducts: [],              // ID sản phẩm được chọn khi relatedProducts = 'selected'
 
     company: 'all',                    // 'all' hoặc 'selected'
     selectedCompanies: [],             // ID công ty được chọn khi company = 'selected'
@@ -612,15 +684,23 @@ const handleStoreModeChange = async (input) => {
 };
 
 
-// Submit form
+// Submit form đã sửa
 const handleSubmit = async () => {
     loading.value = true
 
     // ✅ Chuyển từ textarea (dạng chuỗi) thành mảng
     form.value.other_links = otherLinksText.value
-        .split('\n')                   // tách từng dòng
-        .map(s => s.trim())            // xóa khoảng trắng đầu/cuối
-        .filter(Boolean)               // bỏ dòng rỗng
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean)
+
+    // 👇 Đồng bộ selections vào settings
+    settings.value.selectedCompanies = selectedCompanies.value
+    settings.value.selectedStores = selectedStores.value
+    settings.value.selectedProducts = selectedProductIds.value  // <-- đảm bảo có dòng này
+
+    // 👇 Gán settings vào display_settings
+    form.value.display_settings = JSON.stringify(settings.value)
 
     try {
         if (isEditMode) {
@@ -642,9 +722,52 @@ const handleSubmit = async () => {
 const goBack = () => router.push('/businesses')
 
 onMounted(async () => {
-    await fetchAllProducts();
-    if (isEditMode) await fetchBusiness()
+    await fetchAllProducts()
+    await fetchAllBusinesses()
+    await fetchAllStores()
+
+    await nextTick() // Đảm bảo DOM đã render xong
+
+    if (isEditMode.value) {
+        await fetchBusiness()
+
+        // 👇 Nếu có display_settings thì parse vào settings
+        if (form.value.display_settings) {
+            try {
+                const parsedSettings = JSON.parse(form.value.display_settings)
+                Object.assign(settings.value, parsedSettings)
+            } catch (e) {
+                console.warn('⚠️ Lỗi parse display_settings:', e)
+            }
+        }
+
+        // 👇 Sản phẩm liên quan
+        if (settings.value.relatedProducts === 'selected') {
+            selectedProductIds.value = settings.value.selectedProducts || []
+            productList.value = allProducts.value.filter(p => selectedProductIds.value.includes(p.id))
+        } else if (settings.value.relatedProducts === 'all') {
+            productList.value = allProducts.value
+        }
+
+
+        // 👇 Công ty liên quan
+        if (settings.value.company === 'selected') {
+            selectedCompanies.value = settings.value.selectedCompanies || []
+            businessList.value = allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id))
+        } else if (settings.value.company === 'all') {
+            businessList.value = allBusinesses.value
+        }
+
+        // 👇 Cửa hàng liên quan
+        if (settings.value.store === 'selected') {
+            selectedStores.value = settings.value.selectedStores || []
+            storeList.value = allStores.value.filter(s => selectedStores.value.includes(s.id))
+        } else if (settings.value.store === 'all') {
+            storeList.value = allStores.value
+        }
+    }
 })
+
 </script>
 
 <style scoped>
