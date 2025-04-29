@@ -24,7 +24,7 @@
 
                         <a-form-item label="Mô tả ngắn gọn">
                             <div ref="editorRef"
-                                 style="min-height: 200px; border: 1px solid #ccc; border-radius: 4px; padding: 8px;"/>
+                                 style="min-height: 200px; padding: 8px;"/>
                         </a-form-item>
 
                         <a-form-item label="Logo">
@@ -254,6 +254,8 @@
 
     const loading = ref(false)
     const isIslandExpanded = ref(false)
+    const editorRef = ref(null)
+    const quillInstance = ref(null)
 
     const form = ref({
         user_id: null,
@@ -582,6 +584,11 @@
         // ✅ Gán product_ids riêng (ngoài display_settings)
         form.value.product_ids = [...selectedProductIds.value]
 
+        if (quillInstance.value) {
+            form.value.description = quillInstance.value.root.innerHTML
+        }
+
+
         // ✅ Đồng bộ selections vào settings
         settings.value.selectedCompanies = selectedCompanies.value
         settings.value.selectedStores = selectedStores.value
@@ -593,13 +600,14 @@
         form.value.display_settings = JSON.stringify(settings.value)
 
         try {
-            if (isEditMode) {
+            if (isEditMode.value && route.params.id) {
                 await updateStore(route.params.id, form.value)
                 message.success('Cập nhật thành công')
             } else {
                 await createStore(form.value)
                 message.success('Tạo mới thành công')
             }
+
             router.push('/stores')
         } catch (error) {
             message.error('Có lỗi xảy ra')
@@ -693,6 +701,30 @@
                 storeList.value = [...allStores.value]
             }
         }
+
+        if (editorRef.value) {
+            quillInstance.value = new Quill(editorRef.value, {
+                theme: 'snow',
+                placeholder: 'Nhập mô tả sản phẩm...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{list: 'ordered'}, {list: 'bullet'}],
+                        [{header: [1, 2, false]}],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                }
+            })
+
+            // 👇 Gán mô tả sau khi Quill khởi tạo xong
+            if (isEditMode.value && form.value.description) {
+                quillInstance.value.root.innerHTML = form.value.description
+            }
+        } else {
+            console.warn('⚠️ Không tìm thấy DOM editorRef để gắn Quill.')
+        }
+
     })
 
 
