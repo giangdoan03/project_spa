@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 28, 2025 at 05:02 PM
+-- Generation Time: Apr 29, 2025 at 02:12 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -587,8 +587,7 @@ ALTER TABLE `products`
 -- Indexes for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `product_id` (`product_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `qr_codes`
@@ -761,16 +760,6 @@ ALTER TABLE `survey_questions`
 --
 ALTER TABLE `users`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `product_attributes`
---
-ALTER TABLE `product_attributes`
-  ADD CONSTRAINT `product_attributes_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
