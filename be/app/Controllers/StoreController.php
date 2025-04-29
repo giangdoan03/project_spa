@@ -84,11 +84,17 @@ class StoreController extends ResourceController
         $data['user_id'] = $userId;
         $data['product_ids'] = $this->prepareProductIds($data['product_ids'] ?? null);
 
+        // 👇 Encode display_settings nếu có
+        if (!empty($data['display_settings']) && is_array($data['display_settings'])) {
+            $data['display_settings'] = json_encode($data['display_settings']);
+        }
+
         $this->model->insert($data);
         $data['id'] = $this->model->getInsertID();
 
         return $this->respondCreated($data);
     }
+
 
     public function update($id = null)
     {
@@ -102,6 +108,11 @@ class StoreController extends ResourceController
 
         $data['product_ids'] = $this->prepareProductIds($data['product_ids'] ?? null);
 
+        // 👇 Encode display_settings nếu có
+        if (!empty($data['display_settings']) && is_array($data['display_settings'])) {
+            $data['display_settings'] = json_encode($data['display_settings']);
+        }
+
         $this->model->update($id, $data);
 
         return $this->respond([
@@ -109,6 +120,7 @@ class StoreController extends ResourceController
             'message' => 'Đã cập nhật'
         ]);
     }
+
 
     public function delete($id = null)
     {

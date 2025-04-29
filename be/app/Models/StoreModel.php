@@ -12,7 +12,7 @@ class StoreModel extends Model
 
     protected $allowedFields = [
         'user_id', 'name', 'email', 'phone', 'address',
-        'description', 'logo', 'status', 'product_ids'
+        'description', 'logo', 'status', 'product_ids', 'display_settings'
     ];
 
     protected $useTimestamps = true;
