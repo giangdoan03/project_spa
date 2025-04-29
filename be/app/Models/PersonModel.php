@@ -23,6 +23,7 @@ class PersonModel extends Model
         'country',
         'address',
         'social_links',
+        'display_settings',
         'video_url',
         'created_at',
         'updated_at'

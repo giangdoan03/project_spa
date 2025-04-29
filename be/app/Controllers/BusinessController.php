@@ -22,25 +22,30 @@ class BusinessController extends ResourceController
         $page = $this->request->getGet('page') ?? 1;
         $search = $this->request->getGet('search');
 
-        $model = new BusinessModel();
-        $builder = $model->where('deleted_at', null)->where('user_id', $userId);
+        $builder = $this->model->where('user_id', $userId);
 
         if (!empty($search)) {
             $builder->groupStart()
                 ->like('name', $search)
-                ->orLike('tax_code', $search)
                 ->groupEnd();
         }
 
         $data = $builder->paginate($perPage, 'default', $page);
 
-        $data = array_map([$this, 'formatBusinessItem'], $data);
+        // 👉 Decode display_settings nếu cần
+        $data = array_map(function ($item) {
+            if (!empty($item['display_settings']) && is_string($item['display_settings'])) {
+                $item['display_settings'] = json_decode($item['display_settings'], true);
+            }
+            return $item;
+        }, $data);
 
         return $this->respond([
             'data' => $data,
-            'pager' => $model->pager->getDetails(),
+            'pager' => $this->model->pager->getDetails(),
         ]);
     }
+
 
     public function show($id = null)
     {

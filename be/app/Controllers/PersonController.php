@@ -17,15 +17,35 @@ class PersonController extends ResourceController
     {
         $userId = $this->getUserId();
         $data = $this->model->where('user_id', $userId)->findAll();
+
+        // 👉 Giải mã display_settings cho từng item
+        foreach ($data as &$item) {
+            if (!empty($item['display_settings']) && is_string($item['display_settings'])) {
+                $item['display_settings'] = json_decode($item['display_settings'], true);
+            }
+        }
+
         return $this->respond($data);
     }
+
 
     public function show($id = null)
     {
         $userId = $this->getUserId();
         $data = $this->model->where('user_id', $userId)->find($id);
-        return $data ? $this->respond($data) : $this->failNotFound('Không tìm thấy cá nhân');
+
+        if (!$data) {
+            return $this->failNotFound('Không tìm thấy cá nhân');
+        }
+
+        // 👉 Decode display_settings nếu muốn trả về dạng array
+        if (!empty($data['display_settings']) && is_string($data['display_settings'])) {
+            $data['display_settings'] = json_decode($data['display_settings'], true);
+        }
+
+        return $this->respond($data);
     }
+
 
     public function create()
     {
@@ -37,10 +57,19 @@ class PersonController extends ResourceController
         }
 
         $data['user_id'] = $userId;
+
+        // 👉 Encode display_settings nếu có
+        if (!empty($data['display_settings'])) {
+            $data['display_settings'] = is_array($data['display_settings'])
+                ? json_encode($data['display_settings'])
+                : $data['display_settings'];
+        }
+
         $id = $this->model->insert($data);
 
         return $this->respondCreated(['id' => $id]);
     }
+
 
     public function update($id = null)
     {
@@ -52,9 +81,17 @@ class PersonController extends ResourceController
             return $this->failNotFound('Không tìm thấy cá nhân');
         }
 
+        // 👉 Encode display_settings nếu có
+        if (!empty($data['display_settings'])) {
+            $data['display_settings'] = is_array($data['display_settings'])
+                ? json_encode($data['display_settings'])
+                : $data['display_settings'];
+        }
+
         $this->model->update($id, $data);
         return $this->respond(['id' => $id, 'message' => 'Đã cập nhật thành công']);
     }
+
 
     public function delete($id = null)
     {
