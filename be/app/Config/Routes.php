@@ -25,6 +25,11 @@ $routes->group('api', function ($routes) {
     $routes->resource('stores', ['controller' => 'StoreController']); // Thêm route cho stores
 
     $routes->post('upload', 'UploadController::upload');
+    $routes->post('upload-from-url', 'UploadController::uploadFromUrl');
+
+    $routes->get('images/(:segment)/(:num)', 'ImageController::list/$1/$2');
+    $routes->get('images/cover/(:segment)/(:num)', 'ImageController::cover/$1/$2');
+    $routes->post('images/save/(:num)', 'ImageController::save/$1');
 
     // Route phân quyền (nên đặt ngoài nhóm 'api' nếu bạn dùng giao diện truyền thống)
 

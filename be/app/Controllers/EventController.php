@@ -23,7 +23,7 @@ class EventController extends ResourceController
         $builder = $this->model->where('user_id', $userId);
 
         if ($search) {
-            $builder = $builder->like('name', $search);
+            $builder->like('name', $search);
         }
 
         $data = $builder->paginate($perPage, 'default', $page);
@@ -43,7 +43,18 @@ class EventController extends ResourceController
     {
         $userId = $this->getUserId();
         $data = $this->model->where('user_id', $userId)->find($id);
-        if (!$data) return $this->failNotFound('Không tìm thấy sự kiện');
+
+        if (!$data) {
+            return $this->failNotFound('Không tìm thấy sự kiện');
+        }
+
+        // Parse JSON fields safely
+        $data['images'] = json_decode($data['images'] ?? '[]', true);
+        $data['video'] = json_decode($data['video'] ?? '[]', true);
+        $data['ticket_options'] = json_decode($data['ticket_options'] ?? '[]', true);
+        $data['social_links'] = json_decode($data['social_links'] ?? '{}', true);
+        $data['description'] = json_decode($data['description'] ?? '[]', true);
+
         return $this->respond($data);
     }
 
@@ -58,8 +69,17 @@ class EventController extends ResourceController
 
         $data['user_id'] = $userId;
 
+        // Convert arrays to JSON safely
+        $data['images'] = json_encode($data['images'] ?? []);
+        $data['video'] = json_encode($data['video'] ?? []);
+        $data['ticket_options'] = json_encode($data['ticket_options'] ?? []);
+        $data['social_links'] = json_encode($data['social_links'] ?? []);
+        $data['banner'] = $data['banner'] ?? '';
+        $data['description'] = json_encode($data['description'] ?? []);
+
         $this->model->insert($data);
         $data['id'] = $this->model->getInsertID();
+
         return $this->respondCreated($data);
     }
 
@@ -67,12 +87,43 @@ class EventController extends ResourceController
     {
         $userId = $this->getUserId();
         $data = $this->request->getJSON(true);
-        $existing = $this->model->where('user_id', $userId)->find($id);
 
-        if (!$existing) return $this->failNotFound('Không tìm thấy sự kiện');
+        $existing = $this->model->where('user_id', $userId)->find($id);
+        if (!$existing) {
+            return $this->failNotFound('Không tìm thấy sự kiện');
+        }
+
+        // Encode fields if provided, otherwise keep old value
+        $data['images'] = array_key_exists('images', $data)
+            ? json_encode($data['images'])
+            : $existing['images'];
+
+        $data['video'] = array_key_exists('video', $data)
+            ? json_encode($data['video'])
+            : $existing['video'];
+
+        $data['ticket_options'] = array_key_exists('ticket_options', $data)
+            ? json_encode($data['ticket_options'])
+            : $existing['ticket_options'];
+
+        $data['description'] = array_key_exists('description', $data)
+            ? json_encode($data['description'])
+            : $existing['description'];
+
+        $data['social_links'] = array_key_exists('social_links', $data)
+            ? json_encode($data['social_links'])
+            : $existing['social_links'];
+
+        $data['banner'] = array_key_exists('banner', $data)
+            ? $data['banner']
+            : $existing['banner'];
 
         $this->model->update($id, $data);
-        return $this->respond(['id' => $id, 'message' => 'Đã cập nhật']);
+
+        return $this->respond([
+            'id' => $id,
+            'message' => 'Đã cập nhật'
+        ]);
     }
 
     public function delete($id = null)
@@ -80,9 +131,15 @@ class EventController extends ResourceController
         $userId = $this->getUserId();
         $existing = $this->model->where('user_id', $userId)->find($id);
 
-        if (!$existing) return $this->failNotFound('Không tìm thấy sự kiện');
+        if (!$existing) {
+            return $this->failNotFound('Không tìm thấy sự kiện');
+        }
 
         $this->model->delete($id);
-        return $this->respondDeleted(['id' => $id, 'message' => 'Đã xoá']);
+
+        return $this->respondDeleted([
+            'id' => $id,
+            'message' => 'Đã xoá'
+        ]);
     }
 }

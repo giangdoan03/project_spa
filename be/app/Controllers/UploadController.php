@@ -43,4 +43,47 @@ class UploadController extends ResourceController
             'url' => $publicUrl
         ]);
     }
+
+    public function uploadFromUrl()
+    {
+        $url = $this->request->getJSON()->url ?? null;
+
+        if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return $this->fail('URL không hợp lệ.');
+        }
+
+        // Lấy nội dung file từ URL
+        try {
+            $imageContents = file_get_contents($url);
+        } catch (\Exception $e) {
+            return $this->fail('Không thể tải ảnh từ URL.');
+        }
+
+        // Tạo tên file ngẫu nhiên
+        $pathInfo = pathinfo($url);
+        $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : 'jpg';
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!in_array($extension, $allowedExtensions)) {
+            return $this->fail('Định dạng file không được hỗ trợ.');
+        }
+
+        $filename = uniqid() . '.' . $extension;
+
+        // Lưu file
+        $uploadDir = getenv('UPLOAD_DIR') ?: 'C:/php82/htdocs/assets/image/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        file_put_contents($uploadDir . $filename, $imageContents);
+
+        // Trả về URL công khai
+        $publicUrl = rtrim(getenv('ASSETS_DOMAIN') ?: 'http://assets.giang.test/image/', '/') . '/' . $filename;
+
+        return $this->respond([
+            'url' => $publicUrl
+        ]);
+    }
+
 }

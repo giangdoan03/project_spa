@@ -79,20 +79,17 @@
 
                             <a-card title="Sản phẩm hàng đầu (Top)" style="margin-bottom: 24px;">
                                 <a-form-item>
-                                    <a-radio-group v-model:value="settings.topProductsMode"
-                                                   @change="handleTopProductModeChange">
+                                    <a-radio-group v-model:value="settings.topProductsMode" @change="handleTopProductModeChange">
                                         <a-radio :value="'all'">Tất cả sản phẩm</a-radio>
                                         <a-radio :value="'selected'">Chọn sản phẩm</a-radio>
                                     </a-radio-group>
                                 </a-form-item>
 
                                 <div v-if="settings.topProductsMode === 'selected'" style="margin-bottom: 24px">
-                                    <a-select mode="multiple" style="width: 100%; margin-bottom: 12px"
-                                              placeholder="Chọn sản phẩm top"
+                                    <a-select mode="multiple" style="width: 100%; margin-bottom: 12px" placeholder="Chọn sản phẩm top"
                                               v-model:value="selectedTopProducts"
                                               @change="handleTopProductSelect">
-                                        <a-select-option v-for="product in allProducts" :key="product.id"
-                                                         :value="product.id">
+                                        <a-select-option v-for="product in allProducts" :key="product.id" :value="product.id">
                                             {{ product.name }} - {{ product.price }}đ
                                         </a-select-option>
                                     </a-select>
@@ -133,8 +130,7 @@
                                                 {{ product.name }} - {{ product.price }}đ
                                             </a-select-option>
                                         </a-select>
-                                        <a-table :columns="productColumns" :data-source="productList" row-key="id"
-                                                 bordered size="small">
+                                        <a-table :columns="productColumns" :data-source="productList" row-key="id" bordered size="small">
                                             <template #bodyCell="{ column, record }">
                                                 <template v-if="column.key === 'avatar'">
                                                     <img v-if="record.avatar" :src="parseAvatar(record.avatar)"
@@ -225,7 +221,7 @@
         </a-tabs>
 
         <a-modal v-model:open="previewVisible" :title="previewTitle" footer={null}>
-            <img :src="previewImage" style="width: 100%"/>
+            <img :src="previewImage" style="width: 100%" alt=""/>
         </a-modal>
     </div>
 </template>
