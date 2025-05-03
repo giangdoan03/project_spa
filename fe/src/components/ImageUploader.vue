@@ -23,11 +23,23 @@
 
                 <!-- File khác -->
                 <div v-else class="file-icon">📄</div>
-                <div class="tool_tip_text" @click="showYoutubeModal(file.url)">
-                    <PlayCircleOutlined/>
+                <div
+                    class="tool_tip_text"
+                    v-if="props.multiple"
+                    @click="showYoutubeModal(file.url)"
+                >
+                    <PlayCircleOutlined />
                     <span v-if="file.is_main" class="cover-label">Ảnh chính</span>
-                    <a v-else href="javascript:void(0)" @click="setAsCover(index)" class="cover-link">Đặt làm ảnh chính</a>
+                    <a
+                        v-else
+                        href="javascript:void(0)"
+                        @click="setAsCover(index)"
+                        class="cover-link"
+                    >
+                        Đặt làm ảnh chính
+                    </a>
                 </div>
+
                 <!-- Controls -->
                 <button @click="remove(index)" class="remove-btn">
                     <DeleteOutlined/>
@@ -35,7 +47,10 @@
             </div>
 
             <!-- Thêm -->
-            <div class="add-image-box">
+            <div
+                class="add-image-box"
+                v-if="!(hideUploadIfSingle && !props.multiple && internalList.length >= 1)"
+            >
                 <input
                     type="file"
                     :accept="accept"
@@ -108,6 +123,10 @@ const props = defineProps({
     multiple: {
         type: Boolean,
         default: true
+    },
+    hideUploadIfSingle: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -135,19 +154,26 @@ const youtubePreview = ref({
 const urlInput = ref('')
 
 // Đồng bộ dữ liệu từ ngoài vào
-watch(() => props.modelValue, (val) => {
-    internalList.value = (Array.isArray(val) ? val : []).map(item => {
-        const url = typeof item === 'string' ? item : item.url || ''
-        return {
-            ...item,
-            url,
-            preview: item.preview || url,
-            isYoutube: isYoutubeUrl(url),
-            isCover: item.isCover === 1 || item.isCover === true || item.is_cover === 1 || item.is_cover === '1',
-            uid: item.uid || Date.now().toString()
-        }
-    })
-}, { immediate: true })
+watch(
+    () => props.modelValue,
+    (val) => {
+        const list = Array.isArray(val) ? val : (val ? [val] : [])
+
+        internalList.value = list.map(item => {
+            const isStr = typeof item === 'string'
+            const url = isStr ? item : item?.url || ''
+            return {
+                ...(isStr ? {} : item),
+                url,
+                preview: item?.preview || url,
+                isYoutube: isYoutubeUrl(url),
+                isCover: item?.isCover === 1 || item?.isCover === true || item?.is_cover == 1 || item?.is_cover === '1',
+                uid: item?.uid || Date.now().toString()
+            }
+        })
+    },
+    { immediate: true }
+)
 
 
 
@@ -331,7 +357,7 @@ function setAsCover(index) {
     })
 
     emit('update:modelValue', internalList.value)
-    emit('set-cover', internalList.value[index]) // ✅ Emit thêm sự kiện riêng
+    emit('set-cover', internalList.value[index])
 }
 function isImage(url) {
     return url.startsWith('data:image') || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url)
