@@ -286,7 +286,7 @@ const form = ref({
         // { url: '', is_main: false }
     ],
     banner: '', // chỉ 1 ảnh (string)
-    video: [''] // danh sách nhiều video (mảng string)
+    video: [] // danh sách nhiều video (mảng string)
 })
 
 const socialPlatforms = [

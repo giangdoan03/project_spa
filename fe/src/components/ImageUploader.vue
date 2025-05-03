@@ -24,17 +24,17 @@
                 <!-- File khác -->
                 <div v-else class="file-icon">📄</div>
                 <div
-                    class="tool_tip_text"
-                    v-if="props.multiple"
-                    @click="showYoutubeModal(file.url)"
+                        class="tool_tip_text"
+                        v-if="props.multiple && props.type !== 'video'"
+                        @click="showYoutubeModal(file.url)"
                 >
                     <PlayCircleOutlined />
                     <span v-if="file.is_main" class="cover-label">Ảnh chính</span>
                     <a
-                        v-else
-                        href="javascript:void(0)"
-                        @click="setAsCover(index)"
-                        class="cover-link"
+                            v-else
+                            href="javascript:void(0)"
+                            @click="setAsCover(index)"
+                            class="cover-link"
                     >
                         Đặt làm ảnh chính
                     </a>
@@ -136,7 +136,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const internalList = ref([])
 const fileInput = ref(null)
-const showUrlModal = ref(false)
+let showUrlModal = ref(false)
 const isAddingUrl = ref(false)
 
 const accept = computed(() => {
