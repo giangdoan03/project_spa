@@ -54,6 +54,7 @@ class EventController extends ResourceController
         $data['ticket_options'] = json_decode($data['ticket_options'] ?? '[]', true);
         $data['social_links'] = json_decode($data['social_links'] ?? '{}', true);
         $data['description'] = json_decode($data['description'] ?? '[]', true);
+        $data['display_settings'] = json_decode($data['display_settings'] ?? '[]', true);
 
         return $this->respond($data);
     }
@@ -76,6 +77,7 @@ class EventController extends ResourceController
         $data['social_links'] = json_encode($data['social_links'] ?? []);
         $data['banner'] = $data['banner'] ?? '';
         $data['description'] = json_encode($data['description'] ?? []);
+        $data['display_settings'] = json_encode($data['display_settings'] ?? []);
 
         $this->model->insert($data);
         $data['id'] = $this->model->getInsertID();
@@ -117,6 +119,10 @@ class EventController extends ResourceController
         $data['banner'] = array_key_exists('banner', $data)
             ? $data['banner']
             : $existing['banner'];
+
+        $data['display_settings'] = array_key_exists('display_settings', $data)
+            ? json_encode($data['display_settings'])
+            : $existing['display_settings'];
 
         $this->model->update($id, $data);
 

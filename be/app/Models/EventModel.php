@@ -30,7 +30,8 @@ class EventModel extends Model
         'social_links',
         'images',
         'video',
-        'format_type'
+        'format_type',
+        'display_settings'
     ];
 
     protected $useTimestamps = true;

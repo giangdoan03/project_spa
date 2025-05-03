@@ -170,12 +170,10 @@
                                         </a-select-option>
                                     </a-select>
 
-                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id"
-                                             bordered size="small">
+                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered size="small">
                                         <template #bodyCell="{ column, record }">
                                             <template v-if="column.key === 'logo'">
-                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo"
-                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo" style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
                                             </template>
                                             <template v-if="column.key === 'action'">
                                                 <a-button type="link" @click="removeBusiness(record.id)" danger>Xoá
@@ -568,34 +566,106 @@
             message.error('Không tìm thấy thông tin cửa hàng')
         }
     }
+    const validateStoreForm = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const phoneRegex = /^[0-9]{9,15}$/
 
+        if (!form.value.name?.trim()) {
+            message.error('Tên cửa hàng là bắt buộc')
+            return false
+        }
+
+        if (!logoFileList.value?.length) {
+            message.error('Vui lòng upload logo cửa hàng')
+            return false
+        }
+
+        if (!form.value.email || !emailRegex.test(form.value.email)) {
+            message.error('Vui lòng nhập email hợp lệ')
+            return false
+        }
+
+        if (!form.value.phone || !phoneRegex.test(form.value.phone)) {
+            message.error('Vui lòng nhập số điện thoại hợp lệ')
+            return false
+        }
+
+        if (!form.value.address?.trim()) {
+            message.error('Vui lòng nhập địa chỉ')
+            return false
+        }
+
+        return true
+    }
+
+    const validateDisplaySettings = () => {
+
+        if (
+            settings.value.relatedProducts === 'selected' &&
+            (!selectedProductIds.value || selectedProductIds.value.length === 0)
+        ) {
+            message.error('Vui lòng chọn ít nhất 1 sản phẩm liên quan!')
+            return false
+        }
+
+        if (
+            settings.value.topProductsMode === 'selected' &&
+            (!selectedTopProducts.value || selectedTopProducts.value.length === 0)
+        ) {
+            message.error('Vui lòng chọn ít nhất 1 sản phẩm hàng đầu!')
+            return false
+        }
+
+        if (
+            settings.value.company === 'selected' &&
+            (!selectedCompanies.value || selectedCompanies.value.length === 0)
+        ) {
+            message.error('Vui lòng chọn ít nhất 1 doanh nghiệp!')
+            return false
+        }
+
+        if (
+            settings.value.store === 'selected' &&
+            (!selectedStores.value || selectedStores.value.length === 0)
+        ) {
+            message.error('Vui lòng chọn ít nhất 1 cửa hàng!')
+            return false
+        }
+
+        return true
+    }
 
 
     const handleSubmit = async () => {
         loading.value = true
 
-        // ✅ Gán user_id nếu chưa có
-        form.value.user_id = userStore.user?.id
-
-        // ✅ Gán product_ids riêng (ngoài display_settings)
-        form.value.product_ids = [...selectedProductIds.value]
-
-        if (quillInstance.value) {
-            form.value.description = quillInstance.value.root.innerHTML
+        if (!validateStoreForm() || !validateDisplaySettings()) {
+            loading.value = false
+            return
         }
 
-
-        // ✅ Đồng bộ selections vào settings
-        settings.value.selectedCompanies = selectedCompanies.value
-        settings.value.selectedStores = selectedStores.value
-        settings.value.selectedProducts = selectedProductIds.value
-        settings.value.selectedSurveys = selectedSurveys.value
-        settings.value.topProducts = selectedTopProducts.value // nếu có
-
-        // ✅ Gán vào display_settings
-        form.value.display_settings = JSON.stringify(settings.value)
-
         try {
+            // ✅ Gán user_id nếu chưa có
+            form.value.user_id = userStore.user?.id
+
+            // ✅ Gán product_ids riêng (ngoài display_settings)
+            form.value.product_ids = [...selectedProductIds.value]
+
+            if (quillInstance.value) {
+                form.value.description = quillInstance.value.root.innerHTML
+            }
+
+
+            // ✅ Đồng bộ selections vào settings
+            settings.value.selectedCompanies = selectedCompanies.value
+            settings.value.selectedStores = selectedStores.value
+            settings.value.selectedProducts = selectedProductIds.value
+            settings.value.selectedSurveys = selectedSurveys.value
+            settings.value.topProducts = selectedTopProducts.value // nếu có
+
+            // ✅ Gán vào display_settings
+            form.value.display_settings = JSON.stringify(settings.value)
+
             if (isEditMode.value && route.params.id) {
                 await updateStore(route.params.id, form.value)
                 message.success('Cập nhật thành công')

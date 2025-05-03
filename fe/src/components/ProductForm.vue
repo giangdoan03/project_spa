@@ -875,6 +875,7 @@
                 businessList.value = parseFieldsForList(
                     allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id))
                 )
+                console.log('allBusinesses',allBusinesses)
             } else if (settings.value.company === 'all') {
                 businessList.value = parseFieldsForList(allBusinesses.value)
             }

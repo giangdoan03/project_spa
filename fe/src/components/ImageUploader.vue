@@ -23,19 +23,10 @@
 
                 <!-- File khác -->
                 <div v-else class="file-icon">📄</div>
-                <div
-                        class="tool_tip_text"
-                        v-if="props.multiple && props.type !== 'video'"
-                        @click="showYoutubeModal(file.url)"
-                >
+                <div class="tool_tip_text" v-if="props.multiple && props.type !== 'video'" @click="showYoutubeModal(file.url)">
                     <PlayCircleOutlined />
                     <span v-if="file.is_main" class="cover-label">Ảnh chính</span>
-                    <a
-                            v-else
-                            href="javascript:void(0)"
-                            @click="setAsCover(index)"
-                            class="cover-link"
-                    >
+                    <a v-else href="javascript:void(0)" @click="setAsCover(index)" class="cover-link">
                         Đặt làm ảnh chính
                     </a>
                 </div>
@@ -47,10 +38,7 @@
             </div>
 
             <!-- Thêm -->
-            <div
-                class="add-image-box"
-                v-if="!(hideUploadIfSingle && !props.multiple && internalList.length >= 1)"
-            >
+            <div class="add-image-box" v-if="!(hideUploadIfSingle && !props.multiple && internalList.length >= 1)">
                 <input
                     type="file"
                     :accept="accept"

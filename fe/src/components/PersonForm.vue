@@ -30,12 +30,12 @@
                         </a-form-item>
 
                         <!-- Email -->
-                        <a-form-item label="Email">
+                        <a-form-item label="Email" required>
                             <a-input v-model:value="form.email" placeholder="example@mail.com"/>
                         </a-form-item>
 
                         <!-- Số điện thoại -->
-                        <a-form-item label="Số điện thoại">
+                        <a-form-item label="Số điện thoại" required>
                             <a-input v-model:value="form.phone" placeholder="Nhập số điện thoại"/>
                         </a-form-item>
 
@@ -499,9 +499,96 @@ const fetchPerson = async () => {
     }
 }
 
+
+const validatePersonForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const phoneRegex = /^[0-9]{9,15}$/
+
+    if (!form.value.name?.trim()) {
+        message.error('Tên cá nhân là bắt buộc')
+        return false
+    }
+
+    if (!form.value.email || !emailRegex.test(form.value.email)) {
+        message.error('Vui lòng nhập email hợp lệ')
+        return false
+    }
+
+    if (!form.value.phone || !phoneRegex.test(form.value.phone)) {
+        message.error('Vui lòng nhập số điện thoại hợp lệ')
+        return false
+    }
+
+    if (!form.value.job_title?.trim()) {
+        message.error('Vui lòng nhập chức danh')
+        return false
+    }
+
+    if (!avatarFileList.value || avatarFileList.value.length === 0) {
+        message.error('Vui lòng upload ảnh đại diện')
+        return false
+    }
+
+    if (
+        settings.value.company === 'selected' &&
+        (!selectedCompanies.value?.length)
+    ) {
+        message.error('Chọn ít nhất 1 công ty')
+        return false
+    }
+
+    if (
+        settings.value.store === 'selected' &&
+        (!selectedStores.value?.length)
+    ) {
+        message.error('Chọn ít nhất 1 cửa hàng')
+        return false
+    }
+
+    return true
+}
+
+
+const validateDisplaySettings = () => {
+    const rules = [
+        {
+            condition: settings.value.relatedProducts === 'selected' && (!selectedProductIds.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 sản phẩm liên quan!'
+        },
+        {
+            condition: settings.value.topProductsMode === 'selected' && (!selectedTopProducts.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 sản phẩm hàng đầu!'
+        },
+        {
+            condition: settings.value.company === 'selected' && (!selectedCompanies.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 doanh nghiệp!'
+        },
+        {
+            condition: settings.value.store === 'selected' && (!selectedStores.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 cửa hàng!'
+        }
+    ]
+
+    for (const rule of rules) {
+        if (rule.condition) {
+            message.error(rule.message)
+            return false
+        }
+    }
+
+    return true
+}
+
+
+
 const handleSubmit = async () => {
     try {
         loading.value = true
+
+        if (!validatePersonForm() || !validateDisplaySettings()) {
+            loading.value = false
+            return
+        }
 
         // ✅ Chuyển từ textarea (nếu có) thành mảng
         if (otherLinksText.value !== undefined) {
@@ -523,7 +610,7 @@ const handleSubmit = async () => {
         form.value.user_id = userStore.user?.id
 
         // 👇 Gọi API
-        if (isEditMode) {
+        if (isEditMode.value){
             await updatePerson(route.params.id, form.value)
             message.success('Cập nhật cá nhân thành công')
         } else {
@@ -578,7 +665,6 @@ const handleRemoveFile = () => {
 const goBack = () => router.push('/persons')
 
 onMounted(async () => {
-    await fetchPerson();
     await fetchAllProducts()
     await fetchAllBusinesses()
     await fetchAllStores()
@@ -586,6 +672,7 @@ onMounted(async () => {
     await nextTick() // Đảm bảo DOM đã render xong
 
     if (isEditMode.value) {
+        await fetchPerson();
         // await fetchBusiness()
 
         // 👇 Nếu có display_settings thì parse vào settings

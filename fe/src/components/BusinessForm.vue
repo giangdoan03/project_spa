@@ -243,12 +243,10 @@
                                         </a-select-option>
                                     </a-select>
 
-                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered
-                                             size="small">
+                                    <a-table :columns="businessColumns" :data-source="businessList" row-key="id" bordered size="small">
                                         <template #bodyCell="{ column, record }">
                                             <template v-if="column.key === 'logo'">
-                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo"
-                                                     style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
+                                                <img v-if="record.logo?.[0]" :src="record.logo[0]" alt="Logo" style="height: 40px; width: 40px; object-fit: cover; border-radius: 4px"/>
                                             </template>
                                             <template v-if="column.key === 'action'">
                                                 <a-button type="link" @click="removeBusiness(record.id)" danger>Xoá
@@ -618,7 +616,10 @@ const fetchAllBusinesses = async () => {
 
 // Chọn doanh nghiệp từ select box
 const handleCompanySelect = (ids) => {
-    businessList.value = allBusinesses.value.filter(b => ids.includes(b.id));
+    businessList.value = parseFieldsForList(
+        allBusinesses.value.filter(b => ids.includes(b.id)),
+        ['logo']
+    );
     selectedCompanies.value = ids;
 };
 
@@ -684,33 +685,123 @@ const handleStoreModeChange = async (input) => {
     }
 };
 
+const validateBusinessForm = () => {
+    const phoneRegex = /^[0-9]{9,15}$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    if (!form.value.name?.trim()) {
+        message.error('Vui lòng nhập tên doanh nghiệp')
+        return false
+    }
+
+    if (!form.value.tax_code?.trim()) {
+        message.error('Vui lòng nhập mã số thuế')
+        return false
+    }
+
+    if (!form.value.country?.trim()) {
+        message.error('Vui lòng nhập quốc gia')
+        return false
+    }
+
+    if (!form.value.city?.trim()) {
+        message.error('Vui lòng nhập tỉnh thành')
+        return false
+    }
+
+    if (!form.value.district?.trim()) {
+        message.error('Vui lòng nhập quận huyện')
+        return false
+    }
+
+    if (!form.value.ward?.trim()) {
+        message.error('Vui lòng nhập phường xã')
+        return false
+    }
+
+    if (!form.value.address?.trim()) {
+        message.error('Vui lòng nhập địa chỉ chi tiết')
+        return false
+    }
+
+    if (!form.value.phone || !phoneRegex.test(form.value.phone)) {
+        message.error('Vui lòng nhập số điện thoại hợp lệ')
+        return false
+    }
+
+    if (!form.value.email || !emailRegex.test(form.value.email)) {
+        message.error('Vui lòng nhập email hợp lệ')
+        return false
+    }
+
+    if (!logoFileList.value || logoFileList.value.length === 0) {
+        message.error('Vui lòng upload ảnh đại diện / logo')
+        return false
+    }
+
+    return true
+}
+
+
+const validateDisplaySettings = () => {
+    const checks = [
+        {
+            condition: settings.value.relatedProducts === 'selected' && (!selectedProductIds.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 sản phẩm liên quan!'
+        },
+        {
+            condition: settings.value.company === 'selected' && (!selectedCompanies.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 doanh nghiệp!'
+        },
+        {
+            condition: settings.value.store === 'selected' && (!selectedStores.value?.length),
+            message: 'Vui lòng chọn ít nhất 1 cửa hàng!'
+        }
+    ]
+
+    for (const check of checks) {
+        if (check.condition) {
+            message.error(check.message)
+            return false
+        }
+    }
+
+    return true
+}
+
 
 // Submit form đã sửa
 const handleSubmit = async () => {
     loading.value = true
 
-    // ✅ Chuyển từ textarea (dạng chuỗi) thành mảng
-    form.value.other_links = otherLinksText.value
-        .split('\n')
-        .map(s => s.trim())
-        .filter(Boolean)
-
-    // 👇 Đồng bộ selections vào settings
-    settings.value.selectedCompanies = selectedCompanies.value
-    settings.value.selectedStores = selectedStores.value
-    settings.value.selectedProducts = selectedProductIds.value  // <-- đảm bảo có dòng này
-
-    // 👇 Gán settings vào display_settings
-    form.value.display_settings = JSON.stringify(settings.value)
-
     try {
-        if (isEditMode) {
+        if (!validateBusinessForm() || !validateDisplaySettings()) {
+            loading.value = false
+            return
+        }
+
+        // ✅ Chuyển từ textarea (dạng chuỗi) thành mảng
+        form.value.other_links = otherLinksText.value
+            .split('\n')
+            .map(s => s.trim())
+            .filter(Boolean)
+
+        // 👇 Đồng bộ selections vào settings
+        settings.value.selectedCompanies = selectedCompanies.value
+        settings.value.selectedStores = selectedStores.value
+        settings.value.selectedProducts = selectedProductIds.value
+
+        // 👇 Gán settings vào display_settings
+        form.value.display_settings = JSON.stringify(settings.value)
+
+        if (isEditMode.value) {
             await updateBusiness(route.params.id, form.value)
             message.success('Cập nhật thành công')
         } else {
             await createBusiness(form.value)
             message.success('Tạo mới thành công')
         }
+
         router.push('/businesses')
     } catch (error) {
         message.error('Lỗi lưu doanh nghiệp')
@@ -718,6 +809,7 @@ const handleSubmit = async () => {
         loading.value = false
     }
 }
+
 
 
 const goBack = () => router.push('/businesses')
