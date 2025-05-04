@@ -22,7 +22,7 @@ $routes->group('api', function ($routes) {
     $routes->resource('businesses', ['controller' => 'BusinessController']);
     $routes->resource('persons', ['controller' => 'PersonController']);
     $routes->resource('events', ['controller' => 'EventController']);
-    $routes->resource('stores', ['controller' => 'StoreController']); // Thêm route cho stores
+    $routes->resource('stores', ['controller' => 'StoreController']);
 
     $routes->post('upload', 'UploadController::upload');
     $routes->post('upload-from-url', 'UploadController::uploadFromUrl');
@@ -32,19 +32,29 @@ $routes->group('api', function ($routes) {
     $routes->post('images/save/(:num)', 'ImageController::save/$1');
 
     // Route phân quyền (nên đặt ngoài nhóm 'api' nếu bạn dùng giao diện truyền thống)
-
-    $routes->get('roles', 'RoleController::index'); // <- thêm dòng này
-
-    $routes->get('permissions', 'PermissionController::index');
-    $routes->post('permissions/save', 'PermissionController::save');
-
-    // (Tuỳ chọn) Quản lý vai trò nếu bạn cần
     $routes->get('roles', 'RoleController::index');
     $routes->post('roles/create', 'RoleController::create');
     $routes->post('roles/update/(:num)', 'RoleController::update/$1');
     $routes->post('roles/delete/(:num)', 'RoleController::delete/$1');
 
+    $routes->get('permissions', 'PermissionController::index');
+    $routes->post('permissions/save', 'PermissionController::save');
     $routes->get('permissions/matrix', 'PermissionController::matrix');
 
+    // Loyalty APIs
+    $routes->resource('loyalty-programs', ['controller' => 'LoyaltyProgramController']);
+    $routes->resource('loyalty-gifts', ['controller' => 'LoyaltyGiftController']);
+    $routes->resource('loyalty-vouchers', ['controller' => 'LoyaltyVoucherController']);
 
+    $routes->get('loyalty/participation-history', 'LoyaltyHistoryController::participation');
+    $routes->get('loyalty/winning-history', 'LoyaltyHistoryController::winning');
+
+    $routes->resource('landing-pages', ['controller' => 'LandingPageController']);
+
+    $routes->resource('scan-history', ['controller' => 'ScanHistoryController']);
+    $routes->resource('customer', ['controller' => 'CustomerController']);
+
+    $routes->resource('setting', ['controller' => 'SettingController']);
+
+    $routes->resource('purchase-history', ['controller' => 'PurchaseHistoryController']);
 });

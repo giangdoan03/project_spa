@@ -632,8 +632,6 @@
             const response = await getProduct(route.params.id)
             const data = normalizeProductData(response.data)
 
-            console.log('Dữ liệu sản phẩm:', data) // 👈 Xem rõ ở đây
-
             Object.assign(form.value, data)
 
             form.value.price_mode = data.price_mode || 'single'  // fallback nếu null
@@ -875,7 +873,6 @@
                 businessList.value = parseFieldsForList(
                     allBusinesses.value.filter(b => selectedCompanies.value.includes(b.id))
                 )
-                console.log('allBusinesses',allBusinesses)
             } else if (settings.value.company === 'all') {
                 businessList.value = parseFieldsForList(allBusinesses.value)
             }

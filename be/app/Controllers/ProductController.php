@@ -90,9 +90,7 @@ class ProductController extends ResourceController
 
     public function create()
     {
-        $userId = $this->getUserId(); // Dùng được ngay
-
-        echo $userId;
+        $userId = $this->getUserId();
 
         $productModel = new ProductModel();
         $attributeModel = new ProductAttributeModel();

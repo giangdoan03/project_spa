@@ -8,6 +8,7 @@
         breakpoint="lg"
         @breakpoint="handleBreakpoint"
         @collapse="handleCollapse"
+        style="background-color: #000000;"
     >
         <div class="logo"/>
         <a-menu
@@ -25,10 +26,10 @@
 
             <a-sub-menu key="quan-ly-doi-tuong">
                 <template #title>
-          <span>
-            <AppstoreOutlined/>
-            <span>Quản lý đối tượng</span>
-          </span>
+                      <span>
+                        <AppstoreOutlined/>
+                        <span>Quản lý đối tượng</span>
+                      </span>
                 </template>
 
                 <a-menu-item key="san-pham">
@@ -64,10 +65,10 @@
 
             <a-sub-menu key="chuong-trinh-loyalty">
                 <template #title>
-          <span>
-            <GiftOutlined/>
-            <span>Chương trình loyalty</span>
-          </span>
+                      <span>
+                        <GiftOutlined/>
+                        <span>Chương trình loyalty</span>
+                      </span>
                 </template>
 
                 <a-menu-item key="chuong-trinh">
@@ -101,10 +102,10 @@
                 <span>Lịch sử quét</span>
             </a-menu-item>
 
-            <a-menu-item key="lich-su-checkin">
-                <EnvironmentOutlined/>
-                <span>Lịch sử checkin</span>
-            </a-menu-item>
+<!--            <a-menu-item key="lich-su-checkin">-->
+<!--                <EnvironmentOutlined/>-->
+<!--                <span>Lịch sử checkin</span>-->
+<!--            </a-menu-item>-->
 
             <a-menu-item key="quan-ly-khach-hang">
                 <TeamOutlined/>
@@ -121,7 +122,7 @@
                 <span>Lịch sử mua gói</span>
             </a-menu-item>
             <a-menu-item key="quan-ly-user">
-                <TeamOutlined />
+                <TeamOutlined/>
                 <span>Quản lý người dùng</span>
             </a-menu-item>
         </a-menu>
@@ -161,7 +162,7 @@ const pathToKeyMap = {
     '/my-qr-codes': 'qr-code-marketing',
     '/loyalty/programs': 'chuong-trinh',
     '/loyalty/gifts': 'qua-tang',
-    '/loyalty/vouchers': 'goi-voucher',
+    '/loyalty/voucher-management': 'goi-voucher',
     '/loyalty/history': 'lich-su-nguoi-choi',
     '/custom-pages': 'trang-tu-thiet-ke',
     '/scan-history': 'lich-su-quet',
@@ -173,16 +174,29 @@ const pathToKeyMap = {
 }
 
 const keyToParentMap = {
+    // Quản lý đối tượng
     'san-pham': 'quan-ly-doi-tuong',
     'doanh-nghiep-ca-nhan': 'quan-ly-doi-tuong',
     'ca-nhan': 'quan-ly-doi-tuong',
     'cua-hang': 'quan-ly-doi-tuong',
     'su-kien': 'quan-ly-doi-tuong',
+
+    // Chương trình loyalty
     'chuong-trinh': 'chuong-trinh-loyalty',
     'qua-tang': 'chuong-trinh-loyalty',
     'goi-voucher': 'chuong-trinh-loyalty',
-    'lich-su-nguoi-choi': 'chuong-trinh-loyalty'
+    'lich-su-nguoi-choi': 'chuong-trinh-loyalty',
+
+    // Các menu khác
+    'trang-tu-thiet-ke': 'dashboard',
+    'lich-su-quet': 'dashboard',
+    'lich-su-checkin': 'dashboard',
+    'quan-ly-khach-hang': 'dashboard',
+    'cau-hinh': 'dashboard',
+    'lich-su-mua-goi': 'dashboard',
+    'quan-ly-user': 'dashboard',
 }
+
 
 const updateSelectedAndOpenKeys = () => {
     const currentPath = route.path
@@ -219,11 +233,19 @@ const handleCollapse = (collapsed) => {
     emit('update:collapsed', collapsed)
 }
 </script>
+<style>
+    .ant-menu-dark {
+        background-color: #000000 !important;
+    }
 
+    .ant-menu-sub.ant-menu-inline {
+        background: #000000 !important;
+    }
+</style>
 <style scoped>
-.logo {
-    height: 32px;
-    background: rgba(255, 255, 255, 0.3);
-    margin: 16px;
-}
+    .logo {
+        height: 32px;
+        background: rgba(255, 255, 255, 0.3);
+        margin: 16px;
+    }
 </style>

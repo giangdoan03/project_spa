@@ -23,12 +23,14 @@
 
                 <!-- File khác -->
                 <div v-else class="file-icon">📄</div>
-                <div class="tool_tip_text" v-if="props.multiple && props.type !== 'video'" @click="showYoutubeModal(file.url)">
+                <div class="tool_tip_text" v-if="props.multiple" @click="showYoutubeModal(file.url)">
                     <PlayCircleOutlined />
-                    <span v-if="file.is_main" class="cover-label">Ảnh chính</span>
-                    <a v-else href="javascript:void(0)" @click="setAsCover(index)" class="cover-link">
-                        Đặt làm ảnh chính
-                    </a>
+                    <div v-if="props.type !== 'video'">
+                        <span v-if="file.is_main" class="cover-label">Ảnh chính</span>
+                        <a v-else href="javascript:void(0)" @click="setAsCover(index)" class="cover-link">
+                            Đặt làm ảnh chính
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Controls -->
@@ -373,12 +375,12 @@ function isYoutubeUrl(url) {
 <style scoped>
 
 .cover-link {
-    color: #1890ff;
+    color: #ffffff;
     cursor: pointer;
-    text-decoration: underline;
-    font-size: 13px;
+    font-size: 11px;
     margin-top: 4px;
     display: inline-block;
+    line-height: 1.1;
 }
 
 .image-preview {

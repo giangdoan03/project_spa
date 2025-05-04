@@ -144,9 +144,6 @@ const getAvatarUrl = (avatar) => {
     return null
 }
 
-
-
-
 // Table change
 const handleTableChange = (paginationParam) => {
     pagination.value.current = paginationParam.current
@@ -163,7 +160,7 @@ const deleteProduct = async (id) => {
     try {
         await apiDeleteProduct(id)
         message.success('Đã xoá sản phẩm')
-        fetchProducts()
+        await fetchProducts()
     } catch (error) {
         message.error('Lỗi xoá sản phẩm')
     }
