@@ -50,7 +50,7 @@
             </a-form-item>
 
             <a-form-item label="Mô tả">
-                <quill-editor v-model:content="form.description" contentType="html" style="min-height: 150px;" />
+                <a-textarea v-model:content="form.description" contentType="html" style="min-height: 150px;" />
             </a-form-item>
 
             <a-form-item label="Ảnh voucher">
