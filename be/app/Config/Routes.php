@@ -31,7 +31,6 @@ $routes->group('api', function ($routes) {
     $routes->get('images/cover/(:segment)/(:num)', 'ImageController::cover/$1/$2');
     $routes->post('images/save/(:num)', 'ImageController::save/$1');
 
-    // Route phân quyền (nên đặt ngoài nhóm 'api' nếu bạn dùng giao diện truyền thống)
     $routes->get('roles', 'RoleController::index');
     $routes->post('roles/create', 'RoleController::create');
     $routes->post('roles/update/(:num)', 'RoleController::update/$1');
@@ -41,20 +40,25 @@ $routes->group('api', function ($routes) {
     $routes->post('permissions/save', 'PermissionController::save');
     $routes->get('permissions/matrix', 'PermissionController::matrix');
 
-    // Loyalty APIs
     $routes->resource('loyalty-programs', ['controller' => 'LoyaltyProgramController']);
     $routes->resource('loyalty-gifts', ['controller' => 'LoyaltyGiftController']);
     $routes->resource('loyalty-vouchers', ['controller' => 'LoyaltyVoucherController']);
-
     $routes->get('loyalty/participation-history', 'LoyaltyHistoryController::participation');
     $routes->get('loyalty/winning-history', 'LoyaltyHistoryController::winning');
 
     $routes->resource('landing-pages', ['controller' => 'LandingPageController']);
-
     $routes->resource('scan-history', ['controller' => 'ScanHistoryController']);
     $routes->resource('customer', ['controller' => 'CustomerController']);
-
     $routes->resource('setting', ['controller' => 'SettingController']);
-
     $routes->resource('purchase-history', ['controller' => 'PurchaseHistoryController']);
+
+    // ✅ QR Code Routes (Dùng qr_id dạng chữ + số, không dùng ID số)
+    $routes->group('qr-codes', function ($routes) {
+        $routes->post('', 'QrCodeController::create');
+        $routes->get('list', 'QrCodeController::list');
+        $routes->get('scan/(:segment)', 'QrCodeController::scan/$1');
+        $routes->get('(:alphanum)', 'QrCodeController::show/$1');
+        $routes->put('(:alphanum)', 'QrCodeController::update/$1');
+        $routes->delete('(:alphanum)', 'QrCodeController::delete/$1');
+    });
 });

@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 03, 2025 at 11:37 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: May 05, 2025 at 05:07 PM
+-- Server version: 8.0.30
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,35 +28,35 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `businesses` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `tax_code` varchar(100) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `district` varchar(100) DEFAULT NULL,
-  `ward` varchar(100) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `career` varchar(255) DEFAULT NULL,
-  `facebook_link` varchar(255) DEFAULT NULL,
-  `other_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  `cover_image` varchar(255) DEFAULT NULL,
-  `library_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `video_intro` varchar(255) DEFAULT NULL,
-  `certificate_file` varchar(255) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tax_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ward` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `career` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `facebook_link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `other_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `library_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `video_intro` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `certificate_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lat` decimal(10,8) DEFAULT NULL,
   `lng` decimal(11,8) DEFAULT NULL,
-  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `status` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `display_settings` text DEFAULT NULL
+  `user_id` int NOT NULL,
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -76,13 +76,13 @@ INSERT INTO `businesses` (`id`, `name`, `tax_code`, `country`, `city`, `district
 --
 
 CREATE TABLE `business_extra_info` (
-  `id` bigint(20) NOT NULL,
-  `business_id` bigint(20) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `image` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `business_id` bigint NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -92,10 +92,10 @@ CREATE TABLE `business_extra_info` (
 --
 
 CREATE TABLE `categories` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -137,17 +137,36 @@ INSERT INTO `categories` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `customers`
+--
+
+CREATE TABLE `customers` (
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` text COLLATE utf8mb4_unicode_ci,
+  `last_interaction` date DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `entity_images`
 --
 
 CREATE TABLE `entity_images` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `entity_type` varchar(50) NOT NULL,
-  `entity_id` int(10) UNSIGNED NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `is_cover` tinyint(1) DEFAULT 0,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int UNSIGNED NOT NULL,
+  `entity_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entity_id` int UNSIGNED NOT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_cover` tinyint(1) DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -157,31 +176,31 @@ CREATE TABLE `entity_images` (
 --
 
 CREATE TABLE `events` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `banner` text DEFAULT NULL,
-  `location` varchar(255) DEFAULT NULL,
-  `event_mode` varchar(20) DEFAULT 'online',
-  `is_enabled` tinyint(1) DEFAULT 1,
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `banner` text COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `event_mode` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'online',
+  `is_enabled` tinyint(1) DEFAULT '1',
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `country` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `district` varchar(100) DEFAULT NULL,
-  `contact_first_name` varchar(100) DEFAULT NULL,
-  `contact_last_name` varchar(100) DEFAULT NULL,
-  `contact_phone` varchar(20) DEFAULT NULL,
-  `contact_email` varchar(100) DEFAULT NULL,
-  `ticket_options` text DEFAULT NULL,
-  `social_links` text DEFAULT NULL,
-  `images` text DEFAULT NULL,
-  `video` text DEFAULT NULL,
-  `format_type` enum('online','offline') DEFAULT 'offline',
-  `display_settings` text DEFAULT NULL
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ticket_options` text COLLATE utf8mb4_unicode_ci,
+  `social_links` text COLLATE utf8mb4_unicode_ci,
+  `images` text COLLATE utf8mb4_unicode_ci,
+  `video` text COLLATE utf8mb4_unicode_ci,
+  `format_type` enum('online','offline') COLLATE utf8mb4_unicode_ci DEFAULT 'offline',
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -189,11 +208,157 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`id`, `user_id`, `name`, `banner`, `location`, `event_mode`, `is_enabled`, `start_time`, `end_time`, `description`, `created_at`, `updated_at`, `country`, `city`, `district`, `contact_first_name`, `contact_last_name`, `contact_phone`, `contact_email`, `ticket_options`, `social_links`, `images`, `video`, `format_type`, `display_settings`) VALUES
-(1, 1, 'abc', 'http://assets.giang.test/image/1746037955_5db3c563bd96591ec624.jpg', 'ty mo nam tu liem', 'online', 1, '2025-04-02 19:55:14', '2025-04-09 19:55:17', '[{\"title\":\"ewqeqwqeqwe\",\"content\":\"<p>dsadsadda<\\/p>\"},{\"title\":\"57567567657\",\"content\":\"<p>fsdfdsfsfsf<\\/p>\"},{\"title\":\"mmmmmmmmmmmmmm\",\"content\":\"<p>nnnnnnnnnnnnnnnnnn<\\/p>\"}]', '2025-04-19 03:55:21', '2025-05-02 16:08:03', 'viet nam', 'ha noi', 'nam tu liem', 'doan', 'giang', '0387409300', 'doangiang665@gmail.com', '\"[{\\\"title\\\":\\\"111111111\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":10000000000},{\\\"title\\\":\\\"33333333333\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":6666666666666666}]\"', '\"[{\\\"type\\\":\\\"facebook\\\",\\\"url\\\":\\\"https:\\/\\/dantri.com.vn\\/giao-duc\\/top-9-truong-dai-hoc-tot-nhat-nhat-ban-nam-2025-20250501202923859.htm\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746201737_6b8aef50c620203911ef.jpg\\\"},{\\\"type\\\":\\\"linkedin\\\",\\\"url\\\":\\\"https:\\/\\/cdnphoto.dantri.com.vn\\/7SRYiJD05ukrmyoV6TZx1k3sAZM=\\/thumb_w\\/1020\\/2025\\/05\\/02\\/tbt-1746158118574.jpg\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746201920_c5131d2c0c5858f4bedb.jpg\\\"}]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746029417_20453b5636ecffe9887d.jpg\\\",\\\"is_main\\\":true},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746030360_c16844c25c41255be6e4.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746032537_8307b0403fe457e20580.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746032541_35aea3dbeaa439d9cedd.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746032548_88a4a4a19cbe5408828d.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746037959_aff78cc90d81287f74e4.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746037963_57a3d4cbb59f554357b3.jpg\\\",\\\"is_main\\\":false}]\"', '\"[{\\\"uid\\\":\\\"1746037845545\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=R3GfuzLMPkA\\\",\\\"preview\\\":\\\"https:\\/\\/img.youtube.com\\/vi\\/R3GfuzLMPkA\\/hqdefault.jpg\\\",\\\"isCover\\\":false,\\\"isYoutube\\\":true},{\\\"uid\\\":\\\"1746037969377\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=G5RpJwCJDqc\\\",\\\"preview\\\":\\\"https:\\/\\/img.youtube.com\\/vi\\/G5RpJwCJDqc\\/hqdefault.jpg\\\",\\\"isCover\\\":false,\\\"isYoutube\\\":true}]\"', 'offline', NULL),
-(2, 1, 'xxxxxxx', 'http://assets.giang.test/image/1746202553_13787ae765a78b8865a6.jpg', 'gdfgdfgdfg', 'online', 1, '2025-05-02 16:16:56', '2025-05-15 16:17:01', '[{\"title\":\"6546546546\",\"content\":\"<p>t\\u1ebbtretete<\\/p>\"},{\"title\":\"rtetretet\",\"content\":\"<p>\\u1ec3trtret<\\/p>\"}]', '2025-05-02 16:15:40', '2025-05-02 16:17:24', 'vvvvvvvvvv', 'bbbbbbbbbb', 'ruiyiuyii', 'rewrewr', '56757567', '0387409300', 'doangiang665@gmail.com', '\"[{\\\"title\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":0}]\"', '\"[{\\\"type\\\":\\\"instagram\\\",\\\"url\\\":\\\"https:\\/\\/antdv.com\\/components\\/upload\\/#Upload\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746202636_55513f183c5978bf4488.jpg\\\"}]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746202521_8a81f574aeeac142dd3c.jpg\\\",\\\"is_main\\\":true}]\"', '\"[{\\\"uid\\\":\\\"1746202578711\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=gTkV0z3NTcA\\\",\\\"preview\\\":\\\"https:\\/\\/img.youtube.com\\/vi\\/gTkV0z3NTcA\\/hqdefault.jpg\\\",\\\"isCover\\\":false,\\\"isYoutube\\\":true}]\"', 'offline', NULL),
+(1, 1, 'abc', 'http://assets.giang.test/image/1746037955_5db3c563bd96591ec624.jpg', 'ty mo nam tu liem', 'online', 1, '2025-04-02 05:55:14', '2025-04-09 05:55:17', '[{\"title\":\"ewqeqwqeqwe\",\"content\":\"<p>dsadsadda<\\/p>\"},{\"title\":\"57567567657\",\"content\":\"<p>fsdfdsfsfsf<\\/p>\"},{\"title\":\"mmmmmmmmmmmmmm\",\"content\":\"<p>nnnnnnnnnnnnnnnnnn<\\/p>\"}]', '2025-04-19 03:55:21', '2025-05-04 01:13:24', 'viet nam', 'ha noi', 'nam tu liem', 'doan', 'giang', '0387409300', 'doangiang665@gmail.com', '\"[{\\\"title\\\":\\\"111111111\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":10000000000},{\\\"title\\\":\\\"33333333333\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":6666666666666666}]\"', '\"[{\\\"type\\\":\\\"facebook\\\",\\\"url\\\":\\\"https:\\/\\/dantri.com.vn\\/giao-duc\\/top-9-truong-dai-hoc-tot-nhat-nhat-ban-nam-2025-20250501202923859.htm\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746201737_6b8aef50c620203911ef.jpg\\\"},{\\\"type\\\":\\\"linkedin\\\",\\\"url\\\":\\\"https:\\/\\/cdnphoto.dantri.com.vn\\/7SRYiJD05ukrmyoV6TZx1k3sAZM=\\/thumb_w\\/1020\\/2025\\/05\\/02\\/tbt-1746158118574.jpg\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746201920_c5131d2c0c5858f4bedb.jpg\\\"}]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746029417_20453b5636ecffe9887d.jpg\\\",\\\"is_main\\\":true},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746030360_c16844c25c41255be6e4.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746032537_8307b0403fe457e20580.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746032541_35aea3dbeaa439d9cedd.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746032548_88a4a4a19cbe5408828d.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746037959_aff78cc90d81287f74e4.jpg\\\",\\\"is_main\\\":false},{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746037963_57a3d4cbb59f554357b3.jpg\\\",\\\"is_main\\\":false}]\"', '\"[{\\\"uid\\\":\\\"1746037845545\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=R3GfuzLMPkA\\\",\\\"preview\\\":\\\"https:\\/\\/img.youtube.com\\/vi\\/R3GfuzLMPkA\\/hqdefault.jpg\\\",\\\"isCover\\\":false,\\\"isYoutube\\\":true},{\\\"uid\\\":\\\"1746037969377\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=G5RpJwCJDqc\\\",\\\"preview\\\":\\\"https:\\/\\/img.youtube.com\\/vi\\/G5RpJwCJDqc\\/hqdefault.jpg\\\",\\\"isCover\\\":false,\\\"isYoutube\\\":true}]\"', 'offline', '\"{\\\"selectedTemplate\\\":\\\"tpl-3\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"selected\\\",\\\"selectedCompanies\\\":[\\\"1\\\",\\\"4\\\"],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"topProductsMode\\\":\\\"all\\\",\\\"topProducts\\\":[]}\"'),
+(2, 1, 'xxxxxxx', 'http://assets.giang.test/image/1746202553_13787ae765a78b8865a6.jpg', 'nmnnmmnbnmbm', 'online', 1, '2025-05-02 02:16:56', '2025-05-15 02:17:01', '[{\"title\":\"6546546546\",\"content\":\"<p>t\\u1ebbtretete<\\/p>\"},{\"title\":\"rtetretet\",\"content\":\"<p>\\u1ec3trtret<\\/p>\"}]', '2025-05-02 16:15:40', '2025-05-03 14:32:42', 'vvvvvvvvvv', 'bbbbbbbbbb', 'ruiyiuyii', 'rewrewr', '56757567', '0387409300', 'doangiang665@gmail.com', '\"[{\\\"title\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":0}]\"', '\"[{\\\"type\\\":\\\"instagram\\\",\\\"url\\\":\\\"https:\\/\\/antdv.com\\/components\\/upload\\/#Upload\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746202636_55513f183c5978bf4488.jpg\\\"}]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746202521_8a81f574aeeac142dd3c.jpg\\\",\\\"is_main\\\":true}]\"', '\"[{\\\"uid\\\":\\\"1746202578711\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=gTkV0z3NTcA\\\",\\\"preview\\\":\\\"https:\\/\\/img.youtube.com\\/vi\\/gTkV0z3NTcA\\/hqdefault.jpg\\\",\\\"isCover\\\":false,\\\"isYoutube\\\":true}]\"', 'offline', '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"selected\\\",\\\"selectedCompanies\\\":[\\\"1\\\",\\\"4\\\"],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"topProductsMode\\\":\\\"all\\\",\\\"topProducts\\\":[]}\"'),
 (3, 1, '33333', 'http://assets.giang.test/image/1746258612_4f4625f74cb3d27de0e4.png', 'gggggggg', 'online', 1, '2025-05-03 00:50:24', '2025-05-30 00:50:27', '[{\"title\":\"\",\"content\":\"<p><br><\\/p>\"}]', '2025-05-03 06:19:35', '2025-05-03 08:07:40', NULL, NULL, NULL, '', '', '', '', '\"[{\\\"title\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":0}]\"', '\"[]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746258610_ada5434eb10a8d6fd757.png\\\",\\\"is_main\\\":false}]\"', '\"[]\"', 'offline', '[]'),
 (4, 1, 'ccccccccccccccc', 'http://assets.giang.test/image/1746256539_dc524834f2899997e8c9.jpg', 'xxxxxxxxxxxxxxxx', 'online', 1, '2025-05-02 10:16:00', '2025-05-20 10:16:04', '[{\"title\":\"\",\"content\":\"<p><br><\\/p>\"}]', '2025-05-03 06:25:47', '2025-05-03 07:18:17', NULL, NULL, NULL, '', '', '', '', '\"[{\\\"title\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":0}]\"', '\"[]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746256530_959ce70527ba750584b2.jpg\\\",\\\"is_main\\\":false}]\"', '\"[]\"', 'offline', '[]'),
 (5, 1, 'xxxxxxxxxx', 'http://assets.giang.test/image/1746253818_9096dad87a5b81cf36b5.jpg', 'vvvvvvvvvvvvvv', 'online', 1, '2025-04-28 00:33:53', '2025-05-26 00:33:56', '[{\"title\":\"xxxxxxx\",\"content\":\"<p>vvvvvvvv<\\/p>\"},{\"title\":\"bbbbbbbbbb\",\"content\":\"<p>vvvvvvvvvvvv<\\/p>\"}]', '2025-05-03 06:30:22', '2025-05-03 09:06:11', NULL, NULL, NULL, '', '', '', '', '\"[{\\\"title\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"price\\\":0}]\"', '\"[{\\\"type\\\":\\\"facebook\\\",\\\"url\\\":\\\"https:\\/\\/www.youtube.com\\/watch?v=QEjB71pQDf8\\\",\\\"icon\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746261130_c74cd26ffad1ebd88c80.png\\\"}]\"', '\"[{\\\"url\\\":\\\"http:\\/\\/assets.giang.test\\/image\\/1746253811_07015ce4da9066ba0b45.jpg\\\",\\\"is_main\\\":false}]\"', '\"[]\"', 'offline', '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"selected\\\",\\\"selectedCompanies\\\":[\\\"1\\\"],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"topProductsMode\\\":\\\"all\\\",\\\"topProducts\\\":[],\\\"productLinks\\\":[]}\"');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `landing_pages`
+--
+
+CREATE TABLE `landing_pages` (
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` longtext,
+  `status` enum('draft','published') DEFAULT 'draft',
+  `access_count` int UNSIGNED DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_gifts`
+--
+
+CREATE TABLE `loyalty_gifts` (
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` enum('item','vnpoint') COLLATE utf8mb4_unicode_ci DEFAULT 'item',
+  `value` int DEFAULT '0',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_histories`
+--
+
+CREATE TABLE `loyalty_histories` (
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `program_id` int DEFAULT NULL,
+  `type` enum('participation','winning') NOT NULL,
+  `description` text,
+  `metadata` text,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_participation_logs`
+--
+
+CREATE TABLE `loyalty_participation_logs` (
+  `id` int UNSIGNED NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_unicode_ci,
+  `gift_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `program_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_winner` tinyint(1) DEFAULT '0',
+  `joined_at` datetime DEFAULT NULL,
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_programs`
+--
+
+CREATE TABLE `loyalty_programs` (
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` json DEFAULT NULL,
+  `banner` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `images` json DEFAULT NULL,
+  `video` json DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  `social_links` json DEFAULT NULL,
+  `display_settings` json DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_vouchers`
+--
+
+CREATE TABLE `loyalty_vouchers` (
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` int DEFAULT '0',
+  `quantity` int DEFAULT '0',
+  `issued` int DEFAULT '0',
+  `used` int DEFAULT '0',
+  `max_per_voucher` int DEFAULT '1',
+  `max_per_user` int DEFAULT '1',
+  `valid_from` datetime DEFAULT NULL,
+  `valid_to` datetime DEFAULT NULL,
+  `duration_after_issued` int DEFAULT NULL,
+  `require_owner` tinyint(1) DEFAULT '0',
+  `is_lucky_draw` tinyint(1) DEFAULT '0',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loyalty_winner_logs`
+--
+
+CREATE TABLE `loyalty_winner_logs` (
+  `id` int UNSIGNED NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone_recharge` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_unicode_ci,
+  `gift_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `program_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` text COLLATE utf8mb4_unicode_ci,
+  `won_at` datetime DEFAULT NULL,
+  `received_at` datetime DEFAULT NULL,
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -202,11 +367,11 @@ INSERT INTO `events` (`id`, `user_id`, `name`, `banner`, `location`, `event_mode
 --
 
 CREATE TABLE `permissions` (
-  `id` int(11) NOT NULL,
-  `key_name` varchar(100) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `key_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -260,24 +425,24 @@ INSERT INTO `permissions` (`id`, `key_name`, `description`, `created_at`, `updat
 --
 
 CREATE TABLE `persons` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `first_name` varchar(100) DEFAULT NULL,
-  `last_name` varchar(100) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `avatar` varchar(255) DEFAULT NULL,
-  `video_url` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `social_links` text DEFAULT NULL,
-  `job_title` varchar(100) DEFAULT NULL,
-  `bio` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `display_settings` text DEFAULT NULL
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `video_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `social_links` text COLLATE utf8mb4_unicode_ci,
+  `job_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bio` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -296,28 +461,28 @@ INSERT INTO `persons` (`id`, `user_id`, `first_name`, `last_name`, `name`, `avat
 --
 
 CREATE TABLE `products` (
-  `id` bigint(20) NOT NULL,
-  `sku` varchar(100) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `category_id` bigint(20) DEFAULT NULL,
-  `price_mode` varchar(20) DEFAULT 'single',
-  `price` decimal(15,2) DEFAULT 0.00,
-  `price_from` decimal(15,2) DEFAULT 0.00,
-  `price_to` decimal(15,2) DEFAULT 0.00,
-  `show_contact_price` tinyint(1) DEFAULT 0,
-  `avatar` varchar(255) DEFAULT NULL,
-  `image` varchar(255) DEFAULT NULL,
-  `video` varchar(255) DEFAULT NULL,
-  `certificate_file` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `attributes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `id` bigint NOT NULL,
+  `sku` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category_id` bigint DEFAULT NULL,
+  `price_mode` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'single',
+  `price` decimal(15,2) DEFAULT '0.00',
+  `price_from` decimal(15,2) DEFAULT '0.00',
+  `price_to` decimal(15,2) DEFAULT '0.00',
+  `show_contact_price` tinyint(1) DEFAULT '0',
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `video` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `certificate_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `attributes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `status` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `display_settings` text DEFAULT NULL,
-  `product_links` text DEFAULT NULL
+  `user_id` int NOT NULL,
+  `display_settings` text COLLATE utf8mb4_unicode_ci,
+  `product_links` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -325,11 +490,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price_mode`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`, `product_links`) VALUES
-(1, '5424324324kkk', 'demo 1', 1, 'range', 120000.00, 10000.00, 150000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"96\",\"product_id\":\"1\",\"name\":\"XL\",\"value\":\"342424324\",\"created_at\":\"2025-04-24 16:18:16\",\"updated_at\":\"2025-04-24 16:18:16\"}]', 1, '2025-04-12 17:20:19', '2025-04-25 04:05:50', NULL, 1, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"1\",\"2\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://shopee.vn/\"},{\"platform\":\"Lazada\",\"url\":\"https://tiki.vn/\"},{\"platform\":\"Tiki\",\"url\":\"https://www.lazada.vn/\"}]}', NULL),
-(2, '23424244', 'demo sp', 1, 'range', 120000.00, 40000.00, 60000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1745552471_508fb17cc865c1cd3bea.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', '<p>demo demo</p>', '[{\"id\":\"115\",\"product_id\":\"2\",\"name\":\"xl\",\"value\":\"120000\",\"created_at\":\"2025-04-25 04:05:58\",\"updated_at\":\"2025-04-25 04:05:58\"}]', 1, '2025-04-13 14:58:36', '2025-04-25 04:06:04', NULL, 1, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"5\",\"4\",\"6\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(1, '5424324324kkk', 'demo 1', 1, 'range', 120000.00, 10000.00, 150000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"114\",\"product_id\":\"1\",\"name\":\"XL\",\"value\":\"342424324\",\"created_at\":\"2025-04-25 04:05:50\",\"updated_at\":\"2025-04-25 04:05:50\"},{\"name\":\"M\",\"value\":\"11111\"}]', 1, '2025-04-12 17:20:19', '2025-05-04 09:14:42', NULL, 1, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"1\",\"2\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://shopee.vn/\"},{\"platform\":\"Lazada\",\"url\":\"https://tiki.vn/\"},{\"platform\":\"Tiki\",\"url\":\"https://www.lazada.vn/\"}]}', NULL),
+(2, '23424244', 'demo sp', 1, 'range', 120000.00, 40000.00, 60000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1745552471_508fb17cc865c1cd3bea.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', '<p>demo demo</p>', '[{\"id\":\"116\",\"product_id\":\"2\",\"name\":\"xl\",\"value\":\"120000\",\"created_at\":\"2025-04-25 04:06:04\",\"updated_at\":\"2025-04-25 04:06:04\"}]', 1, '2025-04-13 14:58:36', '2025-05-04 09:54:42', NULL, 1, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"5\",\"4\",\"6\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://vnexpress.net/\"},{\"platform\":\"Lazada\",\"url\":\"https://vnexpress.net/\"},{\"platform\":\"Tiki\",\"url\":\"https://vnexpress.net/\"}]}', NULL),
 (3, '43243242', 'demo demo', 1, 'single', 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 0, '2025-04-13 15:17:23', '2025-04-24 14:48:15', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}', NULL),
-(4, '435435436787AAAAAAAAAA', 'Nước rau má', NULL, 'single', 25000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745479571_e32d4ad88fe5e94a4246.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479579_fc31d80c0b144d95d3a9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479581_77d80ba9c15350d71ce9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479589_c8a7153f6047d2b56181.html\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"69\",\"product_id\":\"4\",\"name\":\"L\",\"value\":\"25000\",\"created_at\":\"2025-04-24 07:27:16\",\"updated_at\":\"2025-04-24 07:27:16\"},{\"id\":\"70\",\"product_id\":\"4\",\"name\":\"M\",\"value\":\"20000\",\"created_at\":\"2025-04-24 07:27:16\",\"updated_at\":\"2025-04-24 07:27:16\"}]', 1, '2025-04-24 07:27:16', '2025-04-24 08:49:28', NULL, 1, '{\"0\":\"{\",\"1\":\"\\\"\",\"2\":\"s\",\"3\":\"e\",\"4\":\"l\",\"5\":\"e\",\"6\":\"c\",\"7\":\"t\",\"8\":\"e\",\"9\":\"d\",\"10\":\"T\",\"11\":\"e\",\"12\":\"m\",\"13\":\"p\",\"14\":\"l\",\"15\":\"a\",\"16\":\"t\",\"17\":\"e\",\"18\":\"\\\"\",\"19\":\":\",\"20\":\"\\\"\",\"21\":\"t\",\"22\":\"p\",\"23\":\"l\",\"24\":\"-\",\"25\":\"1\",\"26\":\"\\\"\",\"27\":\",\",\"28\":\"\\\"\",\"29\":\"r\",\"30\":\"e\",\"31\":\"l\",\"32\":\"a\",\"33\":\"t\",\"34\":\"e\",\"35\":\"d\",\"36\":\"P\",\"37\":\"r\",\"38\":\"o\",\"39\":\"d\",\"40\":\"u\",\"41\":\"c\",\"42\":\"t\",\"43\":\"s\",\"44\":\"\\\"\",\"45\":\":\",\"46\":\"\\\"\",\"47\":\"a\",\"48\":\"l\",\"49\":\"l\",\"50\":\"\\\"\",\"51\":\",\",\"52\":\"\\\"\",\"53\":\"s\",\"54\":\"e\",\"55\":\"l\",\"56\":\"e\",\"57\":\"c\",\"58\":\"t\",\"59\":\"e\",\"60\":\"d\",\"61\":\"P\",\"62\":\"r\",\"63\":\"o\",\"64\":\"d\",\"65\":\"u\",\"66\":\"c\",\"67\":\"t\",\"68\":\"s\",\"69\":\"\\\"\",\"70\":\":\",\"71\":\"[\",\"72\":\"]\",\"73\":\",\",\"74\":\"\\\"\",\"75\":\"c\",\"76\":\"o\",\"77\":\"m\",\"78\":\"p\",\"79\":\"a\",\"80\":\"n\",\"81\":\"y\",\"82\":\"\\\"\",\"83\":\":\",\"84\":\"\\\"\",\"85\":\"a\",\"86\":\"l\",\"87\":\"l\",\"88\":\"\\\"\",\"89\":\",\",\"90\":\"\\\"\",\"91\":\"s\",\"92\":\"e\",\"93\":\"l\",\"94\":\"e\",\"95\":\"c\",\"96\":\"t\",\"97\":\"e\",\"98\":\"d\",\"99\":\"C\",\"100\":\"o\",\"101\":\"m\",\"102\":\"p\",\"103\":\"a\",\"104\":\"n\",\"105\":\"i\",\"106\":\"e\",\"107\":\"s\",\"108\":\"\\\"\",\"109\":\":\",\"110\":\"[\",\"111\":\"]\",\"112\":\",\",\"113\":\"\\\"\",\"114\":\"s\",\"115\":\"t\",\"116\":\"o\",\"117\":\"r\",\"118\":\"e\",\"119\":\"\\\"\",\"120\":\":\",\"121\":\"\\\"\",\"122\":\"a\",\"123\":\"l\",\"124\":\"l\",\"125\":\"\\\"\",\"126\":\",\",\"127\":\"\\\"\",\"128\":\"s\",\"129\":\"e\",\"130\":\"l\",\"131\":\"e\",\"132\":\"c\",\"133\":\"t\",\"134\":\"e\",\"135\":\"d\",\"136\":\"S\",\"137\":\"t\",\"138\":\"o\",\"139\":\"r\",\"140\":\"e\",\"141\":\"s\",\"142\":\"\\\"\",\"143\":\":\",\"144\":\"[\",\"145\":\"]\",\"146\":\",\",\"147\":\"\\\"\",\"148\":\"e\",\"149\":\"n\",\"150\":\"a\",\"151\":\"b\",\"152\":\"l\",\"153\":\"e\",\"154\":\"S\",\"155\":\"u\",\"156\":\"r\",\"157\":\"v\",\"158\":\"e\",\"159\":\"y\",\"160\":\"\\\"\",\"161\":\":\",\"162\":\"f\",\"163\":\"a\",\"164\":\"l\",\"165\":\"s\",\"166\":\"e\",\"167\":\",\",\"168\":\"\\\"\",\"169\":\"s\",\"170\":\"e\",\"171\":\"l\",\"172\":\"e\",\"173\":\"c\",\"174\":\"t\",\"175\":\"e\",\"176\":\"d\",\"177\":\"S\",\"178\":\"u\",\"179\":\"r\",\"180\":\"v\",\"181\":\"e\",\"182\":\"y\",\"183\":\"s\",\"184\":\"\\\"\",\"185\":\":\",\"186\":\"[\",\"187\":\"]\",\"188\":\",\",\"189\":\"\\\"\",\"190\":\"e\",\"191\":\"n\",\"192\":\"a\",\"193\":\"b\",\"194\":\"l\",\"195\":\"e\",\"196\":\"O\",\"197\":\"r\",\"198\":\"d\",\"199\":\"e\",\"200\":\"r\",\"201\":\"B\",\"202\":\"u\",\"203\":\"t\",\"204\":\"t\",\"205\":\"o\",\"206\":\"n\",\"207\":\"\\\"\",\"208\":\":\",\"209\":\"t\",\"210\":\"r\",\"211\":\"u\",\"212\":\"e\",\"213\":\",\",\"214\":\"\\\"\",\"215\":\"p\",\"216\":\"r\",\"217\":\"o\",\"218\":\"d\",\"219\":\"u\",\"220\":\"c\",\"221\":\"t\",\"222\":\"L\",\"223\":\"i\",\"224\":\"n\",\"225\":\"k\",\"226\":\"s\",\"227\":\"\\\"\",\"228\":\":\",\"229\":\"[\",\"230\":\"{\",\"231\":\"\\\"\",\"232\":\"p\",\"233\":\"l\",\"234\":\"a\",\"235\":\"t\",\"236\":\"f\",\"237\":\"o\",\"238\":\"r\",\"239\":\"m\",\"240\":\"\\\"\",\"241\":\":\",\"242\":\"\\\"\",\"243\":\"S\",\"244\":\"h\",\"245\":\"o\",\"246\":\"p\",\"247\":\"e\",\"248\":\"e\",\"249\":\"\\\"\",\"250\":\",\",\"251\":\"\\\"\",\"252\":\"u\",\"253\":\"r\",\"254\":\"l\",\"255\":\"\\\"\",\"256\":\":\",\"257\":\"\\\"\",\"258\":\"\\\"\",\"259\":\"}\",\"260\":\",\",\"261\":\"{\",\"262\":\"\\\"\",\"263\":\"p\",\"264\":\"l\",\"265\":\"a\",\"266\":\"t\",\"267\":\"f\",\"268\":\"o\",\"269\":\"r\",\"270\":\"m\",\"271\":\"\\\"\",\"272\":\":\",\"273\":\"\\\"\",\"274\":\"L\",\"275\":\"a\",\"276\":\"z\",\"277\":\"a\",\"278\":\"d\",\"279\":\"a\",\"280\":\"\\\"\",\"281\":\",\",\"282\":\"\\\"\",\"283\":\"u\",\"284\":\"r\",\"285\":\"l\",\"286\":\"\\\"\",\"287\":\":\",\"288\":\"\\\"\",\"289\":\"\\\"\",\"290\":\"}\",\"291\":\",\",\"292\":\"{\",\"293\":\"\\\"\",\"294\":\"p\",\"295\":\"l\",\"296\":\"a\",\"297\":\"t\",\"298\":\"f\",\"299\":\"o\",\"300\":\"r\",\"301\":\"m\",\"302\":\"\\\"\",\"303\":\":\",\"304\":\"\\\"\",\"305\":\"T\",\"306\":\"i\",\"307\":\"k\",\"308\":\"i\",\"309\":\"\\\"\",\"310\":\",\",\"311\":\"\\\"\",\"312\":\"u\",\"313\":\"r\",\"314\":\"l\",\"315\":\"\\\"\",\"316\":\":\",\"317\":\"\\\"\",\"318\":\"\\\"\",\"319\":\"}\",\"320\":\"]\",\"321\":\"}\",\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
-(5, '454657AADĐGGG', 'rau má', NULL, 'single', 10000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480303_0186821d966918c4db65.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480305_272f716996ccae559ffb.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480307_565b58fd280481cf7755.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480311_58487ae57951309fd294.html\"]', '', '[{\"name\":\"L\",\"value\":\"10000\"}]', 1, '2025-04-24 07:39:06', '2025-04-24 14:48:15', NULL, 1, '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"all\\\",\\\"selectedCompanies\\\":[],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"productLinks\\\":[{\\\"platform\\\":\\\"Shopee\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Lazada\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Tiki\\\",\\\"url\\\":\\\"\\\"}]}\"', NULL),
+(4, '435435436787AAAAAAAAAA', 'Nước rau má', NULL, 'single', 25000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745479571_e32d4ad88fe5e94a4246.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479579_fc31d80c0b144d95d3a9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479581_77d80ba9c15350d71ce9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479589_c8a7153f6047d2b56181.html\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"69\",\"product_id\":\"4\",\"name\":\"L\",\"value\":\"25000\",\"created_at\":\"2025-04-24 07:27:16\",\"updated_at\":\"2025-04-24 07:27:16\"},{\"id\":\"70\",\"product_id\":\"4\",\"name\":\"M\",\"value\":\"20000\",\"created_at\":\"2025-04-24 07:27:16\",\"updated_at\":\"2025-04-24 07:27:16\"}]', 0, '2025-04-24 07:27:16', '2025-05-04 09:47:07', NULL, 1, '{\"0\":\"{\",\"1\":\"\\\"\",\"2\":\"s\",\"3\":\"e\",\"4\":\"l\",\"5\":\"e\",\"6\":\"c\",\"7\":\"t\",\"8\":\"e\",\"9\":\"d\",\"10\":\"T\",\"11\":\"e\",\"12\":\"m\",\"13\":\"p\",\"14\":\"l\",\"15\":\"a\",\"16\":\"t\",\"17\":\"e\",\"18\":\"\\\"\",\"19\":\":\",\"20\":\"\\\"\",\"21\":\"t\",\"22\":\"p\",\"23\":\"l\",\"24\":\"-\",\"25\":\"1\",\"26\":\"\\\"\",\"27\":\",\",\"28\":\"\\\"\",\"29\":\"r\",\"30\":\"e\",\"31\":\"l\",\"32\":\"a\",\"33\":\"t\",\"34\":\"e\",\"35\":\"d\",\"36\":\"P\",\"37\":\"r\",\"38\":\"o\",\"39\":\"d\",\"40\":\"u\",\"41\":\"c\",\"42\":\"t\",\"43\":\"s\",\"44\":\"\\\"\",\"45\":\":\",\"46\":\"\\\"\",\"47\":\"a\",\"48\":\"l\",\"49\":\"l\",\"50\":\"\\\"\",\"51\":\",\",\"52\":\"\\\"\",\"53\":\"s\",\"54\":\"e\",\"55\":\"l\",\"56\":\"e\",\"57\":\"c\",\"58\":\"t\",\"59\":\"e\",\"60\":\"d\",\"61\":\"P\",\"62\":\"r\",\"63\":\"o\",\"64\":\"d\",\"65\":\"u\",\"66\":\"c\",\"67\":\"t\",\"68\":\"s\",\"69\":\"\\\"\",\"70\":\":\",\"71\":\"[\",\"72\":\"]\",\"73\":\",\",\"74\":\"\\\"\",\"75\":\"c\",\"76\":\"o\",\"77\":\"m\",\"78\":\"p\",\"79\":\"a\",\"80\":\"n\",\"81\":\"y\",\"82\":\"\\\"\",\"83\":\":\",\"84\":\"\\\"\",\"85\":\"a\",\"86\":\"l\",\"87\":\"l\",\"88\":\"\\\"\",\"89\":\",\",\"90\":\"\\\"\",\"91\":\"s\",\"92\":\"e\",\"93\":\"l\",\"94\":\"e\",\"95\":\"c\",\"96\":\"t\",\"97\":\"e\",\"98\":\"d\",\"99\":\"C\",\"100\":\"o\",\"101\":\"m\",\"102\":\"p\",\"103\":\"a\",\"104\":\"n\",\"105\":\"i\",\"106\":\"e\",\"107\":\"s\",\"108\":\"\\\"\",\"109\":\":\",\"110\":\"[\",\"111\":\"]\",\"112\":\",\",\"113\":\"\\\"\",\"114\":\"s\",\"115\":\"t\",\"116\":\"o\",\"117\":\"r\",\"118\":\"e\",\"119\":\"\\\"\",\"120\":\":\",\"121\":\"\\\"\",\"122\":\"a\",\"123\":\"l\",\"124\":\"l\",\"125\":\"\\\"\",\"126\":\",\",\"127\":\"\\\"\",\"128\":\"s\",\"129\":\"e\",\"130\":\"l\",\"131\":\"e\",\"132\":\"c\",\"133\":\"t\",\"134\":\"e\",\"135\":\"d\",\"136\":\"S\",\"137\":\"t\",\"138\":\"o\",\"139\":\"r\",\"140\":\"e\",\"141\":\"s\",\"142\":\"\\\"\",\"143\":\":\",\"144\":\"[\",\"145\":\"]\",\"146\":\",\",\"147\":\"\\\"\",\"148\":\"e\",\"149\":\"n\",\"150\":\"a\",\"151\":\"b\",\"152\":\"l\",\"153\":\"e\",\"154\":\"S\",\"155\":\"u\",\"156\":\"r\",\"157\":\"v\",\"158\":\"e\",\"159\":\"y\",\"160\":\"\\\"\",\"161\":\":\",\"162\":\"f\",\"163\":\"a\",\"164\":\"l\",\"165\":\"s\",\"166\":\"e\",\"167\":\",\",\"168\":\"\\\"\",\"169\":\"s\",\"170\":\"e\",\"171\":\"l\",\"172\":\"e\",\"173\":\"c\",\"174\":\"t\",\"175\":\"e\",\"176\":\"d\",\"177\":\"S\",\"178\":\"u\",\"179\":\"r\",\"180\":\"v\",\"181\":\"e\",\"182\":\"y\",\"183\":\"s\",\"184\":\"\\\"\",\"185\":\":\",\"186\":\"[\",\"187\":\"]\",\"188\":\",\",\"189\":\"\\\"\",\"190\":\"e\",\"191\":\"n\",\"192\":\"a\",\"193\":\"b\",\"194\":\"l\",\"195\":\"e\",\"196\":\"O\",\"197\":\"r\",\"198\":\"d\",\"199\":\"e\",\"200\":\"r\",\"201\":\"B\",\"202\":\"u\",\"203\":\"t\",\"204\":\"t\",\"205\":\"o\",\"206\":\"n\",\"207\":\"\\\"\",\"208\":\":\",\"209\":\"t\",\"210\":\"r\",\"211\":\"u\",\"212\":\"e\",\"213\":\",\",\"214\":\"\\\"\",\"215\":\"p\",\"216\":\"r\",\"217\":\"o\",\"218\":\"d\",\"219\":\"u\",\"220\":\"c\",\"221\":\"t\",\"222\":\"L\",\"223\":\"i\",\"224\":\"n\",\"225\":\"k\",\"226\":\"s\",\"227\":\"\\\"\",\"228\":\":\",\"229\":\"[\",\"230\":\"{\",\"231\":\"\\\"\",\"232\":\"p\",\"233\":\"l\",\"234\":\"a\",\"235\":\"t\",\"236\":\"f\",\"237\":\"o\",\"238\":\"r\",\"239\":\"m\",\"240\":\"\\\"\",\"241\":\":\",\"242\":\"\\\"\",\"243\":\"S\",\"244\":\"h\",\"245\":\"o\",\"246\":\"p\",\"247\":\"e\",\"248\":\"e\",\"249\":\"\\\"\",\"250\":\",\",\"251\":\"\\\"\",\"252\":\"u\",\"253\":\"r\",\"254\":\"l\",\"255\":\"\\\"\",\"256\":\":\",\"257\":\"\\\"\",\"258\":\"\\\"\",\"259\":\"}\",\"260\":\",\",\"261\":\"{\",\"262\":\"\\\"\",\"263\":\"p\",\"264\":\"l\",\"265\":\"a\",\"266\":\"t\",\"267\":\"f\",\"268\":\"o\",\"269\":\"r\",\"270\":\"m\",\"271\":\"\\\"\",\"272\":\":\",\"273\":\"\\\"\",\"274\":\"L\",\"275\":\"a\",\"276\":\"z\",\"277\":\"a\",\"278\":\"d\",\"279\":\"a\",\"280\":\"\\\"\",\"281\":\",\",\"282\":\"\\\"\",\"283\":\"u\",\"284\":\"r\",\"285\":\"l\",\"286\":\"\\\"\",\"287\":\":\",\"288\":\"\\\"\",\"289\":\"\\\"\",\"290\":\"}\",\"291\":\",\",\"292\":\"{\",\"293\":\"\\\"\",\"294\":\"p\",\"295\":\"l\",\"296\":\"a\",\"297\":\"t\",\"298\":\"f\",\"299\":\"o\",\"300\":\"r\",\"301\":\"m\",\"302\":\"\\\"\",\"303\":\":\",\"304\":\"\\\"\",\"305\":\"T\",\"306\":\"i\",\"307\":\"k\",\"308\":\"i\",\"309\":\"\\\"\",\"310\":\",\",\"311\":\"\\\"\",\"312\":\"u\",\"313\":\"r\",\"314\":\"l\",\"315\":\"\\\"\",\"316\":\":\",\"317\":\"\\\"\",\"318\":\"\\\"\",\"319\":\"}\",\"320\":\"]\",\"321\":\"}\",\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(5, '454657AADĐGGG', 'rau má', NULL, 'single', 10000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480303_0186821d966918c4db65.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480305_272f716996ccae559ffb.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480307_565b58fd280481cf7755.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480311_58487ae57951309fd294.html\"]', '<p><br></p>', '[{\"id\":\"71\",\"product_id\":\"5\",\"name\":\"L\",\"value\":\"10000\",\"created_at\":\"2025-04-24 07:39:06\",\"updated_at\":\"2025-04-24 07:39:06\"}]', 1, '2025-04-24 07:39:06', '2025-05-04 08:35:53', NULL, 1, '{\"0\":\"{\",\"1\":\"\\\"\",\"2\":\"s\",\"3\":\"e\",\"4\":\"l\",\"5\":\"e\",\"6\":\"c\",\"7\":\"t\",\"8\":\"e\",\"9\":\"d\",\"10\":\"T\",\"11\":\"e\",\"12\":\"m\",\"13\":\"p\",\"14\":\"l\",\"15\":\"a\",\"16\":\"t\",\"17\":\"e\",\"18\":\"\\\"\",\"19\":\":\",\"20\":\"\\\"\",\"21\":\"t\",\"22\":\"p\",\"23\":\"l\",\"24\":\"-\",\"25\":\"1\",\"26\":\"\\\"\",\"27\":\",\",\"28\":\"\\\"\",\"29\":\"r\",\"30\":\"e\",\"31\":\"l\",\"32\":\"a\",\"33\":\"t\",\"34\":\"e\",\"35\":\"d\",\"36\":\"P\",\"37\":\"r\",\"38\":\"o\",\"39\":\"d\",\"40\":\"u\",\"41\":\"c\",\"42\":\"t\",\"43\":\"s\",\"44\":\"\\\"\",\"45\":\":\",\"46\":\"\\\"\",\"47\":\"a\",\"48\":\"l\",\"49\":\"l\",\"50\":\"\\\"\",\"51\":\",\",\"52\":\"\\\"\",\"53\":\"s\",\"54\":\"e\",\"55\":\"l\",\"56\":\"e\",\"57\":\"c\",\"58\":\"t\",\"59\":\"e\",\"60\":\"d\",\"61\":\"P\",\"62\":\"r\",\"63\":\"o\",\"64\":\"d\",\"65\":\"u\",\"66\":\"c\",\"67\":\"t\",\"68\":\"s\",\"69\":\"\\\"\",\"70\":\":\",\"71\":\"[\",\"72\":\"]\",\"73\":\",\",\"74\":\"\\\"\",\"75\":\"c\",\"76\":\"o\",\"77\":\"m\",\"78\":\"p\",\"79\":\"a\",\"80\":\"n\",\"81\":\"y\",\"82\":\"\\\"\",\"83\":\":\",\"84\":\"\\\"\",\"85\":\"a\",\"86\":\"l\",\"87\":\"l\",\"88\":\"\\\"\",\"89\":\",\",\"90\":\"\\\"\",\"91\":\"s\",\"92\":\"e\",\"93\":\"l\",\"94\":\"e\",\"95\":\"c\",\"96\":\"t\",\"97\":\"e\",\"98\":\"d\",\"99\":\"C\",\"100\":\"o\",\"101\":\"m\",\"102\":\"p\",\"103\":\"a\",\"104\":\"n\",\"105\":\"i\",\"106\":\"e\",\"107\":\"s\",\"108\":\"\\\"\",\"109\":\":\",\"110\":\"[\",\"111\":\"]\",\"112\":\",\",\"113\":\"\\\"\",\"114\":\"s\",\"115\":\"t\",\"116\":\"o\",\"117\":\"r\",\"118\":\"e\",\"119\":\"\\\"\",\"120\":\":\",\"121\":\"\\\"\",\"122\":\"a\",\"123\":\"l\",\"124\":\"l\",\"125\":\"\\\"\",\"126\":\",\",\"127\":\"\\\"\",\"128\":\"s\",\"129\":\"e\",\"130\":\"l\",\"131\":\"e\",\"132\":\"c\",\"133\":\"t\",\"134\":\"e\",\"135\":\"d\",\"136\":\"S\",\"137\":\"t\",\"138\":\"o\",\"139\":\"r\",\"140\":\"e\",\"141\":\"s\",\"142\":\"\\\"\",\"143\":\":\",\"144\":\"[\",\"145\":\"]\",\"146\":\",\",\"147\":\"\\\"\",\"148\":\"e\",\"149\":\"n\",\"150\":\"a\",\"151\":\"b\",\"152\":\"l\",\"153\":\"e\",\"154\":\"S\",\"155\":\"u\",\"156\":\"r\",\"157\":\"v\",\"158\":\"e\",\"159\":\"y\",\"160\":\"\\\"\",\"161\":\":\",\"162\":\"f\",\"163\":\"a\",\"164\":\"l\",\"165\":\"s\",\"166\":\"e\",\"167\":\",\",\"168\":\"\\\"\",\"169\":\"s\",\"170\":\"e\",\"171\":\"l\",\"172\":\"e\",\"173\":\"c\",\"174\":\"t\",\"175\":\"e\",\"176\":\"d\",\"177\":\"S\",\"178\":\"u\",\"179\":\"r\",\"180\":\"v\",\"181\":\"e\",\"182\":\"y\",\"183\":\"s\",\"184\":\"\\\"\",\"185\":\":\",\"186\":\"[\",\"187\":\"]\",\"188\":\",\",\"189\":\"\\\"\",\"190\":\"e\",\"191\":\"n\",\"192\":\"a\",\"193\":\"b\",\"194\":\"l\",\"195\":\"e\",\"196\":\"O\",\"197\":\"r\",\"198\":\"d\",\"199\":\"e\",\"200\":\"r\",\"201\":\"B\",\"202\":\"u\",\"203\":\"t\",\"204\":\"t\",\"205\":\"o\",\"206\":\"n\",\"207\":\"\\\"\",\"208\":\":\",\"209\":\"t\",\"210\":\"r\",\"211\":\"u\",\"212\":\"e\",\"213\":\",\",\"214\":\"\\\"\",\"215\":\"p\",\"216\":\"r\",\"217\":\"o\",\"218\":\"d\",\"219\":\"u\",\"220\":\"c\",\"221\":\"t\",\"222\":\"L\",\"223\":\"i\",\"224\":\"n\",\"225\":\"k\",\"226\":\"s\",\"227\":\"\\\"\",\"228\":\":\",\"229\":\"[\",\"230\":\"{\",\"231\":\"\\\"\",\"232\":\"p\",\"233\":\"l\",\"234\":\"a\",\"235\":\"t\",\"236\":\"f\",\"237\":\"o\",\"238\":\"r\",\"239\":\"m\",\"240\":\"\\\"\",\"241\":\":\",\"242\":\"\\\"\",\"243\":\"S\",\"244\":\"h\",\"245\":\"o\",\"246\":\"p\",\"247\":\"e\",\"248\":\"e\",\"249\":\"\\\"\",\"250\":\",\",\"251\":\"\\\"\",\"252\":\"u\",\"253\":\"r\",\"254\":\"l\",\"255\":\"\\\"\",\"256\":\":\",\"257\":\"\\\"\",\"258\":\"\\\"\",\"259\":\"}\",\"260\":\",\",\"261\":\"{\",\"262\":\"\\\"\",\"263\":\"p\",\"264\":\"l\",\"265\":\"a\",\"266\":\"t\",\"267\":\"f\",\"268\":\"o\",\"269\":\"r\",\"270\":\"m\",\"271\":\"\\\"\",\"272\":\":\",\"273\":\"\\\"\",\"274\":\"L\",\"275\":\"a\",\"276\":\"z\",\"277\":\"a\",\"278\":\"d\",\"279\":\"a\",\"280\":\"\\\"\",\"281\":\",\",\"282\":\"\\\"\",\"283\":\"u\",\"284\":\"r\",\"285\":\"l\",\"286\":\"\\\"\",\"287\":\":\",\"288\":\"\\\"\",\"289\":\"\\\"\",\"290\":\"}\",\"291\":\",\",\"292\":\"{\",\"293\":\"\\\"\",\"294\":\"p\",\"295\":\"l\",\"296\":\"a\",\"297\":\"t\",\"298\":\"f\",\"299\":\"o\",\"300\":\"r\",\"301\":\"m\",\"302\":\"\\\"\",\"303\":\":\",\"304\":\"\\\"\",\"305\":\"T\",\"306\":\"i\",\"307\":\"k\",\"308\":\"i\",\"309\":\"\\\"\",\"310\":\",\",\"311\":\"\\\"\",\"312\":\"u\",\"313\":\"r\",\"314\":\"l\",\"315\":\"\\\"\",\"316\":\":\",\"317\":\"\\\"\",\"318\":\"\\\"\",\"319\":\"}\",\"320\":\"]\",\"321\":\"}\",\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"1\",\"2\",\"3\"],\"company\":\"selected\",\"selectedCompanies\":[\"4\",\"1\"],\"store\":\"selected\",\"selectedStores\":[\"4\",\"5\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
 (6, '4535353hhhhhhhh', 'Sữa đậu fami', NULL, 'single', 20000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480582_a58f7b1a82ccf75e9bd6.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480585_6055a70269e35cd3a466.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480592_4835d8dc072c7b31ad5b.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480596_fc8f6d8c4503d8e6feff.txt\"]', '<p><br></p>', '[{\"id\":\"72\",\"product_id\":\"6\",\"name\":\"xl\",\"value\":\"10000\",\"created_at\":\"2025-04-24 07:43:52\",\"updated_at\":\"2025-04-24 07:43:52\"}]', 1, '2025-04-24 07:43:52', '2025-04-28 16:48:44', NULL, 1, '{\"0\":\"{\",\"1\":\"\\\"\",\"2\":\"s\",\"3\":\"e\",\"4\":\"l\",\"5\":\"e\",\"6\":\"c\",\"7\":\"t\",\"8\":\"e\",\"9\":\"d\",\"10\":\"T\",\"11\":\"e\",\"12\":\"m\",\"13\":\"p\",\"14\":\"l\",\"15\":\"a\",\"16\":\"t\",\"17\":\"e\",\"18\":\"\\\"\",\"19\":\":\",\"20\":\"\\\"\",\"21\":\"t\",\"22\":\"p\",\"23\":\"l\",\"24\":\"-\",\"25\":\"1\",\"26\":\"\\\"\",\"27\":\",\",\"28\":\"\\\"\",\"29\":\"r\",\"30\":\"e\",\"31\":\"l\",\"32\":\"a\",\"33\":\"t\",\"34\":\"e\",\"35\":\"d\",\"36\":\"P\",\"37\":\"r\",\"38\":\"o\",\"39\":\"d\",\"40\":\"u\",\"41\":\"c\",\"42\":\"t\",\"43\":\"s\",\"44\":\"\\\"\",\"45\":\":\",\"46\":\"\\\"\",\"47\":\"a\",\"48\":\"l\",\"49\":\"l\",\"50\":\"\\\"\",\"51\":\",\",\"52\":\"\\\"\",\"53\":\"s\",\"54\":\"e\",\"55\":\"l\",\"56\":\"e\",\"57\":\"c\",\"58\":\"t\",\"59\":\"e\",\"60\":\"d\",\"61\":\"P\",\"62\":\"r\",\"63\":\"o\",\"64\":\"d\",\"65\":\"u\",\"66\":\"c\",\"67\":\"t\",\"68\":\"s\",\"69\":\"\\\"\",\"70\":\":\",\"71\":\"[\",\"72\":\"]\",\"73\":\",\",\"74\":\"\\\"\",\"75\":\"c\",\"76\":\"o\",\"77\":\"m\",\"78\":\"p\",\"79\":\"a\",\"80\":\"n\",\"81\":\"y\",\"82\":\"\\\"\",\"83\":\":\",\"84\":\"\\\"\",\"85\":\"a\",\"86\":\"l\",\"87\":\"l\",\"88\":\"\\\"\",\"89\":\",\",\"90\":\"\\\"\",\"91\":\"s\",\"92\":\"e\",\"93\":\"l\",\"94\":\"e\",\"95\":\"c\",\"96\":\"t\",\"97\":\"e\",\"98\":\"d\",\"99\":\"C\",\"100\":\"o\",\"101\":\"m\",\"102\":\"p\",\"103\":\"a\",\"104\":\"n\",\"105\":\"i\",\"106\":\"e\",\"107\":\"s\",\"108\":\"\\\"\",\"109\":\":\",\"110\":\"[\",\"111\":\"]\",\"112\":\",\",\"113\":\"\\\"\",\"114\":\"s\",\"115\":\"t\",\"116\":\"o\",\"117\":\"r\",\"118\":\"e\",\"119\":\"\\\"\",\"120\":\":\",\"121\":\"\\\"\",\"122\":\"a\",\"123\":\"l\",\"124\":\"l\",\"125\":\"\\\"\",\"126\":\",\",\"127\":\"\\\"\",\"128\":\"s\",\"129\":\"e\",\"130\":\"l\",\"131\":\"e\",\"132\":\"c\",\"133\":\"t\",\"134\":\"e\",\"135\":\"d\",\"136\":\"S\",\"137\":\"t\",\"138\":\"o\",\"139\":\"r\",\"140\":\"e\",\"141\":\"s\",\"142\":\"\\\"\",\"143\":\":\",\"144\":\"[\",\"145\":\"]\",\"146\":\",\",\"147\":\"\\\"\",\"148\":\"e\",\"149\":\"n\",\"150\":\"a\",\"151\":\"b\",\"152\":\"l\",\"153\":\"e\",\"154\":\"S\",\"155\":\"u\",\"156\":\"r\",\"157\":\"v\",\"158\":\"e\",\"159\":\"y\",\"160\":\"\\\"\",\"161\":\":\",\"162\":\"f\",\"163\":\"a\",\"164\":\"l\",\"165\":\"s\",\"166\":\"e\",\"167\":\",\",\"168\":\"\\\"\",\"169\":\"s\",\"170\":\"e\",\"171\":\"l\",\"172\":\"e\",\"173\":\"c\",\"174\":\"t\",\"175\":\"e\",\"176\":\"d\",\"177\":\"S\",\"178\":\"u\",\"179\":\"r\",\"180\":\"v\",\"181\":\"e\",\"182\":\"y\",\"183\":\"s\",\"184\":\"\\\"\",\"185\":\":\",\"186\":\"[\",\"187\":\"]\",\"188\":\",\",\"189\":\"\\\"\",\"190\":\"e\",\"191\":\"n\",\"192\":\"a\",\"193\":\"b\",\"194\":\"l\",\"195\":\"e\",\"196\":\"O\",\"197\":\"r\",\"198\":\"d\",\"199\":\"e\",\"200\":\"r\",\"201\":\"B\",\"202\":\"u\",\"203\":\"t\",\"204\":\"t\",\"205\":\"o\",\"206\":\"n\",\"207\":\"\\\"\",\"208\":\":\",\"209\":\"t\",\"210\":\"r\",\"211\":\"u\",\"212\":\"e\",\"213\":\",\",\"214\":\"\\\"\",\"215\":\"p\",\"216\":\"r\",\"217\":\"o\",\"218\":\"d\",\"219\":\"u\",\"220\":\"c\",\"221\":\"t\",\"222\":\"L\",\"223\":\"i\",\"224\":\"n\",\"225\":\"k\",\"226\":\"s\",\"227\":\"\\\"\",\"228\":\":\",\"229\":\"[\",\"230\":\"{\",\"231\":\"\\\"\",\"232\":\"p\",\"233\":\"l\",\"234\":\"a\",\"235\":\"t\",\"236\":\"f\",\"237\":\"o\",\"238\":\"r\",\"239\":\"m\",\"240\":\"\\\"\",\"241\":\":\",\"242\":\"\\\"\",\"243\":\"S\",\"244\":\"h\",\"245\":\"o\",\"246\":\"p\",\"247\":\"e\",\"248\":\"e\",\"249\":\"\\\"\",\"250\":\",\",\"251\":\"\\\"\",\"252\":\"u\",\"253\":\"r\",\"254\":\"l\",\"255\":\"\\\"\",\"256\":\":\",\"257\":\"\\\"\",\"258\":\"\\\"\",\"259\":\"}\",\"260\":\",\",\"261\":\"{\",\"262\":\"\\\"\",\"263\":\"p\",\"264\":\"l\",\"265\":\"a\",\"266\":\"t\",\"267\":\"f\",\"268\":\"o\",\"269\":\"r\",\"270\":\"m\",\"271\":\"\\\"\",\"272\":\":\",\"273\":\"\\\"\",\"274\":\"L\",\"275\":\"a\",\"276\":\"z\",\"277\":\"a\",\"278\":\"d\",\"279\":\"a\",\"280\":\"\\\"\",\"281\":\",\",\"282\":\"\\\"\",\"283\":\"u\",\"284\":\"r\",\"285\":\"l\",\"286\":\"\\\"\",\"287\":\":\",\"288\":\"\\\"\",\"289\":\"\\\"\",\"290\":\"}\",\"291\":\",\",\"292\":\"{\",\"293\":\"\\\"\",\"294\":\"p\",\"295\":\"l\",\"296\":\"a\",\"297\":\"t\",\"298\":\"f\",\"299\":\"o\",\"300\":\"r\",\"301\":\"m\",\"302\":\"\\\"\",\"303\":\":\",\"304\":\"\\\"\",\"305\":\"T\",\"306\":\"i\",\"307\":\"k\",\"308\":\"i\",\"309\":\"\\\"\",\"310\":\",\",\"311\":\"\\\"\",\"312\":\"u\",\"313\":\"r\",\"314\":\"l\",\"315\":\"\\\"\",\"316\":\":\",\"317\":\"\\\"\",\"318\":\"\\\"\",\"319\":\"}\",\"320\":\"]\",\"321\":\"}\",\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"3\",\"4\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
 (7, '3453454353', 'bún đậu', NULL, 'single', 140000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480966_68d7c266dac1fcb14dde.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480970_347dc3ef1b43bf24cf4c.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480975_9de1474121f7e51f1e7e.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480986_6bbf44cd4056913f2f8d.png\"]', '', '[{\"name\":\"L\",\"value\":\"10000\"}]', 1, '2025-04-24 07:50:14', '2025-04-24 07:50:14', NULL, 0, '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"all\\\",\\\"selectedCompanies\\\":[],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"productLinks\\\":[{\\\"platform\\\":\\\"Shopee\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Lazada\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Tiki\\\",\\\"url\\\":\\\"\\\"}]}\"', NULL),
 (8, '34234242', 'nem nuong nha trang', NULL, 'single', 23000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745481478_689e4fb81f3be539c086.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481481_adca135c4dae226d93bb.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481484_67d6fc9c4e13a0d0e694.png\"]', '[]', '', '[{\"name\":\"X\",\"value\":\"23000\"}]', 1, '2025-04-24 07:58:36', '2025-04-24 07:58:36', NULL, 0, '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"all\\\",\\\"selectedCompanies\\\":[],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"productLinks\\\":[{\\\"platform\\\":\\\"Shopee\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Lazada\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Tiki\\\",\\\"url\\\":\\\"\\\"}]}\"', NULL),
@@ -344,12 +509,12 @@ INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price_mode`, `price
 --
 
 CREATE TABLE `product_attributes` (
-  `id` bigint(20) NOT NULL,
-  `product_id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `value` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `product_id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -359,7 +524,6 @@ CREATE TABLE `product_attributes` (
 INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_at`, `updated_at`) VALUES
 (32, 3, 'xl ', '12000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
 (33, 3, 'xxl', '20000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
-(71, 5, 'L', '10000', '2025-04-24 07:39:06', '2025-04-24 07:39:06'),
 (73, 7, 'L', '10000', '2025-04-24 07:50:14', '2025-04-24 07:50:14'),
 (74, 8, 'X', '23000', '2025-04-24 07:58:36', '2025-04-24 07:58:36'),
 (75, 9, 'L', '120000', '2025-04-24 08:02:04', '2025-04-24 08:02:04'),
@@ -367,9 +531,30 @@ INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_
 (79, 4, 'M', '20000', '2025-04-24 08:49:28', '2025-04-24 08:49:28'),
 (100, 11, 'XL', '230000', '2025-04-24 16:33:08', '2025-04-24 16:33:08'),
 (101, 10, 'XL', '2000000', '2025-04-24 17:04:00', '2025-04-24 17:04:00'),
-(114, 1, 'XL', '342424324', '2025-04-25 04:05:50', '2025-04-25 04:05:50'),
-(116, 2, 'xl', '120000', '2025-04-25 04:06:04', '2025-04-25 04:06:04'),
-(117, 6, 'xl', '10000', '2025-04-28 16:48:44', '2025-04-28 16:48:44');
+(117, 6, 'xl', '10000', '2025-04-28 16:48:44', '2025-04-28 16:48:44'),
+(118, 5, 'L', '10000', '2025-05-04 08:35:53', '2025-05-04 08:35:53'),
+(119, 1, 'XL', '342424324', '2025-05-04 09:14:42', '2025-05-04 09:14:42'),
+(120, 1, 'M', '11111', '2025-05-04 09:14:42', '2025-05-04 09:14:42'),
+(121, 2, 'xl', '120000', '2025-05-04 09:54:42', '2025-05-04 09:54:42');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `purchase_histories`
+--
+
+CREATE TABLE `purchase_histories` (
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `customer_id` int UNSIGNED DEFAULT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `quantity` int DEFAULT '1',
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `purchased_at` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -378,16 +563,60 @@ INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_
 --
 
 CREATE TABLE `qr_codes` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `target_type` enum('product','store','business','event','person') NOT NULL,
-  `target_id` int(11) NOT NULL,
-  `qr_name` varchar(255) DEFAULT NULL,
-  `qr_url` varchar(255) NOT NULL,
-  `scan_count` int(11) DEFAULT 0,
+  `id` int NOT NULL,
+  `short_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `target_type` enum('product','store','business','event','person') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_id` int NOT NULL,
+  `qr_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `campaign` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  `expires_at` datetime DEFAULT NULL,
+  `qr_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scan_count` int DEFAULT '0',
+  `last_scanned_at` datetime DEFAULT NULL,
   `settings_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `qr_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `qr_codes`
+--
+
+INSERT INTO `qr_codes` (`id`, `short_code`, `user_id`, `target_type`, `target_id`, `qr_name`, `campaign`, `is_active`, `expires_at`, `qr_url`, `scan_count`, `last_scanned_at`, `settings_json`, `note`, `created_at`, `updated_at`, `qr_id`) VALUES
+(1, 'beaf3e3a', 0, 'product', 1, 'xxxxxxxxxxxxx', NULL, 1, NULL, 'https://example.com/redirect/product/1', 0, NULL, '{\"width\":300,\"height\":300,\"margin\":0,\"data\":\"\",\"dotsOptions\":{\"color\":\"#800053\",\"type\":\"extra-rounded\"},\"cornersSquareOptions\":{\"type\":\"extra-rounded\",\"color\":\"#000000\"},\"cornersDotOptions\":{\"type\":\"dot\",\"color\":\"#000000\"},\"backgroundOptions\":{\"color\":\"#eeeeee\"},\"imageOptions\":{\"imageSize\":0.4,\"hideBackgroundDots\":true,\"margin\":0},\"qrOptions\":{\"typeNumber\":0,\"mode\":\"Byte\",\"errorCorrectionLevel\":\"Q\"},\"image\":\"\"}', NULL, '2025-05-05 09:43:03', '2025-05-05 23:27:34', 'd9bff865'),
+(2, '31b1ff2f', 0, 'product', 6, 'vvvvvvvvvvvvvvv', NULL, 1, NULL, 'https://example.com/redirect/product/6', 0, NULL, '{\"width\":300,\"height\":300,\"margin\":0,\"data\":\"\",\"dotsOptions\":{\"color\":\"#800053\",\"type\":\"extra-rounded\"},\"cornersSquareOptions\":{\"type\":\"extra-rounded\",\"color\":\"#000000\"},\"cornersDotOptions\":{\"type\":\"dot\",\"color\":\"#000000\"},\"backgroundOptions\":{\"color\":\"#eeeeee\"},\"imageOptions\":{\"imageSize\":0.4,\"hideBackgroundDots\":true,\"margin\":0},\"qrOptions\":{\"typeNumber\":0,\"mode\":\"Byte\",\"errorCorrectionLevel\":\"Q\"},\"image\":\"\"}', NULL, '2025-05-05 09:44:19', '2025-05-05 23:27:34', 'd9c0bb17'),
+(3, '3d0dc909', 0, 'product', 2, 'tttttt222', NULL, 1, NULL, 'https://example.com/redirect/product/2', 0, NULL, '{\"width\":300,\"height\":300,\"margin\":0,\"data\":\"\",\"dotsOptions\":{\"color\":\"#800053\",\"type\":\"extra-rounded\"},\"cornersSquareOptions\":{\"type\":\"extra-rounded\",\"color\":\"#000000\"},\"cornersDotOptions\":{\"type\":\"dot\",\"color\":\"#000000\"},\"backgroundOptions\":{\"color\":\"#eeeeee\"},\"imageOptions\":{\"imageSize\":0.4,\"hideBackgroundDots\":true,\"margin\":0},\"qrOptions\":{\"typeNumber\":0,\"mode\":\"Byte\",\"errorCorrectionLevel\":\"Q\"},\"image\":\"\"}', NULL, '2025-05-05 09:46:17', '2025-05-05 16:56:25', 'd9c0c140'),
+(4, 'a2868812', 0, 'product', 5, 'tttttttttttttt', NULL, 1, NULL, 'https://example.com/redirect/product/5', 0, NULL, '{\"width\":300,\"height\":300,\"margin\":0,\"data\":\"\",\"dotsOptions\":{\"color\":\"#800053\",\"type\":\"extra-rounded\"},\"cornersSquareOptions\":{\"type\":\"extra-rounded\",\"color\":\"#000000\"},\"cornersDotOptions\":{\"type\":\"dot\",\"color\":\"#000000\"},\"backgroundOptions\":{\"color\":\"#eeeeee\"},\"imageOptions\":{\"imageSize\":0.4,\"hideBackgroundDots\":true,\"margin\":0},\"qrOptions\":{\"typeNumber\":0,\"mode\":\"Byte\",\"errorCorrectionLevel\":\"Q\"},\"image\":\"\"}', NULL, '2025-05-05 09:46:57', '2025-05-05 16:56:10', 'd9c0c74a'),
+(5, '7cc36059', 0, 'product', 6, 'tyiuuuuuu', NULL, 1, NULL, 'https://example.com/redirect/product/6', 0, NULL, '{\"width\":300,\"height\":300,\"margin\":0,\"data\":\"\",\"dotsOptions\":{\"color\":\"#800053\",\"type\":\"extra-rounded\"},\"cornersSquareOptions\":{\"type\":\"extra-rounded\",\"color\":\"#000000\"},\"cornersDotOptions\":{\"type\":\"dot\",\"color\":\"#000000\"},\"backgroundOptions\":{\"color\":\"#eeeeee\"},\"imageOptions\":{\"imageSize\":0.4,\"hideBackgroundDots\":true,\"margin\":0},\"qrOptions\":{\"typeNumber\":0,\"mode\":\"Byte\",\"errorCorrectionLevel\":\"Q\"},\"image\":\"\"}', NULL, '2025-05-05 09:47:00', '2025-05-05 16:56:37', 'd9c0d21f'),
+(6, '6cbeb6a2', 0, 'product', 9, 'weeeeee', NULL, 1, NULL, 'https://example.com/redirect/product/9', 0, NULL, '{\"width\":300,\"height\":300,\"margin\":0,\"data\":\"\",\"dotsOptions\":{\"color\":\"#800053\",\"type\":\"extra-rounded\"},\"cornersSquareOptions\":{\"type\":\"extra-rounded\",\"color\":\"#000000\"},\"cornersDotOptions\":{\"type\":\"dot\",\"color\":\"#000000\"},\"backgroundOptions\":{\"color\":\"#eeeeee\"},\"imageOptions\":{\"imageSize\":0.4,\"hideBackgroundDots\":true,\"margin\":0},\"qrOptions\":{\"typeNumber\":0,\"mode\":\"Byte\",\"errorCorrectionLevel\":\"Q\"},\"image\":\"\"}', NULL, '2025-05-05 09:47:11', '2025-05-05 16:56:52', 'd9c0dad2');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `qr_scan_logs`
+--
+
+CREATE TABLE `qr_scan_logs` (
+  `id` int NOT NULL,
+  `qr_code_id` int DEFAULT NULL,
+  `short_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_id` int DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `os` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `device_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `browser` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `latitude` double DEFAULT NULL,
+  `longitude` double DEFAULT NULL,
+  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -397,11 +626,11 @@ CREATE TABLE `qr_codes` (
 --
 
 CREATE TABLE `roles` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -420,10 +649,10 @@ INSERT INTO `roles` (`id`, `name`, `description`, `created_at`, `updated_at`) VA
 --
 
 CREATE TABLE `role_permissions` (
-  `id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `id` int NOT NULL,
+  `role_id` int NOT NULL,
+  `permission_id` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -442,24 +671,71 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`, `created_at`) 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `scan_histories`
+--
+
+CREATE TABLE `scan_histories` (
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `qr_name` varchar(255) DEFAULT NULL,
+  `object_name` varchar(255) DEFAULT NULL,
+  `object_image` text,
+  `qr_type` varchar(100) DEFAULT NULL,
+  `customer` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `ip` varchar(50) DEFAULT NULL,
+  `os` varchar(50) DEFAULT NULL,
+  `app` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `user_id`, `key`, `value`, `created_at`, `updated_at`) VALUES
+(1, 1, 'xxxxx', '2222', '2025-05-04 15:10:39', '2025-05-04 15:10:39'),
+(2, 1, 'vvvvv', '222211111', '2025-05-04 15:10:48', '2025-05-04 15:10:48');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `stores`
 --
 
 CREATE TABLE `stores` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `display_settings` text DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `product_ids` text DEFAULT NULL
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `display_settings` text COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `product_ids` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -471,7 +747,7 @@ INSERT INTO `stores` (`id`, `user_id`, `name`, `logo`, `address`, `phone`, `emai
 (2, 3, 'Cửa hàng demo 2', 'http://assets.giang.test/image/1745508366_fbe589f048b5b352163e.png', 'tây mỗ, nam từ liêm', '0387409300', 'doangiang665@gmail.com', NULL, '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">Kệ để màn hình máy tính Homeline kệ để PC decor bàn làm việc, bàn học chất liệu gỗ MDF cao cấp chống xước - D48</span></p>', '2025-04-24 15:26:22', '2025-04-24 15:26:22', NULL, 1, '[\"10\",\"11\"]'),
 (3, 3, 'Cửa hàng tạp hóa pew pew', 'http://assets.giang.test/image/1745514221_cc7f4778e22f25f9e86b.jpg', 'nam từ liêm, hà nội', '0387409300', 'doangiang665@gmail.com', NULL, '<p>cửa hàng tạp hóa 10k</p>', '2025-04-24 17:03:43', '2025-04-24 17:03:43', NULL, 1, '[]'),
 (4, 1, 'cửa hàng 2', 'http://assets.giang.test/image/1745902592_23ccb866515a39eacc0f.jpg', 'tay mo nam tu liem', '0387409300', 'giang@gmail.com', NULL, '', '2025-04-29 04:56:33', '2025-04-29 04:56:51', '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"4\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"all\",\"selectedStores\":[\"1\",\"4\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"topProductsMode\":\"selected\",\"topProducts\":[\"2\"]}', 1, '[\"4\"]'),
-(5, 1, 'gggggggg', 'http://assets.giang.test/image/1746258587_08836e9fa786a9d22f76.png', 'xuan thuy, cau giay', '0387409300', 'qe@gmail.com', NULL, '<p><br></p>', '2025-05-03 06:23:25', '2025-05-03 07:50:00', '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"3\",\"4\",\"6\"],\"company\":\"selected\",\"selectedCompanies\":[\"4\",\"1\"],\"store\":\"all\",\"selectedStores\":[\"1\",\"4\",\"5\",\"6\",\"7\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"topProductsMode\":\"selected\",\"topProducts\":[\"1\",\"2\",\"4\"]}', 1, '[\"3\",\"4\",\"6\"]'),
+(5, 1, 'gggggggg', 'http://assets.giang.test/image/1746258587_08836e9fa786a9d22f76.png', 'xuan thuy, cau giay', '0387409300', 'qe@gmail.com', NULL, '<p>gggggggggggggg</p>', '2025-05-03 06:23:25', '2025-05-03 14:34:13', '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"3\",\"4\",\"6\"],\"company\":\"selected\",\"selectedCompanies\":[\"4\"],\"store\":\"all\",\"selectedStores\":[\"1\",\"4\",\"5\",\"6\",\"7\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"topProductsMode\":\"selected\",\"topProducts\":[\"1\",\"2\",\"4\"]}', 1, '[\"3\",\"4\",\"6\"]'),
 (6, 1, 'xxxxx', 'http://assets.giang.test/image/1746254862_8f14809456d38f343fe2.jpg', 'le duc tho nam tu liem ha noi', '0387409300', 'xxx@gmail.com', NULL, '<p><br></p>', '2025-05-03 06:34:23', '2025-05-03 06:51:14', '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"3\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"all\",\"selectedStores\":[\"1\",\"4\",\"5\",\"6\",\"7\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"topProductsMode\":\"selected\",\"topProducts\":[\"2\"]}', 1, '[\"3\"]'),
 (7, 1, 'xxxxxxxxxx', 'http://assets.giang.test/image/1746254261_fc9580dbd75aa45ed9b1.jpg', 'tay mo', '0387409300', 'giang@gmail.com', NULL, '<p><br></p>', '2025-05-03 06:37:42', '2025-05-03 08:56:19', '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"9\"],\"company\":\"all\",\"selectedCompanies\":[\"1\",\"4\"],\"store\":\"all\",\"selectedStores\":[\"1\",\"4\",\"5\",\"6\",\"7\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"topProductsMode\":\"all\",\"topProducts\":[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"9\"]}', 1, '[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"9\"]');
 
@@ -482,13 +758,13 @@ INSERT INTO `stores` (`id`, `user_id`, `name`, `logo`, `address`, `phone`, `emai
 --
 
 CREATE TABLE `surveys` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `group_id` bigint(20) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `group_id` bigint DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -498,16 +774,16 @@ CREATE TABLE `surveys` (
 --
 
 CREATE TABLE `users` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `name` varchar(255) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `avatar` varchar(255) DEFAULT NULL,
-  `role` varchar(50) DEFAULT 'user',
-  `role_id` int(11) DEFAULT NULL
+  `id` int UNSIGNED NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'user',
+  `role_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -541,6 +817,12 @@ ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `customers`
+--
+ALTER TABLE `customers`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `entity_images`
 --
 ALTER TABLE `entity_images`
@@ -550,6 +832,49 @@ ALTER TABLE `entity_images`
 -- Indexes for table `events`
 --
 ALTER TABLE `events`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `landing_pages`
+--
+ALTER TABLE `landing_pages`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `loyalty_gifts`
+--
+ALTER TABLE `loyalty_gifts`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `loyalty_histories`
+--
+ALTER TABLE `loyalty_histories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `loyalty_participation_logs`
+--
+ALTER TABLE `loyalty_participation_logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `loyalty_programs`
+--
+ALTER TABLE `loyalty_programs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `loyalty_vouchers`
+--
+ALTER TABLE `loyalty_vouchers`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `loyalty_winner_logs`
+--
+ALTER TABLE `loyalty_winner_logs`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -577,9 +902,22 @@ ALTER TABLE `product_attributes`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `purchase_histories`
+--
+ALTER TABLE `purchase_histories`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `qr_codes`
 --
 ALTER TABLE `qr_codes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `qr_id` (`qr_id`);
+
+--
+-- Indexes for table `qr_scan_logs`
+--
+ALTER TABLE `qr_scan_logs`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -592,6 +930,18 @@ ALTER TABLE `roles`
 -- Indexes for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `scan_histories`
+--
+ALTER TABLE `scan_histories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -621,91 +971,163 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `businesses`
 --
 ALTER TABLE `businesses`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `business_extra_info`
 --
 ALTER TABLE `business_extra_info`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `customers`
+--
+ALTER TABLE `customers`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `entity_images`
 --
 ALTER TABLE `entity_images`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `landing_pages`
+--
+ALTER TABLE `landing_pages`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `loyalty_gifts`
+--
+ALTER TABLE `loyalty_gifts`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `loyalty_histories`
+--
+ALTER TABLE `loyalty_histories`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `loyalty_participation_logs`
+--
+ALTER TABLE `loyalty_participation_logs`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `loyalty_programs`
+--
+ALTER TABLE `loyalty_programs`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `loyalty_vouchers`
+--
+ALTER TABLE `loyalty_vouchers`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `loyalty_winner_logs`
+--
+ALTER TABLE `loyalty_winner_logs`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `persons`
 --
 ALTER TABLE `persons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+
+--
+-- AUTO_INCREMENT for table `purchase_histories`
+--
+ALTER TABLE `purchase_histories`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `qr_codes`
 --
 ALTER TABLE `qr_codes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `qr_scan_logs`
+--
+ALTER TABLE `qr_scan_logs`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `scan_histories`
+--
+ALTER TABLE `scan_histories`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
