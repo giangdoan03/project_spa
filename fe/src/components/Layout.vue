@@ -60,3 +60,9 @@ const handleLogout = async () => {
     }
 }
 </script>
+
+<style>
+    .bg_card_gray {
+        background: #f3f4f5;
+    }
+</style>

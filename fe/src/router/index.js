@@ -55,8 +55,25 @@ const routes = [
             { path: 'products/:id/edit', name: 'products-edit', component: ProductForm, meta: { breadcrumb: 'Sửa sản phẩm', parent: 'products' } },
 
             // QR Codes
-            { path: 'my-qr-codes', name: 'my-qr-codes', component: MyQRCodes, meta: { breadcrumb: 'Mã QR của tôi' } },
-            { path: 'my-qr-codes/create', name: 'qr-create', component: QRCreateForm, meta: { breadcrumb: 'Tạo mã QR', parent: 'my-qr-codes' } },
+            {
+                path: 'my-qr-codes',
+                name: 'my-qr-codes',
+                component: MyQRCodes,
+                meta: { breadcrumb: 'Mã QR của tôi' }
+            },
+            {
+                path: 'my-qr-codes/create',
+                name: 'qr-create',
+                component: QRCreateForm,
+                meta: { breadcrumb: 'Tạo mã QR', parent: 'my-qr-codes' }
+            },
+            {
+                path: 'my-qr-codes/:qr_id/edit',
+                name: 'qr-edit',
+                component: QRCreateForm,
+                meta: { breadcrumb: 'Sửa mã QR', parent: 'my-qr-codes' }
+            },
+
 
             // Businesses
             { path: 'businesses', name: 'businesses', component: BusinessList, meta: { breadcrumb: 'Doanh nghiệp' } },

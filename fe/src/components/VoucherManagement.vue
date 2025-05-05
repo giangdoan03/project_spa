@@ -25,9 +25,9 @@
                     <img :src="record.image" alt="img" style="width: 40px; height: 40px; border-radius: 4px" />
                 </template>
                 <template v-if="column.key === 'status'">
-          <span :style="{ color: record.status ? 'green' : 'red' }">
-            {{ record.status ? 'Đang hoạt động' : 'Tạm dừng' }}
-          </span>
+                      <span :style="{ color: record.status ? 'green' : 'red' }">
+                        {{ record.status ? 'Đang hoạt động' : 'Tạm dừng' }}
+                      </span>
                 </template>
                 <template v-if="column.key === 'action'">
                     <a-space>

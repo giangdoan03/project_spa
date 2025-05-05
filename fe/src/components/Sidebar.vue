@@ -160,6 +160,7 @@ const pathToKeyMap = {
     '/stores': 'cua-hang',
     '/events': 'su-kien',
     '/my-qr-codes': 'qr-code-marketing',
+    '/my-qr-codes/:id/edit': 'qr-code-marketing',
     '/loyalty/programs': 'chuong-trinh',
     '/loyalty/gifts': 'qua-tang',
     '/loyalty/voucher-management': 'goi-voucher',

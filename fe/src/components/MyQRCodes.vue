@@ -2,7 +2,6 @@
     <div>
         <a-page-header title="Mã QR của tôi" />
 
-        <!-- Thanh công cụ gồm bộ lọc + nút Tạo mã QR -->
         <a-row justify="space-between" style="margin-bottom: 16px;">
             <a-col>
                 <a-space>
@@ -33,18 +32,17 @@
             </a-col>
         </a-row>
 
-        <!-- Bảng danh sách QR -->
-        <a-table :columns="columns" :data-source="qrCodes" row-key="id" :loading="loading">
+        <a-table :columns="columns" :data-source="qrCodes" row-key="qr_id" :loading="loading">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'qr'">
-                    <img :src="record.qr_image_url" alt="QR" style="height: 60px;" />
+                    <div :ref="el => appendQRCode(el, record)" style="width: 60px; height: 60px;"></div>
                 </template>
                 <template v-if="column.key === 'action'">
                     <a-space>
-                        <a-button icon="download" @click="download(record)">Tải</a-button>
-                        <a-button icon="edit" @click="edit(record)">Sửa</a-button>
-                        <a-popconfirm title="Xoá mã QR này?" @confirm="remove(record.id)">
-                            <a-button danger icon="delete" />
+                        <a-button @click="download(record)">Tải</a-button>
+                        <a-button @click="edit(record)">Sửa</a-button>
+                        <a-popconfirm title="Xoá mã QR này?" @confirm="remove(record.qr_id)">
+                            <a-button danger>Xoá</a-button>
                         </a-popconfirm>
                     </a-space>
                 </template>
@@ -53,18 +51,18 @@
     </div>
 </template>
 
-
 <script setup>
-import {ref, onMounted} from 'vue'
-import {message} from 'ant-design-vue'
-
+import { ref, onMounted } from 'vue'
+import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
+import { getQRList, deleteQR } from '@/api/qrcode'
+import { PlusOutlined } from '@ant-design/icons-vue'
+
+import QRCodeStyling from 'qr-code-styling'
+
+const qrInstances = ref({})
 
 const router = useRouter()
-
-import {
-    PlusOutlined,
-} from '@ant-design/icons-vue'
 
 const qrCodes = ref([])
 const search = ref('')
@@ -72,38 +70,75 @@ const filterType = ref('')
 const loading = ref(false)
 
 const columns = [
-    {title: 'Mã', key: 'qr', dataIndex: 'qr_image_url'},
-    {title: 'Liên kết', key: 'url', dataIndex: 'qr_url'},
-    {title: 'Tên', key: 'qr_name', dataIndex: 'qr_name'},
-    {title: 'Tên đối tượng', key: 'target_name', dataIndex: 'target_name'},
-    {title: 'Kiểu', key: 'target_type', dataIndex: 'target_type'},
-    {title: 'Nhật ký quét', key: 'scan_count', dataIndex: 'scan_count'},
-    {title: 'Hành động', key: 'action'},
+    { title: 'Mã', key: 'qr', dataIndex: 'qr_image_url' },
+    { title: 'Liên kết', key: 'qr_url', dataIndex: 'qr_url' },
+    { title: 'Tên', key: 'qr_name', dataIndex: 'qr_name' },
+    { title: 'Tên đối tượng', key: 'target_name', dataIndex: 'target_name' },
+    { title: 'Kiểu', key: 'target_type', dataIndex: 'target_type' },
+    { title: 'Nhật ký quét', key: 'scan_count', dataIndex: 'scan_count' },
+    { title: 'Hành động', key: 'action' },
 ]
 
 const fetchQRCodes = async () => {
     loading.value = true
-    // TODO: Gọi API, truyền search.value và filterType.value
-    // qrCodes.value = await fetch('/api/my-qr-codes?search=...').then(r => r.json())
-    loading.value = false
+    try {
+        const params = {
+            search: search.value,
+            type: filterType.value
+        }
+        const res = await getQRList(params)
+        qrCodes.value = res.data || []
+    } catch (err) {
+        message.error('Lỗi tải danh sách QR')
+        console.error(err)
+    } finally {
+        loading.value = false
+    }
 }
 
 const download = (record) => {
-    window.open(record.qr_image_url)
+    window.open(record.qr_image_url, '_blank')
 }
 
 const edit = (record) => {
-    // router.push(`/qr-codes/${record.id}/edit`)
+    router.push(`/my-qr-codes/${record.qr_id}/edit`)
 }
 
-const remove = async (id) => {
-    // await fetch(`/api/qr-codes/${id}`, { method: 'DELETE' })
-    message.success('Đã xoá thành công')
-    fetchQRCodes()
+const remove = async (qr_id) => {
+    try {
+        await deleteQR(qr_id)
+        message.success('Đã xoá thành công')
+        await fetchQRCodes()
+    } catch (err) {
+        message.error('Xoá thất bại')
+    }
 }
 
 const goToCreateQR = () => {
     router.push('/my-qr-codes/create')
 }
+
+const appendQRCode = (el, record) => {
+    if (!el || qrInstances.value[record.qr_id]) return
+
+    try {
+        const config = typeof record.settings_json === 'string'
+            ? JSON.parse(record.settings_json)
+            : record.settings_json
+
+        const qrCode = new QRCodeStyling({
+            ...config,
+            width: 60,
+            height: 60,
+            data: record.qr_url || config.data || 'https://example.com'
+        })
+
+        qrCode.append(el)
+        qrInstances.value[record.qr_id] = qrCode
+    } catch (e) {
+        console.error('QR init failed for', record.qr_id, e)
+    }
+}
+
 onMounted(fetchQRCodes)
 </script>
