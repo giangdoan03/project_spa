@@ -264,7 +264,7 @@ watch(form, () => {
 
     const config = {
         ...form.value.settings,
-        data: `https://qr-code.io/${form.value.short_code}`
+        data: `https://qrcode.io/${form.value.short_code}`
     }
 
     qrCode.update(config)
@@ -274,8 +274,8 @@ onMounted(() => {
     qrCode = new QRCodeStyling({
         ...form.value.settings,
         data: form.value.short_code
-            ? `https://qr-code.io/${form.value.short_code}`
-            : 'https://qr-code.io/placeholder'
+            ? `https://qrcode.io/${form.value.short_code}`
+            : 'https://qrcode.io/placeholder'
     })
     qrCode.append(qrRef.value)
 })

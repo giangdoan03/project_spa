@@ -49,6 +49,15 @@
                     <div :ref="el => appendQRCode(el, record)" style="width: 60px; height: 60px;"></div>
                 </template>
 
+                <template v-if="column.key === 'target_name'">
+                    <a
+                        :href="getTargetEditUrl(record)"
+                        style="color: #1677ff"
+                    >
+                        {{ record.target_name }}
+                    </a>
+                </template>
+
                 <template v-if="column.key === 'action'">
                     <a-space>
                         <a-button @click="download(record)">Tải</a-button>
@@ -81,7 +90,7 @@
     const columns = [
         { title: 'Mã', key: 'qr', dataIndex: 'qr_image_url' },
         { title: 'Liên kết', key: 'qr_url', dataIndex: 'qr_url' },
-        { title: 'Tên', key: 'qr_name', dataIndex: 'qr_name' },
+        { title: 'Tên mã QR', key: 'qr_name', dataIndex: 'qr_name' },
         { title: 'Tên đối tượng', key: 'target_name', dataIndex: 'target_name' },
         { title: 'Kiểu', key: 'target_type', dataIndex: 'target_type' },
         { title: 'Nhật ký quét', key: 'scan_count', dataIndex: 'scan_count' },
@@ -93,6 +102,13 @@
         return isLocal && url.startsWith('https://')
             ? url.replace('https://', 'http://')
             : url
+    }
+
+    const getTargetEditUrl = (record) => {
+        const type = record.target_type
+        const id = record.target_id
+        if (!type || !id) return '#'
+        return `/${type}s/${id}/edit`
     }
 
 
