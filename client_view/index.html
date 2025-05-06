@@ -1,95 +1,184 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Chi tiết mã QR</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <title>Chi tiết sản phẩm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-      }
-      #info {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f9f9f9;
-        border-left: 4px solid #007bff;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Thông tin mã QR / Đối tượng</h1>
-    <div id="info">Đang tải dữ liệu...</div>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 12px;
+            margin: 0;
+            background: #f8f9fa;
+        }
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const pathSegments = window.location.pathname
-          .split("/")
-          .filter(Boolean);
-        const qrId = pathSegments[0] || null;
+        .product-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .price {
+            font-size: 18px;
+            color: #d9230f;
+            margin-bottom: 12px;
+        }
+
+        .swiper {
+            width: 100%;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .buy-buttons a {
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            padding: 10px 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .buy-buttons a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div id="info">Đang tải dữ liệu...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const qrId = window.location.pathname.split("/").filter(Boolean)[0];
         const params = new URLSearchParams(window.location.search);
-        const track = params.get("track") || generateTrackCode();
+        const track = params.get("track") || "auto_" + Math.random().toString(36).slice(2, 10);
         const scanSource = detectScanSource();
 
         if (!qrId) {
-          document.getElementById("info").innerHTML = "Không tìm thấy mã QR.";
-          return;
+            document.getElementById("info").innerHTML = "Không tìm thấy mã QR.";
+            return;
         }
 
-        // Gọi API để lấy thông tin mã QR
         fetch(`http://api.giang.test/api/qr-codes/detail/${qrId}`)
-          .then((res) => res.json())
-          .then((data) => {
-            if (!data.qr) {
-              document.getElementById("info").innerHTML = "QR không tồn tại.";
-              return;
-            }
+            .then((res) => res.json())
+            .then((data) => {
+                if (!data.qr || !data.target) {
+                    document.getElementById("info").innerHTML = "QR không tồn tại.";
+                    return;
+                }
 
-            const qr = data.qr;
-            let html = `<p><strong>Tên:</strong> ${qr.qr_name}</p>`;
-            html += `<p><strong>Loại:</strong> ${qr.target_type}</p>`;
-            html += `<p><strong>Link:</strong> <a href="${qr.qr_url}" target="_blank">${qr.qr_url}</a></p>`;
-            document.getElementById("info").innerHTML = html;
+                const qr = data.qr;
+                const product = data.target;
 
-            // Gửi log tracking
-            fetch("http://api.giang.test/api/qr-codes/track", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                code: qr.qr_id,
-                track: track,
-                short_code: qr.short_code || qrId,
-                qr_url: qr.qr_url,
-                type: qr.target_type,
-                target_id: qr.target_id,
-                scan_source: scanSource,
-              }),
-            })
-              .then((res) => res.json())
-              .then((res) => console.log("Tracking OK:", res))
-              .catch((err) => console.error("Lỗi tracking:", err));
-          });
+                const parseJsonArray = (field) => {
+                    try {
+                        const val = JSON.parse(product[field]);
+                        return Array.isArray(val) ? val : [];
+                    } catch {
+                        return [];
+                    }
+                };
 
-        // Random tracking code nếu không có
-        function generateTrackCode() {
-          return "auto_" + Math.random().toString(36).substring(2, 10);
-        }
+                const images = parseJsonArray("image");
+                const avatar = parseJsonArray("avatar")[0] || "";
+                const videos = parseJsonArray("video");
+                const certificates = parseJsonArray("certificate_file");
 
-        // Phát hiện nguồn quét (browser/platform)
+                const price = parseFloat(product.price || 0).toLocaleString("vi-VN") + " ₫";
+
+                let html = "";
+
+                if (avatar) {
+                    html += `<img src="${avatar}" alt="Ảnh đại diện" style="width:100%;border-radius:8px;margin-bottom:12px;" />`;
+                }
+
+                if (images.length) {
+                    html += `
+            <div class="swiper mySwiper">
+              <div class="swiper-wrapper">
+                ${images.map(img => `<div class="swiper-slide"><img src="${img}" alt="Ảnh" /></div>`).join('')}
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>`;
+                }
+
+                html += `<div class="product-name">${product.name || '(Không có tên)'}</div>`;
+                html += `<div class="price">Giá: ${price}</div>`;
+                html += `<div class="description">${product.description || 'Không có mô tả sản phẩm.'}</div>`;
+
+                if (videos.length) {
+                    html += `<h4>Video / Ảnh động</h4>`;
+                    videos.forEach(url => {
+                        html += `<img src="${url}" alt="Video ảnh" style="width:100%;border-radius:8px;margin-bottom:12px;" />`;
+                    });
+                }
+
+                if (certificates.length) {
+                    html += `<h4>Chứng chỉ</h4>`;
+                    certificates.forEach(url => {
+                        const name = url.split("/").pop();
+                        html += `<p><a href="${url}" target="_blank">${name}</a></p>`;
+                    });
+                }
+
+                document.getElementById("info").innerHTML = html;
+
+                if (images.length) {
+                    new Swiper(".mySwiper", {
+                        pagination: { el: ".swiper-pagination" }
+                    });
+                }
+
+                // Tracking log
+                fetch("http://api.giang.test/api/qr-codes/track", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        code: qr.qr_id,
+                        track: track,
+                        short_code: qr.short_code || qrId,
+                        qr_url: qr.qr_url,
+                        type: qr.target_type,
+                        target_id: qr.target_id,
+                        scan_source: scanSource
+                    })
+                }).catch(console.error);
+            });
+
         function detectScanSource() {
-          const ua = navigator.userAgent.toLowerCase();
-          if (ua.includes("zalo")) return "zalo_scan";
-          if (ua.includes("fb")) return "facebook_app";
-          if (ua.includes("chrome")) return "chrome";
-          if (ua.includes("safari") && !ua.includes("chrome")) return "safari";
-          if (ua.includes("firefox")) return "firefox";
-          if (ua.includes("edge")) return "edge";
-          if (ua.includes("android")) return "android_browser";
-          if (ua.includes("iphone") || ua.includes("ipad"))
-            return "ios_browser";
-          return "unknown";
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.includes("zalo")) return "zalo_scan";
+            if (ua.includes("fb")) return "facebook_app";
+            if (ua.includes("chrome")) return "chrome";
+            if (ua.includes("safari") && !ua.includes("chrome")) return "safari";
+            if (ua.includes("firefox")) return "firefox";
+            if (ua.includes("edge")) return "edge";
+            if (ua.includes("android")) return "android_browser";
+            if (ua.includes("iphone") || ua.includes("ipad")) return "ios_browser";
+            return "unknown";
         }
-      });
-    </script>
-  </body>
+    });
+</script>
+</body>
 </html>
