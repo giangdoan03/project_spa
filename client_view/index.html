@@ -12,117 +12,178 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", async () => {
         const pathSegments = window.location.pathname.split("/").filter(Boolean);
         const qrId = pathSegments[0] || null;
         const params = new URLSearchParams(window.location.search);
         const track = params.get("track") || generateTrackCode();
         const scanSource = detectScanSource();
 
-        if (!qrId) {
-            document.getElementById("info").innerHTML = "Không tìm thấy mã QR.";
-            return;
+        const infoEl = document.getElementById("info");
+        infoEl.innerHTML = "";
+
+        if (!qrId) return (infoEl.textContent = "Không tìm thấy mã QR.");
+
+        try {
+            const res = await fetch(`http://api.giang.test/api/qr-codes/detail/${qrId}`);
+            const data = await res.json();
+
+            if (!data.qr || !data.target) {
+                infoEl.textContent = "QR không tồn tại hoặc không có sản phẩm.";
+                return;
+            }
+
+            const { qr, target: product } = data;
+
+            // Parse data
+            const images = safeParse(product.image, []);
+            const avatar = safeParse(product.avatar, [])[0] || "";
+            const attributes = safeParse(product.attributes, []);
+            const displaySettings = safeParse(safeParse(product.display_settings, "{}"), {});
+            const productLinks = displaySettings.productLinks || [];
+            const price = parseFloat(product.price || 0).toLocaleString("vi-VN") + " ₫";
+
+            const container = document.createElement("div");
+            container.className = "max-w-md mx-auto bg-white p-4 rounded-xl shadow-sm";
+
+            // Images
+            if (images.length) container.appendChild(renderImages(images));
+
+            // Title + Avatar
+            const header = document.createElement("div");
+            header.className = "flex items-center gap-3 mb-3";
+            if (avatar) {
+                const img = document.createElement("img");
+                img.src = avatar;
+                img.alt = "avatar";
+                img.className = "w-12 h-12 rounded-full object-cover border";
+                header.appendChild(img);
+            }
+            const name = document.createElement("h1");
+            name.className = "text-lg font-bold";
+            name.textContent = product.name || "(Không có tên)";
+            header.appendChild(name);
+            container.appendChild(header);
+
+            // Price
+            const priceEl = document.createElement("div");
+            priceEl.className = "text-red-600 font-semibold text-base mb-3";
+            priceEl.textContent = `Giá: ${price}`;
+            container.appendChild(priceEl);
+
+            // Description
+            const desc = document.createElement("div");
+            desc.className = "text-sm leading-relaxed text-gray-700 mb-4";
+            desc.innerHTML = product.description || "Không có mô tả sản phẩm.";
+            container.appendChild(desc);
+
+            // Attributes
+            const attrSection = renderAttributes(attributes);
+            if (attrSection) container.appendChild(attrSection);
+
+            // Buy buttons
+            const buyBtn = renderBuyButtons(productLinks);
+            if (buyBtn) container.appendChild(buyBtn);
+
+            // Gắn vào info
+            infoEl.appendChild(container);
+
+            // Swiper init
+            if (images.length) {
+                new Swiper(".mySwiper", {
+                    pagination: { el: ".swiper-pagination", clickable: true }
+                });
+            }
+
+            // Tracking
+            await fetch("http://api.giang.test/api/qr-codes/track", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    code: qr.qr_id,
+                    track,
+                    short_code: qr.short_code || qrId,
+                    qr_url: qr.qr_url,
+                    type: qr.target_type,
+                    target_id: qr.target_id,
+                    scan_source: scanSource
+                })
+            });
+        } catch (err) {
+            infoEl.textContent = "Không thể kết nối tới máy chủ.";
+            console.error(err);
         }
 
-        fetch(`http://api.giang.test/api/qr-codes/detail/${qrId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (!data.qr || !data.target) {
-                    document.getElementById("info").innerHTML = "QR không tồn tại hoặc không có sản phẩm.";
-                    return;
-                }
+        function safeParse(json, fallback = {}) {
+            try {
+                return typeof json === "string" ? JSON.parse(json) : json;
+            } catch {
+                return fallback;
+            }
+        }
 
-                const qr = data.qr;
-                const product = data.target;
+        function renderImages(images) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "swiper mySwiper rounded-lg overflow-hidden mb-4 h-44";
 
-                // Parse dữ liệu
-                let images = [];
-                try { images = JSON.parse(product.image); } catch {}
-                let avatar = "";
-                try {
-                    const parsed = JSON.parse(product.avatar);
-                    if (Array.isArray(parsed)) avatar = parsed[0];
-                } catch {}
+            const swiperWrapper = document.createElement("div");
+            swiperWrapper.className = "swiper-wrapper";
 
-                let attributes = [];
-                try { attributes = JSON.parse(product.attributes); } catch {}
-
-                let displaySettings = {};
-                try {
-                    displaySettings = JSON.parse(JSON.parse(product.display_settings));
-                } catch {}
-
-                const productLinks = displaySettings.productLinks || [];
-                const price = parseFloat(product.price || 0).toLocaleString("vi-VN") + " ₫";
-
-                // HTML render
-                let html = `<div class="max-w-md mx-auto bg-white p-4 rounded-xl shadow-sm">`;
-
-                if (images.length > 0) {
-                    html += `
-              <div class="swiper mySwiper rounded-lg overflow-hidden mb-4 h-44">
-                <div class="swiper-wrapper">
-                  ${images.map(img => `<div class="swiper-slide"><img src="${img}" class="w-full h-full object-cover" /></div>`).join('')}
-                </div>
-                <div class="swiper-pagination text-center mt-2"></div>
-              </div>
-            `;
-                }
-
-                html += `
-            <div class="flex items-center gap-3 mb-3">
-              ${avatar ? `<img src="${avatar}" class="w-12 h-12 rounded-full object-cover border" alt="avatar">` : ''}
-              <h1 class="text-lg font-bold">${product.name || '(Không có tên)'}</h1>
-            </div>
-            <div class="text-red-600 font-semibold text-base mb-3">Giá: ${price}</div>
-            <div class="text-sm leading-relaxed text-gray-700 mb-4">${product.description || 'Không có mô tả sản phẩm.'}</div>
-          `;
-
-                if (attributes.length > 0) {
-                    html += `<div class="mb-4"><h2 class="font-semibold mb-2">Thông số kỹ thuật:</h2><ul class="list-disc list-inside text-sm text-gray-700">`;
-                    attributes.forEach(attr => {
-                        html += `<li>${attr.name}: ${attr.value}</li>`;
-                    });
-                    html += `</ul></div>`;
-                }
-
-                if (Array.isArray(productLinks) && productLinks.some(p => p.url)) {
-                    html += `<div class="flex flex-wrap gap-2 mb-2">`;
-                    productLinks.forEach(link => {
-                        if (link.url && link.url.startsWith('http')) {
-                            html += `<a href="${link.url}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">${link.platform}</a>`;
-                        }
-                    });
-                    html += `</div>`;
-                }
-
-                html += `</div>`;
-                document.getElementById("info").innerHTML = html;
-
-                if (images.length) {
-                    new Swiper(".mySwiper", {
-                        pagination: { el: ".swiper-pagination", clickable: true }
-                    });
-                }
-
-                // Gửi tracking
-                fetch("http://api.giang.test/api/qr-codes/track", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        code: qr.qr_id,
-                        track: track,
-                        short_code: qr.short_code || qrId,
-                        qr_url: qr.qr_url,
-                        type: qr.target_type,
-                        target_id: qr.target_id,
-                        scan_source: scanSource
-                    })
-                }).then(res => res.json()).then(console.log).catch(console.error);
-            })
-            .catch(() => {
-                document.getElementById("info").innerHTML = "Không thể kết nối tới máy chủ.";
+            images.forEach((img) => {
+                const slide = document.createElement("div");
+                slide.className = "swiper-slide";
+                slide.innerHTML = `<img src="${img}" class="w-full h-full object-cover" />`;
+                swiperWrapper.appendChild(slide);
             });
+
+            const pagination = document.createElement("div");
+            pagination.className = "swiper-pagination text-center mt-2";
+
+            wrapper.appendChild(swiperWrapper);
+            wrapper.appendChild(pagination);
+            return wrapper;
+        }
+
+        function renderAttributes(attributes) {
+            if (!attributes.length) return null;
+            const wrapper = document.createElement("div");
+            wrapper.className = "mb-4";
+
+            const title = document.createElement("h2");
+            title.className = "font-semibold mb-2";
+            title.textContent = "Thông số kỹ thuật:";
+            wrapper.appendChild(title);
+
+            const ul = document.createElement("ul");
+            ul.className = "list-disc list-inside text-sm text-gray-700";
+            attributes.forEach(attr => {
+                const li = document.createElement("li");
+                li.textContent = `${attr.name}: ${attr.value}`;
+                ul.appendChild(li);
+            });
+
+            wrapper.appendChild(ul);
+            return wrapper;
+        }
+
+        function renderBuyButtons(links) {
+            const validLinks = links.filter(l => l.url?.startsWith("http"));
+            if (!validLinks.length) return null;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "flex flex-wrap gap-2 mb-2";
+
+            validLinks.forEach(link => {
+                const a = document.createElement("a");
+                a.href = link.url;
+                a.target = "_blank";
+                a.className = "px-4 py-2 bg-blue-600 text-white rounded text-sm";
+                a.textContent = link.platform || "Mua ngay";
+                wrapper.appendChild(a);
+            });
+
+            return wrapper;
+        }
 
         function generateTrackCode() {
             return "auto_" + Math.random().toString(36).substring(2, 10);
