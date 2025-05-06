@@ -61,4 +61,19 @@ $routes->group('api', function ($routes) {
         $routes->put('(:alphanum)', 'QrCodeController::update/$1');
         $routes->delete('(:alphanum)', 'QrCodeController::delete/$1');
     });
+
+    // 1. Truy cập QR gốc → sinh tracking_code → redirect
+    $routes->get('(:alphanum)', 'QrCodeController::redirectWithTrack/$1');
+
+// 2. Truy cập sau khi redirect → xử lý tracking + hiển thị
+    $routes->get('scan/(:alphanum)', 'QrCodeController::handleScan/$1');
+
+// 3. API chi tiết QR (dành cho frontend gọi)
+    $routes->get('qr-codes/detail/(:segment)', 'QrCodeController::detail/$1');
+
+// 4. API tracking thủ công (nếu dùng fetch)
+    $routes->post('qr-codes/track', 'QrCodeController::track');
+
+
+
 });

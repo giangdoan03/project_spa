@@ -1,7 +1,9 @@
 <template>
     <div class="content_box">
-        <a-page-header title="Quay lại danh sách" @back="router.back()">
-        </a-page-header>
+        <a-button type="link" @click="router.back()" style="padding-left: 0; margin-bottom: 24px; color: #000000">
+            <template #icon><ArrowLeftOutlined /></template>
+            Quay lại danh sách
+        </a-button>
         <a-card style="margin-bottom: 24px" class="bg_card_gray">
             <a-row :gutter="16" class="item-selector">
                 <a-col
@@ -156,7 +158,7 @@ import {
     LinkOutlined, FontSizeOutlined, MessageOutlined, ContactsOutlined, CalendarOutlined,
     PhoneOutlined, MailOutlined, EnvironmentOutlined, WifiOutlined, AppstoreAddOutlined,
     AppstoreOutlined, PictureOutlined, FilePdfOutlined, AudioOutlined, PlayCircleOutlined,
-    ShopOutlined, ShoppingOutlined, UserOutlined, ApartmentOutlined, FlagOutlined
+    ShopOutlined, ShoppingOutlined, UserOutlined, ApartmentOutlined, FlagOutlined, ArrowLeftOutlined
 } from '@ant-design/icons-vue'
 
 // Giả sử các form đã import đúng ở đây:
@@ -258,21 +260,26 @@ const qrRef = ref(null)
 let qrCode = null
 
 watch(form, () => {
-    if (!qrCode) return
+    if (!qrCode || !form.value.short_code) return
+
     const config = {
         ...form.value.settings,
-        data: `https://example.com/redirect/${form.value.target_type}/${form.value.target_id}`
+        data: `https://qr-code.io/${form.value.short_code}`
     }
+
     qrCode.update(config)
 }, { deep: true })
 
 onMounted(() => {
     qrCode = new QRCodeStyling({
         ...form.value.settings,
-        data: 'https://your-frontend.com/scan/placeholder' // sẽ cập nhật lại sau khi có short_code
+        data: form.value.short_code
+            ? `https://qr-code.io/${form.value.short_code}`
+            : 'https://qr-code.io/placeholder'
     })
     qrCode.append(qrRef.value)
 })
+
 
 
 const handleSubmit = async () => {
@@ -284,7 +291,7 @@ const handleSubmit = async () => {
     const payload = {
         ...form.value,
         target_type: selectedKey.value,
-        qr_url: `https://example.com/redirect/${selectedKey.value}/${form.value.target_id}`,
+        qr_url: `https://qr-code.io/${form.value.short_code || 'placeholder'}`,
         settings_json: JSON.stringify(form.value.settings)
     }
 
@@ -293,14 +300,26 @@ const handleSubmit = async () => {
             await updateQR(route.params.qr_id, payload)
             message.success('Cập nhật mã QR thành công!')
         } else {
-            await createQR(payload)
+            const res = await createQR(payload)
             message.success('Tạo mã QR thành công!')
+
+            // Cập nhật short_code và qr_id để gán lại QR preview
+            form.value.short_code = res.data?.short_code
+            form.value.qr_id = res.data?.qr_id
+
+            if (qrCode && form.value.short_code) {
+                qrCode.update({
+                    ...form.value.settings,
+                    data: `https://qr-code.io/${form.value.short_code}`
+                })
+            }
         }
     } catch (err) {
         console.error('Lỗi:', err.response?.data || err.message)
         message.error(isEditMode.value ? 'Cập nhật thất bại!' : 'Tạo mã QR thất bại!')
     }
 }
+
 
 onMounted(async () => {
     if (isEditMode.value) {

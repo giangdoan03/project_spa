@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chi tiết mã QR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      #info {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-left: 4px solid #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Thông tin mã QR / Đối tượng</h1>
+    <div id="info">Đang tải dữ liệu...</div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const pathSegments = window.location.pathname
+          .split("/")
+          .filter(Boolean);
+        const qrId = pathSegments[0] || null;
+        const params = new URLSearchParams(window.location.search);
+        const track = params.get("track") || generateTrackCode();
+        const scanSource = detectScanSource();
+
+        if (!qrId) {
+          document.getElementById("info").innerHTML = "Không tìm thấy mã QR.";
+          return;
+        }
+
+        // Gọi API để lấy thông tin mã QR
+        fetch(`http://api.giang.test/api/qr-codes/detail/${qrId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.qr) {
+              document.getElementById("info").innerHTML = "QR không tồn tại.";
+              return;
+            }
+
+            const qr = data.qr;
+            let html = `<p><strong>Tên:</strong> ${qr.qr_name}</p>`;
+            html += `<p><strong>Loại:</strong> ${qr.target_type}</p>`;
+            html += `<p><strong>Link:</strong> <a href="${qr.qr_url}" target="_blank">${qr.qr_url}</a></p>`;
+            document.getElementById("info").innerHTML = html;
+
+            // Gửi log tracking
+            fetch("http://api.giang.test/api/qr-codes/track", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                code: qr.qr_id,
+                track: track,
+                short_code: qr.short_code || qrId,
+                qr_url: qr.qr_url,
+                type: qr.target_type,
+                target_id: qr.target_id,
+                scan_source: scanSource,
+              }),
+            })
+              .then((res) => res.json())
+              .then((res) => console.log("Tracking OK:", res))
+              .catch((err) => console.error("Lỗi tracking:", err));
+          });
+
+        // Random tracking code nếu không có
+        function generateTrackCode() {
+          return "auto_" + Math.random().toString(36).substring(2, 10);
+        }
+
+        // Phát hiện nguồn quét (browser/platform)
+        function detectScanSource() {
+          const ua = navigator.userAgent.toLowerCase();
+          if (ua.includes("zalo")) return "zalo_scan";
+          if (ua.includes("fb")) return "facebook_app";
+          if (ua.includes("chrome")) return "chrome";
+          if (ua.includes("safari") && !ua.includes("chrome")) return "safari";
+          if (ua.includes("firefox")) return "firefox";
+          if (ua.includes("edge")) return "edge";
+          if (ua.includes("android")) return "android_browser";
+          if (ua.includes("iphone") || ua.includes("ipad"))
+            return "ios_browser";
+          return "unknown";
+        }
+      });
+    </script>
+  </body>
+</html>

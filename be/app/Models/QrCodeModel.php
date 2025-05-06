@@ -13,7 +13,7 @@ class QrCodeModel extends Model
         'qr_name', 'qr_url', 'short_code',
         'campaign', 'is_active', 'expires_at',
         'scan_count', 'last_scanned_at',
-        'settings_json', 'note'
+        'settings_json', 'note', 'qr_id'
     ];
 
     protected $useTimestamps = true;
