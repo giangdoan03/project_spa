@@ -1,78 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <title>Chi tiết sản phẩm</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 12px;
-            margin: 0;
-            background: #f8f9fa;
-        }
-
-        .product-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: #222;
-            margin-top: 12px;
-            margin-bottom: 8px;
-        }
-
-        .price {
-            font-size: 18px;
-            color: #d9230f;
-            margin-bottom: 12px;
-        }
-
-        .swiper {
-            width: 100%;
-            border-radius: 6px;
-            margin-bottom: 16px;
-        }
-
-        .swiper-slide img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .description {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #333;
-            margin-bottom: 16px;
-        }
-
-        .buy-buttons a {
-            display: inline-block;
-            margin-right: 8px;
-            margin-bottom: 8px;
-            padding: 10px 16px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .buy-buttons a:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
-<body>
-<div id="info">Đang tải dữ liệu...</div>
+<body class="bg-gray-100 text-gray-800">
+<div id="info" class="p-4 text-center text-sm text-gray-500">Đang tải dữ liệu...</div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const qrId = window.location.pathname.split("/").filter(Boolean)[0];
+        const pathSegments = window.location.pathname.split("/").filter(Boolean);
+        const qrId = pathSegments[0] || null;
         const params = new URLSearchParams(window.location.search);
-        const track = params.get("track") || "auto_" + Math.random().toString(36).slice(2, 10);
+        const track = params.get("track") || generateTrackCode();
         const scanSource = detectScanSource();
 
         if (!qrId) {
@@ -81,76 +25,87 @@
         }
 
         fetch(`http://api.giang.test/api/qr-codes/detail/${qrId}`)
-            .then((res) => res.json())
-            .then((data) => {
+            .then(res => res.json())
+            .then(data => {
                 if (!data.qr || !data.target) {
-                    document.getElementById("info").innerHTML = "QR không tồn tại.";
+                    document.getElementById("info").innerHTML = "QR không tồn tại hoặc không có sản phẩm.";
                     return;
                 }
 
                 const qr = data.qr;
                 const product = data.target;
 
-                const parseJsonArray = (field) => {
-                    try {
-                        const val = JSON.parse(product[field]);
-                        return Array.isArray(val) ? val : [];
-                    } catch {
-                        return [];
-                    }
-                };
+                // Parse dữ liệu
+                let images = [];
+                try { images = JSON.parse(product.image); } catch {}
+                let avatar = "";
+                try {
+                    const parsed = JSON.parse(product.avatar);
+                    if (Array.isArray(parsed)) avatar = parsed[0];
+                } catch {}
 
-                const images = parseJsonArray("image");
-                const avatar = parseJsonArray("avatar")[0] || "";
-                const videos = parseJsonArray("video");
-                const certificates = parseJsonArray("certificate_file");
+                let attributes = [];
+                try { attributes = JSON.parse(product.attributes); } catch {}
 
+                let displaySettings = {};
+                try {
+                    displaySettings = JSON.parse(JSON.parse(product.display_settings));
+                } catch {}
+
+                const productLinks = displaySettings.productLinks || [];
                 const price = parseFloat(product.price || 0).toLocaleString("vi-VN") + " ₫";
 
-                let html = "";
+                // HTML render
+                let html = `<div class="max-w-md mx-auto bg-white p-4 rounded-xl shadow-sm">`;
 
-                if (avatar) {
-                    html += `<img src="${avatar}" alt="Ảnh đại diện" style="width:100%;border-radius:8px;margin-bottom:12px;" />`;
-                }
-
-                if (images.length) {
+                if (images.length > 0) {
                     html += `
-            <div class="swiper mySwiper">
-              <div class="swiper-wrapper">
-                ${images.map(img => `<div class="swiper-slide"><img src="${img}" alt="Ảnh" /></div>`).join('')}
+              <div class="swiper mySwiper rounded-lg overflow-hidden mb-4 h-44">
+                <div class="swiper-wrapper">
+                  ${images.map(img => `<div class="swiper-slide"><img src="${img}" class="w-full h-full object-cover" /></div>`).join('')}
+                </div>
+                <div class="swiper-pagination text-center mt-2"></div>
               </div>
-              <div class="swiper-pagination"></div>
-            </div>`;
+            `;
                 }
 
-                html += `<div class="product-name">${product.name || '(Không có tên)'}</div>`;
-                html += `<div class="price">Giá: ${price}</div>`;
-                html += `<div class="description">${product.description || 'Không có mô tả sản phẩm.'}</div>`;
+                html += `
+            <div class="flex items-center gap-3 mb-3">
+              ${avatar ? `<img src="${avatar}" class="w-12 h-12 rounded-full object-cover border" alt="avatar">` : ''}
+              <h1 class="text-lg font-bold">${product.name || '(Không có tên)'}</h1>
+            </div>
+            <div class="text-red-600 font-semibold text-base mb-3">Giá: ${price}</div>
+            <div class="text-sm leading-relaxed text-gray-700 mb-4">${product.description || 'Không có mô tả sản phẩm.'}</div>
+          `;
 
-                if (videos.length) {
-                    html += `<h4>Video / Ảnh động</h4>`;
-                    videos.forEach(url => {
-                        html += `<img src="${url}" alt="Video ảnh" style="width:100%;border-radius:8px;margin-bottom:12px;" />`;
+                if (attributes.length > 0) {
+                    html += `<div class="mb-4"><h2 class="font-semibold mb-2">Thông số kỹ thuật:</h2><ul class="list-disc list-inside text-sm text-gray-700">`;
+                    attributes.forEach(attr => {
+                        html += `<li>${attr.name}: ${attr.value}</li>`;
                     });
+                    html += `</ul></div>`;
                 }
 
-                if (certificates.length) {
-                    html += `<h4>Chứng chỉ</h4>`;
-                    certificates.forEach(url => {
-                        const name = url.split("/").pop();
-                        html += `<p><a href="${url}" target="_blank">${name}</a></p>`;
+                if (Array.isArray(productLinks) && productLinks.some(p => p.url)) {
+                    html += `<div class="flex flex-wrap gap-2 mb-2">`;
+                    productLinks.forEach(link => {
+                        if (link.url && link.url.startsWith('http')) {
+                            html += `<a href="${link.url}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">${link.platform}</a>`;
+                        }
                     });
+                    html += `</div>`;
                 }
 
+                html += `</div>`;
                 document.getElementById("info").innerHTML = html;
 
                 if (images.length) {
                     new Swiper(".mySwiper", {
-                        pagination: { el: ".swiper-pagination" }
+                        pagination: { el: ".swiper-pagination", clickable: true }
                     });
                 }
 
-                // Tracking log
+                // Gửi tracking
                 fetch("http://api.giang.test/api/qr-codes/track", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -163,8 +118,15 @@
                         target_id: qr.target_id,
                         scan_source: scanSource
                     })
-                }).catch(console.error);
+                }).then(res => res.json()).then(console.log).catch(console.error);
+            })
+            .catch(() => {
+                document.getElementById("info").innerHTML = "Không thể kết nối tới máy chủ.";
             });
+
+        function generateTrackCode() {
+            return "auto_" + Math.random().toString(36).substring(2, 10);
+        }
 
         function detectScanSource() {
             const ua = navigator.userAgent.toLowerCase();
