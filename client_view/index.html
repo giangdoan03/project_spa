@@ -6,14 +6,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    <style>
+        .swiper {
+            width: 100%;
+            height: 25rem; /* tương đương h-64 */
+        }
+        .swiper-slide img {
+            object-fit: contain;
+            max-height: 100%;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-gray-800 h-screen">
-<div id="info" class="max-w-md mx-auto bg-white shadow-lg overflow-hidden h-screen flex flex-col">
-    <!-- Nội dung sẽ được đổ từ JS -->
-</div>
-</body>
+<div id="info" class="max-w-md mx-auto bg-white shadow-lg overflow-hidden h-screen flex flex-col"></div>
+
+<!-- Handlebars template -->
+<script id="product-template" type="text/x-handlebars-template">
+    {{#if images.length}}
+    {{#if (gt images.length 1)}}
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            {{#each images}}
+            <div class="swiper-slide">
+                <img src="{{this}}" class="w-full object-contain" style="max-height: 100vh;" alt="slide">
+            </div>
+            {{/each}}
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+    {{else}}
+    <img src="{{images.[0]}}" class="w-full object-contain" style="max-height: 100vh;" alt="Ảnh sản phẩm">
+    {{/if}}
+    {{/if}}
+
+    <div class="p-4 overflow-y-auto flex-1">
+        <h1 class="text-xl font-semibold">{{product.name}}</h1>
+        <p class="text-green-700 font-bold text-lg mt-1">{{price}}</p>
+        <span class="text-xs bg-gray-200 px-2 py-1 rounded-full inline-block mt-1">kích thước: {{product.size}}</span>
+
+        <div class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md font-semibold">Thông tin</div>
+        <div class="mt-4">
+            <p class="font-medium">{{product.name}}</p>
+            <p class="text-sm text-gray-600">{{{product.description}}}</p>
+        </div>
+
+        <div class="mt-6 bg-green-100 p-4 rounded-lg">
+            <h2 class="font-semibold mb-2">Company</h2>
+            <div class="flex items-center gap-3">
+                <img src="{{avatar}}" class="w-10 h-10 rounded" alt="logo">
+                <div>
+                    <p class="font-medium">{{product.company_name}}</p>
+                    <p class="text-sm text-gray-600">📱 {{product.phone}}</p>
+                </div>
+            </div>
+        </div>
+
+        {{#if related.length}}
+        <div class="mt-6">
+            <h2 class="font-semibold mb-2">Related products</h2>
+            <div class="flex gap-3">
+                {{#each related}}
+                <div class="text-center">
+                    <img src="{{this.image}}" class="border rounded-lg" alt="">
+                    <p class="text-sm text-gray-500">x{{this.count}}</p>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if productLinks.length}}
+        <div class="mt-4 flex flex-wrap gap-2">
+            {{#each productLinks}}
+            <a href="{{this.url}}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+                {{this.platform}}
+            </a>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        <div class="mt-6 text-center text-xs text-gray-500">
+            <p><img src="https://placehold.co/16x16?text=🔗" class="inline-block mr-1" />Powered by <strong>iCheckQR</strong></p>
+        </div>
+    </div>
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    Handlebars.registerHelper("gt", function (a, b) {
+        return a > b;
+    });
+
     document.addEventListener("DOMContentLoaded", async () => {
         const qrId = window.location.pathname.split("/").filter(Boolean)[0];
         const params = new URLSearchParams(window.location.search);
@@ -28,105 +112,44 @@
         try {
             const res = await fetch(`http://api.giang.test/api/qr-codes/detail/${qrId}`);
             const data = await res.json();
-
             if (!data.qr || !data.target) {
                 infoEl.innerHTML = `<p class="text-center p-4">QR không tồn tại hoặc không có sản phẩm.</p>`;
                 return;
             }
 
             const { qr, target: product } = data;
-            const images = safeParse(product.image, []);
-            const avatar = safeParse(product.avatar, [])[0] || "";
+            const images = tryParseImages(product.image);
+            const mainImage = images[0] || "";
+
+            let avatar = "";
+            try {
+                const rawAvatar = product.avatar;
+                const parsed = typeof rawAvatar === "string" ? JSON.parse(rawAvatar) : rawAvatar;
+                avatar = Array.isArray(parsed) ? cleanUrl(parsed[0]) : cleanUrl(parsed);
+            } catch {
+                avatar = "";
+            }
+
             const attributes = safeParse(product.attributes, []);
             const settings = safeParse(safeParse(product.display_settings, "{}"), {});
             const productLinks = settings.productLinks || [];
             const related = Array.isArray(settings.relatedProducts) ? settings.relatedProducts : [];
-
             const price = parseFloat(product.price || 0).toLocaleString("vi-VN") + " ₫";
 
-            infoEl.innerHTML = `
-      <!-- Carousel -->
-      <div class="swiper mySwiper h-64">
-       <div class="swiper-wrapper">
-  ${images.map(img => `
-    <div class="swiper-slide">
-      <img src="${img}" class="w-full object-contain" style="max-height: 100vh;" alt="">
-    </div>`).join("")}
-</div>
+            const template = Handlebars.compile(document.getElementById("product-template").innerHTML);
+            infoEl.innerHTML = template({ qr, product, images, mainImage, avatar, attributes, settings, productLinks, related, price });
 
-        <div class="swiper-pagination"></div>
-      </div>
-
-      <div class="p-4 overflow-y-auto flex-1">
-        <!-- Title & Price -->
-        <h1 class="text-xl font-semibold">${product.name || '(Không có tên)'}</h1>
-        <p class="text-green-700 font-bold text-lg mt-1">${price}</p>
-        <span class="text-xs bg-gray-200 px-2 py-1 rounded-full inline-block mt-1">
-          kích thước: ${product.size || 'XS'}
-        </span>
-
-        <!-- Tab -->
-        <div class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md font-semibold">tesst</div>
-
-        <!-- Description -->
-        <div class="mt-4">
-          <p class="font-medium">${product.name || "demo"}</p>
-          <p class="text-sm text-gray-600">${product.description || "Mô tả Sản phẩm"}</p>
-        </div>
-
-        <!-- Company -->
-        <div class="mt-6 bg-green-100 p-4 rounded-lg">
-          <h2 class="font-semibold mb-2">Company</h2>
-          <div class="flex items-center gap-3">
-            <img src="${product.logo || 'https://placehold.co/40x40?text=Logo'}" class="w-10 h-10 rounded" alt="logo">
-            <div>
-              <p class="font-medium">${product.company_name || "demo"}</p>
-              <p class="text-sm text-gray-600">📱 ${product.phone || "+84912345678"}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Related Products -->
-        ${related.length ? `
-          <div class="mt-6">
-            <h2 class="font-semibold mb-2">Related products</h2>
-            <div class="flex gap-3">
-              ${related.map((r, i) => `
-                <div class="text-center">
-                  <img src="${r.image || 'https://placehold.co/80x80?text=' + (i + 1)}" class="border rounded-lg" alt="">
-                  <p class="text-sm text-gray-500">x${r.count || 1}</p>
-                </div>
-              `).join("")}
-            </div>
-          </div>` : ""}
-
-        <!-- Buy Buttons -->
-        ${productLinks.length ? `
-          <div class="mt-4 flex flex-wrap gap-2">
-            ${productLinks.map(link => `
-              <a href="${link.url}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
-                ${link.platform || "Mua ngay"}
-              </a>`).join("")}
-          </div>` : ""}
-
-        <!-- Footer -->
-        <div class="mt-6 text-center text-xs text-gray-500">
-          <p>
-            <img src="https://placehold.co/16x16?text=🔗" class="inline-block mr-1" />
-            Powered by <strong>iCheckQR</strong>
-          </p>
-        </div>
-      </div>
-    `;
-
-            // Swiper init
-            if (images.length) {
-                new Swiper(".mySwiper", {
-                    pagination: { el: ".swiper-pagination", clickable: true }
+            if (images.length > 1) {
+                requestAnimationFrame(() => {
+                    new Swiper(".mySwiper", {
+                        pagination: {
+                            el: ".swiper-pagination",
+                            clickable: true,
+                        },
+                    });
                 });
             }
 
-            // Tracking
             await fetch("http://api.giang.test/api/qr-codes/track", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -140,9 +163,14 @@
                     scan_source: detectScanSource()
                 })
             });
+
         } catch (err) {
             infoEl.innerHTML = `<p class="text-center p-4">Không thể kết nối tới máy chủ.</p>`;
             console.error(err);
+        }
+
+        function cleanUrl(url) {
+            return url?.replace(/^"+|"+$/g, "").replace(/\\/g, "").trim() || "";
         }
 
         function safeParse(input, fallback = []) {
@@ -152,6 +180,23 @@
                 return fallback;
             }
         }
+
+        function tryParseImages(raw) {
+            if (!raw || typeof raw !== "string") return [];
+            try {
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed)
+                    ? parsed.map(cleanUrl).filter(url => isValidImage(url))
+                    : [];
+            } catch {
+                return raw.split(",").map(cleanUrl).filter(url => isValidImage(url));
+            }
+        }
+
+        function isValidImage(url) {
+            return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+        }
+
 
         function generateTrackCode() {
             return "auto_" + Math.random().toString(36).substring(2, 10);
@@ -171,5 +216,5 @@
         }
     });
 </script>
-
+</body>
 </html>
