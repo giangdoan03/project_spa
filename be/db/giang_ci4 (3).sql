@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 07, 2025 at 05:57 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: May 08, 2025 at 06:10 PM
+-- Server version: 8.0.30
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,35 +28,35 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `businesses` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `tax_code` varchar(100) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `district` varchar(100) DEFAULT NULL,
-  `ward` varchar(100) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `career` varchar(255) DEFAULT NULL,
-  `facebook_link` varchar(255) DEFAULT NULL,
-  `other_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  `cover_image` varchar(255) DEFAULT NULL,
-  `library_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `video_intro` varchar(255) DEFAULT NULL,
-  `certificate_file` varchar(255) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tax_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ward` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `career` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `facebook_link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `other_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cover_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `library_images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `video_intro` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `certificate_file` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lat` decimal(10,8) DEFAULT NULL,
   `lng` decimal(11,8) DEFAULT NULL,
-  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `extra_info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `status` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `display_settings` text DEFAULT NULL
+  `user_id` int NOT NULL,
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -76,13 +76,13 @@ INSERT INTO `businesses` (`id`, `name`, `tax_code`, `country`, `city`, `district
 --
 
 CREATE TABLE `business_extra_info` (
-  `id` bigint(20) NOT NULL,
-  `business_id` bigint(20) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `image` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `business_id` bigint NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -92,10 +92,10 @@ CREATE TABLE `business_extra_info` (
 --
 
 CREATE TABLE `categories` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -141,16 +141,16 @@ INSERT INTO `categories` (`id`, `name`, `created_at`, `updated_at`) VALUES
 --
 
 CREATE TABLE `customers` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `avatar` text DEFAULT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` text COLLATE utf8mb4_unicode_ci,
   `last_interaction` date DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -160,13 +160,13 @@ CREATE TABLE `customers` (
 --
 
 CREATE TABLE `entity_images` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `entity_type` varchar(50) NOT NULL,
-  `entity_id` int(10) UNSIGNED NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `is_cover` tinyint(1) DEFAULT 0,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int UNSIGNED NOT NULL,
+  `entity_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entity_id` int UNSIGNED NOT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_cover` tinyint(1) DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -176,31 +176,31 @@ CREATE TABLE `entity_images` (
 --
 
 CREATE TABLE `events` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `banner` text DEFAULT NULL,
-  `location` varchar(255) DEFAULT NULL,
-  `event_mode` varchar(20) DEFAULT 'online',
-  `is_enabled` tinyint(1) DEFAULT 1,
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `banner` text COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `event_mode` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'online',
+  `is_enabled` tinyint(1) DEFAULT '1',
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `country` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `district` varchar(100) DEFAULT NULL,
-  `contact_first_name` varchar(100) DEFAULT NULL,
-  `contact_last_name` varchar(100) DEFAULT NULL,
-  `contact_phone` varchar(20) DEFAULT NULL,
-  `contact_email` varchar(100) DEFAULT NULL,
-  `ticket_options` text DEFAULT NULL,
-  `social_links` text DEFAULT NULL,
-  `images` text DEFAULT NULL,
-  `video` text DEFAULT NULL,
-  `format_type` enum('online','offline') DEFAULT 'offline',
-  `display_settings` text DEFAULT NULL
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ticket_options` text COLLATE utf8mb4_unicode_ci,
+  `social_links` text COLLATE utf8mb4_unicode_ci,
+  `images` text COLLATE utf8mb4_unicode_ci,
+  `video` text COLLATE utf8mb4_unicode_ci,
+  `format_type` enum('online','offline') COLLATE utf8mb4_unicode_ci DEFAULT 'offline',
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -221,14 +221,14 @@ INSERT INTO `events` (`id`, `user_id`, `name`, `banner`, `location`, `event_mode
 --
 
 CREATE TABLE `landing_pages` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `content` longtext DEFAULT NULL,
-  `status` enum('draft','published') DEFAULT 'draft',
-  `access_count` int(10) UNSIGNED DEFAULT 0,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci,
+  `status` enum('draft','published') COLLATE utf8mb4_unicode_ci DEFAULT 'draft',
+  `access_count` int UNSIGNED DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -238,16 +238,16 @@ CREATE TABLE `landing_pages` (
 --
 
 CREATE TABLE `loyalty_gifts` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `image` varchar(255) DEFAULT NULL,
-  `type` enum('item','vnpoint') DEFAULT 'item',
-  `value` int(11) DEFAULT 0,
-  `description` text DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `user_id` int(10) UNSIGNED DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` enum('item','vnpoint') COLLATE utf8mb4_unicode_ci DEFAULT 'item',
+  `value` int DEFAULT '0',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -257,13 +257,13 @@ CREATE TABLE `loyalty_gifts` (
 --
 
 CREATE TABLE `loyalty_histories` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `program_id` int(11) DEFAULT NULL,
-  `type` enum('participation','winning') NOT NULL,
-  `description` text DEFAULT NULL,
-  `metadata` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int NOT NULL,
+  `program_id` int DEFAULT NULL,
+  `type` enum('participation','winning') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `metadata` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -273,18 +273,18 @@ CREATE TABLE `loyalty_histories` (
 --
 
 CREATE TABLE `loyalty_participation_logs` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `full_name` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `address` text DEFAULT NULL,
-  `gift_name` varchar(255) DEFAULT NULL,
-  `program_name` varchar(255) DEFAULT NULL,
-  `target_type` varchar(50) DEFAULT NULL,
-  `product_name` varchar(255) DEFAULT NULL,
-  `is_winner` tinyint(1) DEFAULT 0,
+  `id` int UNSIGNED NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_unicode_ci,
+  `gift_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `program_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_winner` tinyint(1) DEFAULT '0',
   `joined_at` datetime DEFAULT NULL,
-  `user_id` int(10) UNSIGNED DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -294,20 +294,20 @@ CREATE TABLE `loyalty_participation_logs` (
 --
 
 CREATE TABLE `loyalty_programs` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `banner` varchar(255) DEFAULT NULL,
-  `images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `video` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `social_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `display_settings` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `banner` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `images` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `video` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `status` tinyint(1) DEFAULT '1',
+  `social_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `display_settings` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -317,25 +317,25 @@ CREATE TABLE `loyalty_programs` (
 --
 
 CREATE TABLE `loyalty_vouchers` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `value` int(11) DEFAULT 0,
-  `quantity` int(11) DEFAULT 0,
-  `issued` int(11) DEFAULT 0,
-  `used` int(11) DEFAULT 0,
-  `max_per_voucher` int(11) DEFAULT 1,
-  `max_per_user` int(11) DEFAULT 1,
+  `id` int UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` int DEFAULT '0',
+  `quantity` int DEFAULT '0',
+  `issued` int DEFAULT '0',
+  `used` int DEFAULT '0',
+  `max_per_voucher` int DEFAULT '1',
+  `max_per_user` int DEFAULT '1',
   `valid_from` datetime DEFAULT NULL,
   `valid_to` datetime DEFAULT NULL,
-  `duration_after_issued` int(11) DEFAULT NULL,
-  `require_owner` tinyint(1) DEFAULT 0,
-  `is_lucky_draw` tinyint(1) DEFAULT 0,
-  `description` text DEFAULT NULL,
-  `image` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `user_id` int(10) UNSIGNED DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `duration_after_issued` int DEFAULT NULL,
+  `require_owner` tinyint(1) DEFAULT '0',
+  `is_lucky_draw` tinyint(1) DEFAULT '0',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -345,19 +345,19 @@ CREATE TABLE `loyalty_vouchers` (
 --
 
 CREATE TABLE `loyalty_winner_logs` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `full_name` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `phone_recharge` varchar(50) DEFAULT NULL,
-  `address` text DEFAULT NULL,
-  `gift_name` varchar(255) DEFAULT NULL,
-  `program_name` varchar(255) DEFAULT NULL,
-  `target_type` varchar(50) DEFAULT NULL,
-  `reason` text DEFAULT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone_recharge` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` text COLLATE utf8mb4_unicode_ci,
+  `gift_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `program_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reason` text COLLATE utf8mb4_unicode_ci,
   `won_at` datetime DEFAULT NULL,
   `received_at` datetime DEFAULT NULL,
-  `user_id` int(10) UNSIGNED DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `user_id` int UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -367,11 +367,11 @@ CREATE TABLE `loyalty_winner_logs` (
 --
 
 CREATE TABLE `permissions` (
-  `id` int(11) NOT NULL,
-  `key_name` varchar(100) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `key_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -425,24 +425,24 @@ INSERT INTO `permissions` (`id`, `key_name`, `description`, `created_at`, `updat
 --
 
 CREATE TABLE `persons` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `first_name` varchar(100) DEFAULT NULL,
-  `last_name` varchar(100) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `avatar` varchar(255) DEFAULT NULL,
-  `video_url` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `social_links` text DEFAULT NULL,
-  `job_title` varchar(100) DEFAULT NULL,
-  `bio` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `display_settings` text DEFAULT NULL
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `first_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `video_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `social_links` text COLLATE utf8mb4_unicode_ci,
+  `job_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bio` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `display_settings` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -461,46 +461,56 @@ INSERT INTO `persons` (`id`, `user_id`, `first_name`, `last_name`, `name`, `avat
 --
 
 CREATE TABLE `products` (
-  `id` bigint(20) NOT NULL,
-  `sku` varchar(100) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `category_id` bigint(20) DEFAULT NULL,
-  `price_mode` varchar(20) DEFAULT 'single',
-  `price` decimal(15,2) DEFAULT 0.00,
-  `price_from` decimal(15,2) DEFAULT 0.00,
-  `price_to` decimal(15,2) DEFAULT 0.00,
-  `show_contact_price` tinyint(1) DEFAULT 0,
-  `avatar` text DEFAULT NULL,
-  `image` text DEFAULT NULL,
-  `video` text DEFAULT NULL,
-  `certificate_file` text DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `attributes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `id` bigint NOT NULL,
+  `sku` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category_id` bigint DEFAULT NULL,
+  `price_mode` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'single',
+  `price` decimal(15,2) DEFAULT '0.00',
+  `price_from` decimal(15,2) DEFAULT '0.00',
+  `price_to` decimal(15,2) DEFAULT '0.00',
+  `show_contact_price` tinyint(1) DEFAULT '0',
+  `avatar` text COLLATE utf8mb4_unicode_ci,
+  `images` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `video` text COLLATE utf8mb4_unicode_ci,
+  `certificate_file` text COLLATE utf8mb4_unicode_ci,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `attributes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `display_settings` text DEFAULT NULL,
-  `product_links` text DEFAULT NULL
+  `user_id` int NOT NULL,
+  `display_settings` text COLLATE utf8mb4_unicode_ci,
+  `product_links` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price_mode`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `image`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`, `product_links`) VALUES
-(1, '5424324324kkk', 'demo 1', 1, 'range', 120000.00, 10000.00, 150000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"114\",\"product_id\":\"1\",\"name\":\"XL\",\"value\":\"342424324\",\"created_at\":\"2025-04-25 04:05:50\",\"updated_at\":\"2025-04-25 04:05:50\"},{\"name\":\"M\",\"value\":\"11111\"}]', 1, '2025-04-12 17:20:19', '2025-05-04 09:14:42', NULL, 1, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"1\",\"2\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://shopee.vn/\"},{\"platform\":\"Lazada\",\"url\":\"https://tiki.vn/\"},{\"platform\":\"Tiki\",\"url\":\"https://www.lazada.vn/\"}]}', NULL),
-(2, '23424244', 'demo sp', 1, 'range', 120000.00, 40000.00, 60000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1745552471_508fb17cc865c1cd3bea.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', '<p>demo demo</p>', '[{\"id\":\"116\",\"product_id\":\"2\",\"name\":\"xl\",\"value\":\"120000\",\"created_at\":\"2025-04-25 04:06:04\",\"updated_at\":\"2025-04-25 04:06:04\"}]', 1, '2025-04-13 14:58:36', '2025-05-04 09:54:42', NULL, 1, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"5\",\"4\",\"6\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://vnexpress.net/\"},{\"platform\":\"Lazada\",\"url\":\"https://vnexpress.net/\"},{\"platform\":\"Tiki\",\"url\":\"https://vnexpress.net/\"}]}', NULL),
-(3, '43243242', 'demo demo', 1, 'single', 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', 'demo demo', '[{\"id\": \"24\", \"name\": \"xl \", \"value\": \"12000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}, {\"id\": \"25\", \"name\": \"xxl\", \"value\": \"20000\", \"created_at\": \"2025-04-20 03:52:02\", \"product_id\": \"3\", \"updated_at\": \"2025-04-20 03:52:02\"}]', 0, '2025-04-13 15:17:23', '2025-04-24 14:48:15', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}', NULL),
-(4, '435435436787AAAAAAAAAA', 'Nước rau má', NULL, 'single', 25000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745479571_e32d4ad88fe5e94a4246.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479579_fc31d80c0b144d95d3a9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479581_77d80ba9c15350d71ce9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479589_c8a7153f6047d2b56181.html\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"69\",\"product_id\":\"4\",\"name\":\"L\",\"value\":\"25000\",\"created_at\":\"2025-04-24 07:27:16\",\"updated_at\":\"2025-04-24 07:27:16\"},{\"id\":\"70\",\"product_id\":\"4\",\"name\":\"M\",\"value\":\"20000\",\"created_at\":\"2025-04-24 07:27:16\",\"updated_at\":\"2025-04-24 07:27:16\"}]', 0, '2025-04-24 07:27:16', '2025-05-07 10:03:14', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}', NULL),
-(5, '454657AADĐGGG', 'rau má', NULL, 'single', 10000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480303_0186821d966918c4db65.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480305_272f716996ccae559ffb.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480307_565b58fd280481cf7755.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480311_58487ae57951309fd294.html\"]', '<p><br></p>', '[{\"id\":\"71\",\"product_id\":\"5\",\"name\":\"L\",\"value\":\"10000\",\"created_at\":\"2025-04-24 07:39:06\",\"updated_at\":\"2025-04-24 07:39:06\"}]', 1, '2025-04-24 07:39:06', '2025-05-07 10:03:18', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}', NULL),
+INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price_mode`, `price`, `price_from`, `price_to`, `show_contact_price`, `avatar`, `images`, `video`, `certificate_file`, `description`, `attributes`, `status`, `created_at`, `updated_at`, `deleted_at`, `user_id`, `display_settings`, `product_links`) VALUES
+(1, '5424324324kkk', 'demo 1', 1, 'range', 120000.00, 10000.00, 150000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030161_1629c049dd5304b986df.jpg\"]', '[{\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1745030163_2becc0716ebd8871b505.jpg\",\"isYoutube\":false,\"isCover\":false,\"uid\":\"1746721974938\",\"is_main\":false},{\"uid\":\"1746722023534\",\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1746722023_7a6443cc59ab292b1881.png\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1746722023_7a6443cc59ab292b1881.png\",\"isCover\":true,\"isYoutube\":false,\"is_main\":true}]', '[{\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1745030164_168ff7d22e43564ad35c.jpg\",\"isYoutube\":false,\"isCover\":false,\"uid\":\"1746721974941\"},{\"uid\":\"1746722027364\",\"url\":\"https:\\/\\/www.youtube.com\\/watch?v=uSGJcjLJok4\",\"preview\":\"https:\\/\\/img.youtube.com\\/vi\\/uSGJcjLJok4\\/hqdefault.jpg\",\"isCover\":false,\"isYoutube\":true}]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558167_bca4a4605e98ca0c07e5.pdf\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[]', 1, '2025-04-12 17:20:19', '2025-05-08 16:49:30', NULL, 1, '{\"selectedTemplate\":\"tpl-3\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"1\",\"2\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://shopee.vn/\"},{\"platform\":\"Lazada\",\"url\":\"https://tiki.vn/\"},{\"platform\":\"Tiki\",\"url\":\"https://www.lazada.vn/\"}]}', NULL),
+(2, '23424244', 'demo sp', 1, 'range', 120000.00, 40000.00, 60000.00, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030182_9c8ac5def4099a010923.jpg\"]', '[{\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1745030183_b10b3ec25f2fcedf2095.jpg\",\"isYoutube\":false,\"isCover\":false,\"uid\":\"1746723245921\",\"is_main\":false},{\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1745552471_508fb17cc865c1cd3bea.png\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1745552471_508fb17cc865c1cd3bea.png\",\"isYoutube\":false,\"isCover\":true,\"uid\":\"1746723245921\",\"is_main\":true}]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745030185_6a907b219d2810ceec89.jpg\"]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744558212_d3135ea188a37ab7205c.pdf\"]', '<p>demo demo</p>', '[]', 1, '2025-04-13 14:58:36', '2025-05-08 16:54:12', NULL, 1, '{\"selectedTemplate\":\"tpl-2\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"5\",\"4\",\"6\"],\"company\":\"selected\",\"selectedCompanies\":[\"1\"],\"store\":\"selected\",\"selectedStores\":[\"1\"],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://vnexpress.net/\"},{\"platform\":\"Lazada\",\"url\":\"https://vnexpress.net/\"},{\"platform\":\"Tiki\",\"url\":\"https://vnexpress.net/\"}]}', NULL),
+(3, '43243242', 'demo demo', 1, 'single', 100000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745030199_204f7c732930f2e30a52.jpg\"]', '[{\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1745030201_92e108209607bc4142c8.jpg\",\"isYoutube\":false,\"isCover\":true,\"uid\":\"1746723229843\",\"is_main\":true}]', '[{\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1745030203_d86e92994564c22c5735.jpg\",\"isYoutube\":false,\"isCover\":false,\"uid\":\"1746723208386\"},{\"uid\":\"1746723214132\",\"url\":\"https:\\/\\/www.youtube.com\\/watch?v=uSGJcjLJok4\",\"preview\":\"https:\\/\\/img.youtube.com\\/vi\\/uSGJcjLJok4\\/hqdefault.jpg\",\"isCover\":false,\"isYoutube\":true}]', '[\"http:\\/\\/api.giang.test\\/uploads\\/1744557413_41644f144bdb597f2bae.pdf\"]', '<p>demo demo</p>', '[]', 1, '2025-04-13 15:17:23', '2025-05-08 16:54:01', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(4, '435435436787AAAAAAAAAA', 'Nước rau má', NULL, 'single', 25000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745479571_e32d4ad88fe5e94a4246.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479579_fc31d80c0b144d95d3a9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479581_77d80ba9c15350d71ce9.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745479589_c8a7153f6047d2b56181.html\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"name\":\"xl\",\"value\":\"40000\"}]', 1, '2025-04-24 07:27:16', '2025-05-08 17:44:29', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(5, '454657AADĐGGG', 'rau má', NULL, 'single', 10000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480303_0186821d966918c4db65.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480305_272f716996ccae559ffb.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480307_565b58fd280481cf7755.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480311_58487ae57951309fd294.html\"]', '<p><br></p>', '[{\"id\":\"71\",\"product_id\":\"5\",\"name\":\"L\",\"value\":\"10000\",\"created_at\":\"2025-04-24 07:39:06\",\"updated_at\":\"2025-04-24 07:39:06\"}]', 0, '2025-04-24 07:39:06', '2025-05-08 16:53:22', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}', NULL),
 (6, '4535353hhhhhhhh', 'Sữa đậu fami', NULL, 'single', 20000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480582_a58f7b1a82ccf75e9bd6.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1746588542_19bc23f70285d1047e52.png\",\"http:\\/\\/assets.giang.test\\/image\\/1746588547_f8e1bb55b154e37bf4d5.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1746588551_ad655404aa05b59bd397.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1746588566_5cf4df87782da1a45f51.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1746588590_caab2f3fd4acf9c458c0.png\",\"http:\\/\\/assets.giang.test\\/image\\/1746588636_ae4f0d4d5e1aeeebb28d.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480592_4835d8dc072c7b31ad5b.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480596_fc8f6d8c4503d8e6feff.txt\"]', '<p><span style=\"background-color: rgb(252, 250, 246); color: rgb(34, 34, 34);\">Tổng Bí thư chỉ ra Việt Nam và Kazakhstan chia sẻ nhiều điểm tương đồng về vị trí địa chiến lược, lịch sử phát triển và văn hoá, đều đề cao truyền thống hiếu học, lòng hiếu khách cũng như tinh thần đoàn kết. Hai nước đều vượt qua những giai đoạn kinh tế khó khăn và đã vươn lên mạnh mẽ nhờ tinh thần đổi mới, sáng tạo, dám nghĩ, dám làm.</span></p>', '[{\"id\":\"131\",\"product_id\":\"6\",\"name\":\"xl\",\"value\":\"10000\",\"created_at\":\"2025-05-07 03:30:38\",\"updated_at\":\"2025-05-07 03:30:38\"}]', 1, '2025-04-24 07:43:52', '2025-05-07 03:45:51', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"1\",\"2\",\"3\",\"4\"],\"company\":\"selected\",\"selectedCompanies\":[\"4\"],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":true,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
 (7, '3453454353', 'bún đậu', NULL, 'single', 140000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745480966_68d7c266dac1fcb14dde.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480970_347dc3ef1b43bf24cf4c.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480975_9de1474121f7e51f1e7e.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745480986_6bbf44cd4056913f2f8d.png\"]', '', '[{\"name\":\"L\",\"value\":\"10000\"}]', 1, '2025-04-24 07:50:14', '2025-04-24 07:50:14', NULL, 0, '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"all\\\",\\\"selectedCompanies\\\":[],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"productLinks\\\":[{\\\"platform\\\":\\\"Shopee\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Lazada\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Tiki\\\",\\\"url\\\":\\\"\\\"}]}\"', NULL),
 (8, '34234242', 'nem nuong nha trang', NULL, 'single', 23000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745481478_689e4fb81f3be539c086.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481481_adca135c4dae226d93bb.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481484_67d6fc9c4e13a0d0e694.png\"]', '[]', '', '[{\"name\":\"X\",\"value\":\"23000\"}]', 1, '2025-04-24 07:58:36', '2025-04-24 07:58:36', NULL, 0, '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"all\\\",\\\"selectedCompanies\\\":[],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"productLinks\\\":[{\\\"platform\\\":\\\"Shopee\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Lazada\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Tiki\\\",\\\"url\\\":\\\"\\\"}]}\"', NULL),
 (9, '4353543535435', 'Vịt om sấu', NULL, 'single', 124000.00, NULL, NULL, 0, '\"http:\\/\\/assets.giang.test\\/image\\/1746548933_2a0c2ddd9c1b54c12efb.jpg\"', '[\"http:\\/\\/assets.giang.test\\/image\\/1746548943_67bbb734b9e15dfd1295.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481679_875e9a818fe1dbb531ea.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481689_ca1989e0b3c6e8d7adaf.txt\"]', '<p><br></p>', '[{\"id\":\"75\",\"product_id\":\"9\",\"name\":\"L\",\"value\":\"120000\",\"created_at\":\"2025-04-24 08:02:04\",\"updated_at\":\"2025-04-24 08:02:04\"}]', 1, '2025-04-24 08:02:04', '2025-05-07 10:03:26', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"company\":\"all\",\"store\":\"all\",\"enableSurvey\":true,\"enableOrderButton\":true}', NULL),
 (10, '54356465464', 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 1, 'single', 1500000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745506841_4fab5f44fa54d974ba11.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481785_7e1b5ecc5e060c8a96fe.png\",\"http:\\/\\/assets.giang.test\\/image\\/1745506019_855fbb66bf4f40091f09.jpg\",\"http:\\/\\/assets.giang.test\\/image\\/1745507157_375fc75b50de8a6ad20b.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481788_49c58f5b697b0823f8ee.png\",\"http:\\/\\/assets.giang.test\\/image\\/1745507161_67fd47f8896136598fdf.jpg\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745481795_526baab6a0b8fa0aca46.html\"]', '<p>Các trường hợp bảo hành cụ thể\n\n- Sản phẩm bị hư hỏng/ bể vỡ trong quá trình vận chuyển \n\n- Sản phẩm bị lỗi do lỗi từ nhà sản xuất \n\n- Sản phẩm giao đến không đúng với đơn hàng đã đặt \n\n- Sản phẩm được giao không đủ số lượng theo đơn hàng đã đặt \n\n- Những lỗi khác do kỹ thuật, chất liệu của sản phẩm </p>', '[{\"id\":\"99\",\"product_id\":\"10\",\"name\":\"XL\",\"value\":\"2000000\",\"created_at\":\"2025-04-24 16:32:03\",\"updated_at\":\"2025-04-24 16:32:03\"}]', 1, '2025-04-24 08:05:05', '2025-04-24 17:04:00', NULL, 3, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"10\",\"11\"],\"company\":\"selected\",\"selectedCompanies\":[\"2\",\"3\"],\"store\":\"selected\",\"selectedStores\":[\"2\",\"3\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"https://shopee.vn/\"},{\"platform\":\"Lazada\",\"url\":\"https://www.lazada.vn/\"},{\"platform\":\"Tiki\",\"url\":\"https://tiki.vn/\"}]}', NULL),
-(11, '54353453535', 'Điều khiển điều hòa NAGAKAWA - Remote máy lạnh Nagakawa hàng loại 1 bảo hành đổi trả 30 ngày', 5, 'single', 120000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745506496_b61218fe994ad5b2abe5.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745482473_c82e19525025ad5852fe.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745482475_16c60515a6f0f2b4dcab.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745482482_b672aeeef7a3fc2c57d9.html\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"88\",\"product_id\":\"11\",\"name\":\"XL\",\"value\":\"230000\",\"created_at\":\"2025-04-24 15:16:05\",\"updated_at\":\"2025-04-24 15:16:05\"}]', 1, '2025-04-24 08:15:54', '2025-04-24 16:33:08', NULL, 3, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"10\",\"11\"],\"company\":\"selected\",\"selectedCompanies\":[\"2\"],\"store\":\"selected\",\"selectedStores\":[\"2\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL);
+(11, '54353453535', 'Điều khiển điều hòa NAGAKAWA - Remote máy lạnh Nagakawa hàng loại 1 bảo hành đổi trả 30 ngày', 5, 'single', 120000.00, NULL, NULL, 0, '[\"http:\\/\\/assets.giang.test\\/image\\/1745506496_b61218fe994ad5b2abe5.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745482473_c82e19525025ad5852fe.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745482475_16c60515a6f0f2b4dcab.png\"]', '[\"http:\\/\\/assets.giang.test\\/image\\/1745482482_b672aeeef7a3fc2c57d9.html\"]', '<p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">- Xuất xứ : Trung Quốc</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Thiết kế nhỏ gọn, vừa tầm tay.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Các phím to, rõ, dễ nhìn, không bị phai mờ theo thời gian.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Sử dụng 2 pin AAA, không cần thiết lập cài đặt.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-Khoảng cách khiển lên đến 8m.</span></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgba(0, 0, 0, 0.8);\">-An toàn cho người sử dụng.</span></p><p><br></p>', '[{\"id\":\"88\",\"product_id\":\"11\",\"name\":\"XL\",\"value\":\"230000\",\"created_at\":\"2025-04-24 15:16:05\",\"updated_at\":\"2025-04-24 15:16:05\"}]', 1, '2025-04-24 08:15:54', '2025-04-24 16:33:08', NULL, 3, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"10\",\"11\"],\"company\":\"selected\",\"selectedCompanies\":[\"2\"],\"store\":\"selected\",\"selectedStores\":[\"2\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(12, '444444444444', 'demo 3424', 2, 'single', 4555000.00, NULL, NULL, 0, '[]', '[{\"uid\":\"1746719702331\",\"url\":\"http://assets.giang.test/image/1746719702_42df0a8126c4f17fe087.png\",\"preview\":\"http://assets.giang.test/image/1746719702_42df0a8126c4f17fe087.png\",\"isCover\":true,\"isYoutube\":false,\"is_main\":true}]', '[]', '[]', '<p>xxxxxxxxxxxxxx</p>', '[{\"id\":\"137\",\"product_id\":\"12\",\"name\":\"xl\",\"value\":\"x\",\"created_at\":\"2025-05-08 15:52:15\",\"updated_at\":\"2025-05-08 15:52:15\"}]', 1, '2025-05-08 15:11:39', '2025-05-08 16:14:50', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"selected\",\"selectedProducts\":[\"10\",\"11\"],\"company\":\"selected\",\"selectedCompanies\":[\"2\"],\"store\":\"selected\",\"selectedStores\":[\"2\"],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(13, '34435345', 'tểtrtetertet', 2, 'single', 200000.00, NULL, NULL, 0, '[]', '[{\"uid\":\"1746719991343\",\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1746719991_244ff8f118a2af43c7ed.png\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1746719991_244ff8f118a2af43c7ed.png\",\"isCover\":false,\"isYoutube\":false}]', '[]', '[]', '<p>cccccccccccccc</p>', '[{\"name\":\"xxxxx\",\"value\":\"3333\"}]', 1, '2025-05-08 16:00:56', '2025-05-08 16:00:56', NULL, 1, '\"{\\\"selectedTemplate\\\":\\\"tpl-1\\\",\\\"relatedProducts\\\":\\\"all\\\",\\\"selectedProducts\\\":[],\\\"company\\\":\\\"all\\\",\\\"selectedCompanies\\\":[],\\\"store\\\":\\\"all\\\",\\\"selectedStores\\\":[],\\\"enableSurvey\\\":false,\\\"selectedSurveys\\\":[],\\\"enableOrderButton\\\":true,\\\"productLinks\\\":[{\\\"platform\\\":\\\"Shopee\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Lazada\\\",\\\"url\\\":\\\"\\\"},{\\\"platform\\\":\\\"Tiki\\\",\\\"url\\\":\\\"\\\"}]}\"', NULL),
+(14, '3424324234', 'utyuututu', 2, 'single', 566666.00, NULL, NULL, 0, '[]', '[{\"uid\":\"1746720181709\",\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1746720181_d7ddd9602e30e4878ab8.png\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1746720181_d7ddd9602e30e4878ab8.png\",\"isCover\":true,\"isYoutube\":false,\"is_main\":true},{\"uid\":\"1746721929024\",\"url\":\"http:\\/\\/assets.giang.test\\/image\\/1746721929_d6011647c13941e37ec9.png\",\"preview\":\"http:\\/\\/assets.giang.test\\/image\\/1746721929_d6011647c13941e37ec9.png\",\"isCover\":false,\"isYoutube\":false}]', '[{\"uid\":\"1746721934773\",\"url\":\"https:\\/\\/www.youtube.com\\/watch?v=uSGJcjLJok4\",\"preview\":\"https:\\/\\/img.youtube.com\\/vi\\/uSGJcjLJok4\\/hqdefault.jpg\",\"isCover\":false,\"isYoutube\":true}]', '[]', '<p>cccccccccccc</p>', '[]', 1, '2025-05-08 16:03:24', '2025-05-08 16:32:18', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(15, 'SKU001', 'Sản phẩm A', NULL, '1', 0.00, 100000.00, NULL, 0, NULL, NULL, NULL, NULL, '0', NULL, 1, '2025-05-08 17:17:41', '2025-05-08 17:17:41', NULL, 1, NULL, NULL),
+(16, 'SKU002', 'Sản phẩm B', 250000, '2', 0.00, 200000.00, 150000.00, 0, NULL, NULL, NULL, NULL, '1', NULL, 0, '2025-05-08 17:17:41', '2025-05-08 17:17:41', NULL, 1, NULL, NULL),
+(17, 'SP001', 'Sản phẩm mẫu', 1, 'single', 100000.00, NULL, NULL, 1, NULL, '[{\"url\": \"https://i.imgur.com/yigrfKn.png\", \"isCover\": true}]', NULL, NULL, 'Mô tả sản phẩm mẫu', NULL, 1, '2025-05-08 17:29:49', '2025-05-08 17:29:49', NULL, 1, NULL, NULL),
+(18, 'SP001', 'Sản phẩm mẫu 2', 1, 'single', 100000.00, NULL, NULL, 1, NULL, '[{\"url\": \"https://i.imgur.com/5WZleXo.png\", \"isCover\": true}]', NULL, NULL, 'Mô tả sản phẩm mẫu', NULL, 1, '2025-05-08 17:34:02', '2025-05-08 17:34:02', NULL, 1, NULL, NULL),
+(19, 'SP001', 'Sản phẩm mẫu 3', 1, 'single', 100000.00, NULL, NULL, 1, NULL, '[{\"url\": \"https://i.imgur.com/5WZleXo.png\", \"isCover\": true}]', NULL, NULL, 'Mô tả sản phẩm mẫu', NULL, 1, '2025-05-08 17:38:19', '2025-05-08 17:38:19', NULL, 1, NULL, NULL),
+(20, 'SP001', 'Sản phẩm mẫu 3xxxxx', 1, 'single', 100000.00, NULL, NULL, 0, '[]', '[{\"url\":\"https:\\/\\/i.imgur.com\\/7T2xp6A.jpeg\",\"isCover\":true}]', '[]', '[]', '<p>Mô tả sản phẩm mẫu</p>', '[{\"name\":\"l\",\"value\":\"20000\"}]', 1, '2025-05-08 17:43:44', '2025-05-08 17:47:54', NULL, 1, '{\"selectedTemplate\":\"tpl-1\",\"relatedProducts\":\"all\",\"selectedProducts\":[],\"company\":\"all\",\"selectedCompanies\":[],\"store\":\"all\",\"selectedStores\":[],\"enableSurvey\":false,\"selectedSurveys\":[],\"enableOrderButton\":true,\"productLinks\":[{\"platform\":\"Shopee\",\"url\":\"\"},{\"platform\":\"Lazada\",\"url\":\"\"},{\"platform\":\"Tiki\",\"url\":\"\"}]}', NULL),
+(21, 'SP001', 'Sản phẩm mẫu 3xxxxx', 1, 'single', 100000.00, NULL, NULL, 1, NULL, '[{\"url\":\"https:\\/\\/i.imgur.com\\/GdvX1Tm.png\",\"isCover\":true}]', NULL, NULL, 'Mô tả sản phẩm mẫu', '[{\"name\":\"Size\",\"value\":\"L\"},{\"name\":\"M\\u00e0u\",\"value\":\"\\u0110\\u1ecf\"}]', 1, '2025-05-08 17:56:06', '2025-05-08 17:56:06', NULL, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -509,12 +519,12 @@ INSERT INTO `products` (`id`, `sku`, `name`, `category_id`, `price_mode`, `price
 --
 
 CREATE TABLE `product_attributes` (
-  `id` bigint(20) NOT NULL,
-  `product_id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `value` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `product_id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -526,8 +536,6 @@ INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_
 (33, 3, 'xxl', '20000', '2025-04-20 04:09:53', '2025-04-20 04:09:53'),
 (73, 7, 'L', '10000', '2025-04-24 07:50:14', '2025-04-24 07:50:14'),
 (74, 8, 'X', '23000', '2025-04-24 07:58:36', '2025-04-24 07:58:36'),
-(78, 4, 'L', '25000', '2025-04-24 08:49:28', '2025-04-24 08:49:28'),
-(79, 4, 'M', '20000', '2025-04-24 08:49:28', '2025-04-24 08:49:28'),
 (100, 11, 'XL', '230000', '2025-04-24 16:33:08', '2025-04-24 16:33:08'),
 (101, 10, 'XL', '2000000', '2025-04-24 17:04:00', '2025-04-24 17:04:00'),
 (118, 5, 'L', '10000', '2025-05-04 08:35:53', '2025-05-04 08:35:53'),
@@ -535,7 +543,19 @@ INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_
 (120, 1, 'M', '11111', '2025-05-04 09:14:42', '2025-05-04 09:14:42'),
 (121, 2, 'xl', '120000', '2025-05-04 09:54:42', '2025-05-04 09:54:42'),
 (122, 9, 'L', '120000', '2025-05-06 16:29:06', '2025-05-06 16:29:06'),
-(132, 6, 'xl', '10000', '2025-05-07 03:45:51', '2025-05-07 03:45:51');
+(132, 6, 'xl', '10000', '2025-05-07 03:45:51', '2025-05-07 03:45:51'),
+(139, 12, 'xl', 'x', '2025-05-08 15:59:22', '2025-05-08 15:59:22'),
+(140, 13, 'xxxxx', '3333', '2025-05-08 16:00:56', '2025-05-08 16:00:56'),
+(141, 14, 'gggg', '675775', '2025-05-08 16:03:24', '2025-05-08 16:03:24'),
+(142, 15, '[\"http', '//example.com/image_a.jpg\"]', '2025-05-08 17:17:41', '2025-05-08 17:17:41'),
+(143, 16, '[\"http', '//example.com/image_b.jpg\"]', '2025-05-08 17:17:41', '2025-05-08 17:17:41'),
+(144, 17, '[{\"name\"', '\"Size\"', '2025-05-08 17:29:49', '2025-05-08 17:29:49'),
+(145, 17, '\"value\"', '\"L\"}]', '2025-05-08 17:29:49', '2025-05-08 17:29:49'),
+(146, 18, 'Size', 'L', '2025-05-08 17:34:02', '2025-05-08 17:34:02'),
+(147, 19, 'Size', 'L', '2025-05-08 17:38:19', '2025-05-08 17:38:19'),
+(148, 19, 'Màu', 'Đỏ', '2025-05-08 17:38:19', '2025-05-08 17:38:19'),
+(151, 4, 'xl', '40000', '2025-05-08 17:44:29', '2025-05-08 17:44:29'),
+(153, 20, 'l', '20000', '2025-05-08 17:47:54', '2025-05-08 17:47:54');
 
 -- --------------------------------------------------------
 
@@ -544,16 +564,16 @@ INSERT INTO `product_attributes` (`id`, `product_id`, `name`, `value`, `created_
 --
 
 CREATE TABLE `purchase_histories` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL,
-  `customer_id` int(10) UNSIGNED DEFAULT NULL,
-  `product_name` varchar(255) NOT NULL,
-  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `quantity` int(11) DEFAULT 1,
-  `note` text DEFAULT NULL,
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `customer_id` int UNSIGNED DEFAULT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `quantity` int DEFAULT '1',
+  `note` text COLLATE utf8mb4_unicode_ci,
   `purchased_at` datetime DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -563,23 +583,23 @@ CREATE TABLE `purchase_histories` (
 --
 
 CREATE TABLE `qr_codes` (
-  `id` int(11) NOT NULL,
-  `short_code` varchar(50) DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `target_type` enum('product','store','business','event','person') NOT NULL,
-  `target_id` int(11) NOT NULL,
-  `qr_name` varchar(255) DEFAULT NULL,
-  `campaign` varchar(100) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT 1,
+  `id` int NOT NULL,
+  `short_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `target_type` enum('product','store','business','event','person') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_id` int NOT NULL,
+  `qr_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `campaign` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
   `expires_at` datetime DEFAULT NULL,
-  `qr_url` varchar(255) NOT NULL,
-  `scan_count` int(11) DEFAULT 0,
+  `qr_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scan_count` int DEFAULT '0',
   `last_scanned_at` datetime DEFAULT NULL,
   `settings_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `note` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `qr_id` varchar(100) NOT NULL
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `qr_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -602,27 +622,27 @@ INSERT INTO `qr_codes` (`id`, `short_code`, `user_id`, `target_type`, `target_id
 --
 
 CREATE TABLE `qr_scan_logs` (
-  `id` int(11) NOT NULL,
-  `qr_id` int(11) DEFAULT NULL,
-  `tracking_code` varchar(100) NOT NULL,
-  `short_code` varchar(50) DEFAULT NULL,
-  `qr_url` varchar(255) DEFAULT NULL,
-  `type` varchar(20) DEFAULT NULL,
-  `target_id` int(11) DEFAULT NULL,
-  `user_agent` text DEFAULT NULL,
-  `os` varchar(50) DEFAULT NULL,
-  `device_type` varchar(50) DEFAULT NULL,
-  `browser` varchar(50) DEFAULT NULL,
-  `ip_address` varchar(50) DEFAULT NULL,
-  `referer` varchar(255) DEFAULT NULL,
-  `scan_source` varchar(100) DEFAULT NULL,
-  `is_unique` tinyint(1) DEFAULT 1,
-  `country` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
+  `id` int NOT NULL,
+  `qr_id` int DEFAULT NULL,
+  `tracking_code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `short_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `qr_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_id` int DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `os` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `device_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `browser` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `scan_source` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_unique` tinyint(1) DEFAULT '1',
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `latitude` double DEFAULT NULL,
   `longitude` double DEFAULT NULL,
-  `phone_number` varchar(20) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -842,7 +862,13 @@ INSERT INTO `qr_scan_logs` (`id`, `qr_id`, `tracking_code`, `short_code`, `qr_ur
 (226, 0, 'auto_cpl6eeb5', '31b1ff2f', 'https://qrcode.io/d9c0bb17', 'product', 6, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 03:55:44'),
 (227, 0, 'auto_jt8g8qvu', 'bdb48b5e', 'https://qrcode.io/d9c0dad3', 'product', 9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 03:56:26'),
 (228, 0, 'auto_mjljws9y', 'beaf3e3a', 'https://qrcode.io/d9bff865', 'product', 5, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 03:56:30'),
-(229, 0, 'auto_tkz8dj53', 'bdb48b5e', 'https://qrcode.io/d9c0dad3', 'product', 9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 03:56:49');
+(229, 0, 'auto_tkz8dj53', 'bdb48b5e', 'https://qrcode.io/d9c0dad3', 'product', 9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 03:56:49'),
+(230, 0, 'auto_bmprlyas', 'bdb48b5e', 'https://qrcode.io/d9c0dad3', 'product', 9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 17:04:29'),
+(231, 0, 'auto_er3djg55', '31b1ff2f', 'https://qrcode.io/d9c0bb17', 'product', 6, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 17:04:41'),
+(232, 0, 'auto_039b36wy', '31b1ff2f', 'https://qrcode.io/d9c0bb17', 'product', 6, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-07 17:11:26'),
+(233, 0, 'auto_5usa2b38', 'bdb48b5e', 'https://qrcode.io/d9c0dad3', 'product', 9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-08 13:46:49'),
+(234, 0, 'auto_a2l1tjd1', '6cbeb6a2', 'https://qrcode.io/d9c0dad2', 'product', 9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-08 13:46:54'),
+(235, 0, 'auto_wlyeejxa', 'a2868812', 'https://qrcode.io/d9c0c74a', 'product', 5, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'Windows', 'Desktop', 'Chrome', '127.0.0.1', 'http://qrcode.io/', 'chrome', 1, '1', '1', 1, 1, NULL, '2025-05-08 13:46:58');
 
 -- --------------------------------------------------------
 
@@ -851,11 +877,11 @@ INSERT INTO `qr_scan_logs` (`id`, `qr_id`, `tracking_code`, `short_code`, `qr_ur
 --
 
 CREATE TABLE `roles` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -874,10 +900,10 @@ INSERT INTO `roles` (`id`, `name`, `description`, `created_at`, `updated_at`) VA
 --
 
 CREATE TABLE `role_permissions` (
-  `id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `id` int NOT NULL,
+  `role_id` int NOT NULL,
+  `permission_id` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -900,12 +926,12 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`, `created_at`) 
 --
 
 CREATE TABLE `settings` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `value` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -923,20 +949,20 @@ INSERT INTO `settings` (`id`, `user_id`, `key`, `value`, `created_at`, `updated_
 --
 
 CREATE TABLE `stores` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `website` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `display_settings` text DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `product_ids` text DEFAULT NULL
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `display_settings` text COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `product_ids` text COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -959,13 +985,13 @@ INSERT INTO `stores` (`id`, `user_id`, `name`, `logo`, `address`, `phone`, `emai
 --
 
 CREATE TABLE `surveys` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `group_id` bigint(20) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` bigint NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `group_id` bigint DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` tinyint(1) DEFAULT '1',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -975,16 +1001,16 @@ CREATE TABLE `surveys` (
 --
 
 CREATE TABLE `users` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `name` varchar(255) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `avatar` varchar(255) DEFAULT NULL,
-  `role` varchar(50) DEFAULT 'user',
-  `role_id` int(11) DEFAULT NULL
+  `id` int UNSIGNED NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'user',
+  `role_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1167,157 +1193,157 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `businesses`
 --
 ALTER TABLE `businesses`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `business_extra_info`
 --
 ALTER TABLE `business_extra_info`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `entity_images`
 --
 ALTER TABLE `entity_images`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `landing_pages`
 --
 ALTER TABLE `landing_pages`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loyalty_gifts`
 --
 ALTER TABLE `loyalty_gifts`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loyalty_histories`
 --
 ALTER TABLE `loyalty_histories`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loyalty_participation_logs`
 --
 ALTER TABLE `loyalty_participation_logs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loyalty_programs`
 --
 ALTER TABLE `loyalty_programs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loyalty_vouchers`
 --
 ALTER TABLE `loyalty_vouchers`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loyalty_winner_logs`
 --
 ALTER TABLE `loyalty_winner_logs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `persons`
 --
 ALTER TABLE `persons`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `product_attributes`
 --
 ALTER TABLE `product_attributes`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
 
 --
 -- AUTO_INCREMENT for table `purchase_histories`
 --
 ALTER TABLE `purchase_histories`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `qr_codes`
 --
 ALTER TABLE `qr_codes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `qr_scan_logs`
 --
 ALTER TABLE `qr_scan_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=230;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=236;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

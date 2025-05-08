@@ -2,23 +2,24 @@ export const normalizeProductData = (data) => {
     const fieldsToParse = ['avatar', 'image', 'video', 'certificate_file']
 
     fieldsToParse.forEach(field => {
-        try {
-            if (!data[field]) {
+        const value = data[field]
+
+        if (!value) {
+            data[field] = []
+        } else if (Array.isArray(value)) {
+            // Đã là mảng → dùng luôn
+            data[field] = value
+        } else if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value)
+                data[field] = Array.isArray(parsed) ? parsed : [parsed]
+            } catch (e) {
+                // Nếu JSON.parse lỗi, giữ nguyên chuỗi gốc
                 data[field] = []
-            } else {
-                let parsed = JSON.parse(data[field])
-                if (Array.isArray(parsed)) {
-                    data[field] = parsed
-                } else if (typeof parsed === 'string') {
-                    // Trường hợp bị JSON stringify nhiều lớp, ví dụ: "\"http://url.jpg\""
-                    data[field] = [parsed.replace(/^"(.*)"$/, '$1')]
-                } else {
-                    data[field] = []
-                }
             }
-        } catch {
-            // Nếu JSON.parse thất bại, cố gắng loại bỏ dấu nháy ngoài cùng
-            data[field] = [data[field].replace(/^"(.*)"$/, '$1')]
+        } else {
+            // Trường hợp không rõ → fallback về mảng rỗng
+            data[field] = []
         }
     })
 
@@ -27,6 +28,7 @@ export const normalizeProductData = (data) => {
 
     return data
 }
+
 
 
 export const formatDate = (value) => {

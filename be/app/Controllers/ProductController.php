@@ -4,10 +4,12 @@ namespace App\Controllers;
 
 use App\Models\ProductModel;
 use App\Models\ProductAttributeModel;
+use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 use App\Traits\AuthTrait;
 
@@ -34,7 +36,7 @@ class ProductController extends ResourceController
 
     public function index()
     {
-        $userId = $this->getUserId(); // Dùng được ngay
+        $userId = $this->getUserId();
 
         log_message('debug', 'SESSION USER_ID in index: ' . $userId);
 
@@ -44,7 +46,7 @@ class ProductController extends ResourceController
         $search = $this->request->getGet('search');
 
         $builder = $productModel->where('deleted_at', null)
-            ->where('user_id', $userId); // 👈 Lọc theo user
+            ->where('user_id', $userId);
 
         if ($search) {
             $builder->groupStart()
@@ -56,6 +58,19 @@ class ProductController extends ResourceController
         $products = $builder->paginate($perPage, 'default', $page);
 
         foreach ($products as &$product) {
+            // Decode JSON fields
+            $jsonFields = ['avatar', 'images', 'video', 'certificate_file', 'display_settings'];
+            foreach ($jsonFields as $field) {
+                if (isset($product[$field]) && is_string($product[$field])) {
+                    $decoded = json_decode($product[$field], true);
+                    $product[$field] = is_array($decoded) ? $decoded : [];
+                } elseif (!isset($product[$field])) {
+                    $product[$field] = [];
+                }
+            }
+            unset($product['image']);
+
+            // Gán attributes
             $product['attributes'] = (new ProductAttributeModel())
                 ->where('product_id', $product['id'])
                 ->findAll();
@@ -82,6 +97,17 @@ class ProductController extends ResourceController
         // Kiểm tra quyền sở hữu sản phẩm
         if ($product['user_id'] != $userId) {
             return $this->failForbidden('Bạn không có quyền xem sản phẩm này');
+        }
+
+        // ✅ Decode các trường JSON nếu là chuỗi
+        $jsonFields = ['avatar', 'images', 'video', 'certificate_file', 'attributes', 'display_settings'];
+        foreach ($jsonFields as $field) {
+            if (!empty($product[$field]) && is_string($product[$field])) {
+                $decoded = json_decode($product[$field], true);
+                $product[$field] = is_array($decoded) ? $decoded : [];
+            } else {
+                $product[$field] = [];
+            }
         }
 
         return $this->respond($product);
@@ -120,11 +146,18 @@ class ProductController extends ResourceController
             'user_id' => $userId, // 👈 Gán user_id vào sản phẩm
         ];
 
-        // Encode các field mảng
-        $arrayFields = ['avatar', 'image', 'video', 'certificate_file', 'attributes'];
+
+        $arrayFields = ['avatar', 'images', 'video', 'certificate_file', 'attributes'];
         foreach ($arrayFields as $field) {
-            $productData[$field] = json_encode($data[$field] ?? []);
+            if (isset($data[$field])) {
+                $value = $data[$field];
+                // Nếu đã là chuỗi JSON rồi thì dùng luôn, không encode lại
+                $productData[$field] = is_string($value) ? $value : json_encode($value);
+            } else {
+                $productData[$field] = json_encode([]); // fallback nếu không có
+            }
         }
+
 
         // Insert sản phẩm
         $productId = $productModel->insert($productData);
@@ -156,7 +189,7 @@ class ProductController extends ResourceController
     public function update($id = null)
     {
         $session = session();
-        $userId = $session->get('user_id'); // 👈 Lấy user_id từ session
+        $userId = $session->get('user_id');
 
         $productModel = new ProductModel();
         $attributeModel = new ProductAttributeModel();
@@ -172,13 +205,22 @@ class ProductController extends ResourceController
             return $this->failForbidden('Bạn không có quyền sửa sản phẩm này');
         }
 
-        // Validate dữ liệu đầu vào
+        // ✅ Trường hợp chỉ cập nhật ảnh (images) => bỏ qua validate
+        if (isset($data['images']) && count($data) === 1) {
+            $productModel->update($id, [
+                'images' => is_array($data['images']) ? json_encode($data['images']) : $data['images'],
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+            return $this->respond(['message' => 'Cập nhật ảnh sản phẩm thành công']);
+        }
+
+        // ✅ Trường hợp cập nhật đầy đủ => cần validate
         $validationResult = $this->validateProduct($data);
         if ($validationResult !== true) {
             return $validationResult;
         }
 
-        // Chuẩn bị dữ liệu cập nhật
+        // ✅ Chuẩn bị dữ liệu cập nhật
         $productData = [
             'sku' => $data['sku'] ?? null,
             'name' => $data['name'] ?? null,
@@ -193,25 +235,30 @@ class ProductController extends ResourceController
             'updated_at' => date('Y-m-d H:i:s'),
         ];
 
-        // Encode các field mảng thành JSON string
-        $arrayFields = ['avatar', 'image', 'video', 'certificate_file', 'attributes'];
-        foreach ($arrayFields as $field) {
-            $productData[$field] = json_encode($data[$field] ?? []);
+        // ✅ Các field dạng JSON
+        $jsonFields = ['avatar', 'images', 'video', 'certificate_file', 'attributes', 'display_settings'];
+        foreach ($jsonFields as $field) {
+            if (isset($data[$field])) {
+                $value = $data[$field];
+                $productData[$field] = is_string($value) ? $value : json_encode($value);
+            } else {
+                $productData[$field] = json_encode([]);
+            }
         }
 
+        // ✅ display_settings nếu có
         if (!empty($data['display_settings'])) {
-            $productData['display_settings'] = is_array($data['display_settings'])
-                ? json_encode($data['display_settings'])
-                : $data['display_settings'];
+            $productData['display_settings'] = is_string($data['display_settings'])
+                ? $data['display_settings']
+                : json_encode($data['display_settings']);
         }
 
-        // Cập nhật sản phẩm
+        // ✅ Cập nhật sản phẩm
         $productModel->update($id, $productData);
 
-        // Cập nhật thuộc tính sản phẩm
+        // ✅ Cập nhật thuộc tính
         if (!empty($data['attributes']) && is_array($data['attributes'])) {
             $attributeModel->where('product_id', $id)->delete();
-
             foreach ($data['attributes'] as $attribute) {
                 if (!empty($attribute['name']) && !empty($attribute['value'])) {
                     $attributeModel->insert([
@@ -227,6 +274,7 @@ class ProductController extends ResourceController
 
         return $this->respond(['message' => 'Cập nhật sản phẩm thành công']);
     }
+
 
 
     public function toggleStatus($id = null)
@@ -295,43 +343,63 @@ class ProductController extends ResourceController
             ->setBody($data);
     }
 
-    public function import()
+    public function import(): ResponseInterface
     {
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            return $this->failUnauthorized('Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.');
+        }
+
         $file = $this->request->getFile('file');
-
-        if (!$file->isValid()) {
-            return $this->fail('Invalid file upload.');
+        if (!$file || !$file->isValid()) {
+            return $this->fail('File không hợp lệ.');
         }
 
-        $data = json_decode(file_get_contents($file->getTempName()), true);
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->fail('Invalid JSON format.');
-        }
+            // Bỏ dòng tiêu đề
+            array_shift($sheet);
 
-        $productModel = new ProductModel();
-        $attributeModel = new ProductAttributeModel();
+            $productModel = new \App\Models\ProductModel();
 
-        foreach ($data as $item) {
-            // Insert product
-            $productData = $item;
-            unset($productData['attributes']);
-            $productId = $productModel->insert($productData);
+            foreach ($sheet as $row) {
+                $productData = [
+                    'sku' => trim($row['A']),
+                    'name' => trim($row['B']),
+                    'price_mode' => $row['C'] ?? 'single',
+                    'price' => $row['D'] ?? 0,
+                    'price_from' => $row['E'] ?? null,
+                    'price_to' => $row['F'] ?? null,
+                    'category_id' => $row['G'] ?? null,
+                    'description' => $row['H'] ?? '',
+                    'show_contact_price' => $row['I'] === '1' ? 1 : 0,
+                    'status' => $row['J'] === '1' ? 1 : 0,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'user_id' => $userId,
+                    'images' => $this->safeJson($row['L'] ?? ''),
+                    'attributes' => $this->safeJson($row['K'] ?? ''),
+                ];
 
-            // Insert attributes
-            if (!empty($item['attributes'])) {
-                foreach ($item['attributes'] as $attribute) {
-                    $attributeModel->insert([
-                        'product_id' => $productId,
-                        'name' => $attribute['name'],
-                        'value' => $attribute['value'],
-                    ]);
-                }
+                $productModel->insert($productData);
             }
-        }
 
-        return $this->respond(['message' => 'Products imported successfully']);
+            return $this->respond(['message' => 'Import thành công']);
+        } catch (\Throwable $e) {
+            return $this->fail('Lỗi khi đọc file Excel: ' . $e->getMessage());
+        }
     }
+
+// 👇 Hàm phụ trợ dùng trong import
+    private function safeJson($cell): bool|string
+    {
+        $raw = trim((string) $cell, "\"");
+        $json = json_decode($raw, true);
+        return is_array($json) ? json_encode($json) : json_encode([]);
+    }
+
 
     public function exportExcel()
     {

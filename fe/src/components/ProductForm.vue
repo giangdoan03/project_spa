@@ -6,54 +6,21 @@
                 <a-form :model="form" layout="vertical" @finish="handleSubmit">
                     <a-card title="Chọn giao diện mẫu" style="margin-bottom: 24px;">
                         <!-- Ảnh đại diện -->
-                        <a-form-item label="Ảnh đại diện của sản phẩm">
-                            <a-upload
-                                    list-type="picture-card"
-                                    :file-list="avatarFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('avatar', file)"
-                                    :before-upload="(file) => handleBeforeUploadSingle('avatar', file)"
-                                    :max-count="1"
-                            >
-                                <div v-if="avatarFileList.length === 0">
-                                    <upload-outlined/>
-                                    <div style="margin-top: 8px">Ảnh</div>
-                                </div>
-                            </a-upload>
-                        </a-form-item>
-
-                        <!-- Ảnh sản phẩm -->
                         <a-form-item label="Ảnh sản phẩm">
-                            <a-upload
-                                    list-type="picture-card"
-                                    :file-list="imageFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('image', file)"
-                                    :before-upload="(file) => handleBeforeUploadMultiple('image', file)"
-                                    multiple
-                            >
-                                <div>
-                                    <upload-outlined/>
-                                    <div style="margin-top: 8px">Upload</div>
-                                </div>
-                            </a-upload>
+                            <ImageUploader
+                                type="image"
+                                :modelValue="form.images"
+                                @update:modelValue="val => form.images = val"
+                                @set-cover="handleSetMainImage"
+                            />
                         </a-form-item>
-
                         <!-- Video sản phẩm -->
                         <a-form-item label="Video giới thiệu sản phẩm">
-                            <a-upload
-                                    list-type="picture-card"
-                                    :file-list="videoFileList"
-                                    :on-preview="handlePreview"
-                                    :on-remove="(file) => handleRemoveFile('video', file)"
-                                    :before-upload="(file) => handleBeforeUploadMultiple('video', file)"
-                                    multiple
-                            >
-                                <div>
-                                    <upload-outlined/>
-                                    <div style="margin-top: 8px">Upload</div>
-                                </div>
-                            </a-upload>
+                            <ImageUploader
+                                type="video"
+                                :modelValue="normalizeToArray(form.video)"
+                                @update:modelValue="val => form.video = val"
+                            />
                         </a-form-item>
 
                         <!-- Chứng chỉ -->
@@ -357,6 +324,8 @@
     import Quill from 'quill'
     import 'quill/dist/quill.snow.css'
     import {parseFieldsForList} from '@/utils/formUtils'
+    import ImageUploader from "@/components/ImageUploader.vue";
+    import {updateEvent} from "@/api/event.js";
 
     const editorRef = ref(null)
     const quillInstance = ref(null)
@@ -377,7 +346,7 @@
         price_to: null,
         show_contact_price: false,
         avatar: [],
-        image: [],
+        images: [],
         video: [],
         certificate_file: [],
         description: '',
@@ -434,13 +403,76 @@
 
 
     const parseAvatar = (avatar) => {
+        if (!avatar) return null
+
+        if (Array.isArray(avatar)) return avatar[0] || null
+
+        if (typeof avatar === 'string') {
+            try {
+                const parsed = JSON.parse(avatar)
+                if (Array.isArray(parsed)) return parsed[0] || null
+                return avatar // nếu không phải array thì trả về nguyên chuỗi
+            } catch {
+                return avatar // fallback: dùng nguyên chuỗi
+            }
+        }
+
+        return null
+    }
+
+
+    const handleSetMainImage = async (image) => {
         try {
-            const parsed = JSON.parse(avatar)
-            return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : ''
-        } catch {
-            return ''
+            const eventId = route.params.id
+
+            // Tạo bản sao images và cập nhật is_main
+            const updatedImages = form.value.images.map(img => ({
+                ...img,
+                is_main: img.url === image.url
+            }))
+
+            // Gọi API cập nhật CHỈ trường images
+            await updateProduct(eventId, {
+                images: JSON.stringify(updatedImages)
+            })
+
+            // Cập nhật lại vào form để đồng bộ UI
+            form.value.images = updatedImages
+
+            message.success('Đã cập nhật ảnh chính thành công')
+        } catch (err) {
+            console.error(err)
+            message.error('Không thể cập nhật ảnh chính')
         }
     }
+
+    const validateImages = () => {
+        if (!form.value.images || form.value.images.length === 0) {
+            message.error('Bạn cần thêm ít nhất 1 ảnh cho sự kiện')
+            return false
+        }
+
+        if (!form.value.banner || form.value.banner === '') {
+            message.error('Bạn cần chọn ảnh bìa cho sự kiện')
+            return false
+        }
+
+        return true
+    }
+
+    const normalizeToArray = (val) => {
+        if (Array.isArray(val)) return val
+        if (typeof val === 'string' && val !== '') {
+            return [{
+                url: val,
+                preview: val,
+                uid: Date.now().toString(),
+                isCover: true
+            }]
+        }
+        return []
+    }
+
 
     // Gọi API sản phẩm
     const fetchAllProducts = async () => {
@@ -654,32 +686,52 @@
                 settings.value = {...settings.value, ...data.display_settings}
             }
 
-            const fields = ['avatar', 'image', 'video', 'certificate_file']
+            const fields = ['avatar', 'images', 'video', 'certificate_file']
             fields.forEach(field => {
-                const fileUrls = form.value[field] || []
-                fileUrls.forEach(url => updateFileList(field, url))
+                let value = form.value[field]
+                if (typeof value === 'string') {
+                    try {
+                        value = JSON.parse(value)
+                    } catch (e) {
+                        value = []
+                    }
+                }
+
+                form.value[field] = value  // cập nhật lại thành mảng
+                value.forEach(file => updateFileList(field, file))
             })
         } catch (error) {
             message.error('Không tìm thấy sản phẩm')
+            console.error('❌ Lỗi khi fetch sản phẩm:', error)
         }
     }
 
 
-    const updateFileList = (field, url) => {
+    const updateFileList = (field, fileData) => {
+        const url = typeof fileData === 'string' ? fileData : fileData.url
+
+        if (!url || typeof url !== 'string') {
+            console.warn(`⚠️ Không thể xử lý file cho trường "${field}":`, fileData)
+            return
+        }
+
         const file = {
             uid: Date.now() + Math.random(),
             name: url.split('/').pop(),
             status: 'done',
             url,
         }
+
         const lists = {
             avatar: avatarFileList,
             image: imageFileList,
             video: videoFileList,
             certificate_file: certificateFileList,
         }
+
         lists[field]?.value.push(file)
     }
+
 
     const handleBeforeUploadSingle = async (field, file) => {
         const hide = message.loading('Đang tải lên...', 0)
@@ -770,7 +822,7 @@
     }
 
     const handleSubmit = async () => {
-        if (!form.value.image.length) {
+        if (!form.value.images.length) {
             message.error('Vui lòng upload ít nhất 1 ảnh sản phẩm!')
             return
         }
@@ -810,6 +862,8 @@
             ...form.value,
             display_settings: JSON.stringify(settings.value)
         }
+
+        delete payload.image
 
         loading.value = true
         try {

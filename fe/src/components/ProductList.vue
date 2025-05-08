@@ -4,6 +4,8 @@
             <a-input v-model:value="search" placeholder="Tìm kiếm sản phẩm..." @pressEnter="fetchProducts" />
             <a-button type="primary" @click="fetchProducts">Tìm kiếm</a-button>
             <a-button type="primary" @click="goToCreate">Thêm sản phẩm</a-button>
+            <a-button type="primary" @click="openImportModal">Import sản phẩm</a-button>
+
         </a-space>
 
         <a-table
@@ -17,8 +19,8 @@
             <template #bodyCell="{ column, record }">
                 <!-- Cột ảnh đại diện -->
                 <template v-if="column.key === 'avatar'">
-                    <img v-if="getAvatarUrl(record.avatar)"
-                         :src="getAvatarUrl(record.avatar)"
+                    <img v-if="getAvatarUrl(record.images)"
+                         :src="getAvatarUrl(record.images)"
                          alt="Avatar"
                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
                 </template>
@@ -44,13 +46,45 @@
             </template>
 
         </a-table>
+
+        <a-modal
+            v-model:open="importVisible"
+            title="Import sản phẩm từ Excel"
+            :confirm-loading="importing"
+            ok-text="Import"
+            cancel-text="Hủy"
+            @ok="handleImport"
+        >
+            <!-- Bọc cả upload và nút tải file mẫu vào cùng một hàng -->
+            <a-space class="mb-2">
+                <a-upload
+                    :beforeUpload="beforeUpload"
+                    :file-list="importFileList"
+                    @remove="handleRemove"
+                    accept=".xlsx"
+                >
+                    <a-button>Chọn file Excel (.xlsx)</a-button>
+                </a-upload>
+
+                <a-button type="link" @click="downloadSample">
+                    📥 Tải file mẫu Excel
+                </a-button>
+            </a-space>
+
+            <div v-if="importFileList.length" class="mt-2">
+                Đã chọn: {{ importFileList[0]?.name }}
+            </div>
+        </a-modal>
+
+
+
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import {getProducts, deleteProduct as apiDeleteProduct, updateProduct, updateProductStatus } from '../api/product'
+import {getProducts, deleteProduct as apiDeleteProduct, updateProduct, updateProductStatus, importProducts } from '../api/product'
 import { message } from 'ant-design-vue'
 
 // Router
@@ -128,19 +162,36 @@ const fetchProducts = async () => {
 }
 
 
-const getAvatarUrl = (avatar) => {
-    if (!avatar) return null
-    try {
-        const parsed = JSON.parse(avatar)
-        if (Array.isArray(parsed) && parsed.length) {
-            return parsed[0]
-        } else if (typeof parsed === 'string') {
-            return parsed
-        }
-    } catch {
-        // Nếu không phải JSON, trả về trực tiếp
-        return avatar.replace(/(^"|"$)/g, '') // Loại bỏ dấu nháy nếu có
+const getAvatarUrl = (images) => {
+    if (!images) return null
+
+    let list = []
+
+    // Nếu là mảng
+    if (Array.isArray(images)) {
+        list = images
     }
+    // Nếu là chuỗi JSON
+    else if (typeof images === 'string') {
+        try {
+            const parsed = JSON.parse(images)
+            if (Array.isArray(parsed)) {
+                list = parsed
+            }
+        } catch {
+            return null
+        }
+    }
+
+    // Tìm ảnh có isCover: true
+    const coverImage = list.find(img => img?.isCover === true)
+    if (coverImage?.url) return coverImage.url
+
+    // Không có isCover → lấy ảnh đầu tiên nếu có
+    if (list.length > 0) {
+        return list[0]?.url || (typeof list[0] === 'string' ? list[0] : null)
+    }
+
     return null
 }
 
@@ -206,7 +257,52 @@ const toggleStatus = async (record, checked) => {
     }
 }
 
+const importVisible = ref(false)
+const importing = ref(false)
+const importFileList = ref([])
 
+// Mở modal
+const openImportModal = () => {
+    importVisible.value = true
+}
+
+// Chọn file
+const beforeUpload = (file) => {
+    importFileList.value = [file]
+    return false // Ngăn auto upload
+}
+
+const handleRemove = () => {
+    importFileList.value = []
+}
+
+// Gửi file lên server
+const handleImport = async () => {
+    if (!importFileList.value.length) {
+        return message.warning('Vui lòng chọn file Excel')
+    }
+
+    const formData = new FormData()
+    formData.append('file', importFileList.value[0])
+
+    importing.value = true
+    try {
+        const response = await importProducts(formData)
+        message.success('Import thành công 🎉')
+        importVisible.value = false
+        importFileList.value = []
+        await fetchProducts()
+    } catch (e) {
+        console.error(e)
+        message.error(e?.response?.data?.messages?.error || 'Lỗi import')
+    } finally {
+        importing.value = false
+    }
+}
+
+const downloadSample = () => {
+    window.open('http://assets.giang.test/image//import_sample.xlsx', '_blank')
+}
 
 // Init
 onMounted(fetchProducts)

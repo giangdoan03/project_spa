@@ -19,3 +19,6 @@ export const uploadFile = (file) => {
     formData.append('file', file)
     return api.post('/upload', formData)
 }
+
+export const importProducts = (formData) => api.post('/products/import', formData)
+

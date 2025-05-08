@@ -40,23 +40,61 @@ const filterOption = (input, option) => {
     return option.label.toLowerCase().includes(input.toLowerCase())
 }
 
+
+const getCoverImageFromImages = (images) => {
+    let list = []
+
+    if (Array.isArray(images)) {
+        list = images
+    } else if (typeof images === 'string') {
+        try {
+            const parsed = JSON.parse(images)
+            if (Array.isArray(parsed)) list = parsed
+        } catch {
+            return null
+        }
+    }
+
+    const cover = list.find(img => img?.isCover === true)
+    return cover?.url || (list[0]?.url || (typeof list[0] === 'string' ? list[0] : null)) || null
+}
+
+
 // Tải sản phẩm từ API
+const parseAvatar = (avatar) => {
+    if (!avatar) return null
+
+    if (Array.isArray(avatar)) return avatar[0] || null
+
+    if (typeof avatar === 'string') {
+        try {
+            const parsed = JSON.parse(avatar)
+            if (Array.isArray(parsed)) return parsed[0] || null
+            return avatar // fallback nếu là chuỗi ảnh đơn
+        } catch {
+            return avatar // fallback nếu parse lỗi
+        }
+    }
+
+    return null
+}
+
 const fetchProducts = async () => {
     try {
         const res = await getProducts({ per_page: 1000 })
-        productOptions.value = (res.data?.data || [])
-            // .filter(product => Number(product.status) === 1) // 👉 Chỉ lấy sản phẩm đã kích hoạt
-            .map(product => ({
-                label: product.name,
-                value: Number(product.id),
-                avatar: JSON.parse(product.avatar || '[]')[0],
-                status: Number(product.status),
-                disabled: Number(product.status) !== 1, // 👈 disable option nếu chưa kích hoạt
-            }))
+        productOptions.value = (res.data?.data || []).map(product => ({
+            label: product.name,
+            value: Number(product.id),
+            avatar: getCoverImageFromImages(product.images),
+            status: Number(product.status),
+            disabled: Number(product.status) !== 1,
+        }))
+
     } catch (err) {
         console.error('Lỗi tải sản phẩm:', err)
     }
 }
+
 
 // Đảm bảo target_id luôn là số
 watch(() => form?.target_id, (val) => {

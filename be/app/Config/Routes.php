@@ -11,7 +11,7 @@ $routes->get('/logout', 'Auth::logout');
 
 $routes->group('api', function ($routes) {
     $routes->resource('products', ['controller' => 'ProductController']);
-    $routes->post('products-import', 'ProductController::import');
+    $routes->post('products/import', 'ProductController::import'); // ✅ dùng dấu /
     $routes->get('products-export-excel', 'ProductController::exportExcel');
     $routes->get('products-export-pdf', 'ProductController::exportPdf');
     $routes->post('products-restore/(:num)', 'ProductController::restore/$1');
