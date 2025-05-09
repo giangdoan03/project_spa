@@ -118,17 +118,17 @@
             }
 
             const { qr, target: product } = data;
-            const images = tryParseImages(product.image);
+            const images = Array.isArray(product.images) ? product.images.filter(url => isValidImage(url)) : [];
             const mainImage = images[0] || "";
 
             let avatar = "";
             try {
                 const rawAvatar = product.avatar;
-                const parsed = typeof rawAvatar === "string" ? JSON.parse(rawAvatar) : rawAvatar;
-                avatar = Array.isArray(parsed) ? cleanUrl(parsed[0]) : cleanUrl(parsed);
+                avatar = Array.isArray(rawAvatar) ? cleanUrl(rawAvatar[0]) : cleanUrl(rawAvatar);
             } catch {
                 avatar = "";
             }
+
 
             const attributes = safeParse(product.attributes, []);
             const settings = safeParse(safeParse(product.display_settings, "{}"), {});

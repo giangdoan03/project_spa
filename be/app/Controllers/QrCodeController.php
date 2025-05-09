@@ -166,11 +166,22 @@ class QrCodeController extends BaseController
         return $this->respond($data);
     }
 
+    // 👉 Thêm hàm helper này vào trong class
+    private function safeJsonDecode($value)
+    {
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+        }
+        return $value;
+    }
+
     public function detail(string $qr_id): ResponseInterface
     {
         $qr = $this->model->where('qr_id', $qr_id)->first();
 
-        // Nếu không tìm thấy QR, trả về dữ liệu rỗng kèm thông báo
         if (!$qr) {
             return $this->respond([
                 'qr' => null,
@@ -192,12 +203,22 @@ class QrCodeController extends BaseController
                 break;
         }
 
+        if ($target) {
+            $fieldsToDecode = ['image', 'images', 'avatar', 'video', 'certificate_file', 'display_settings', 'attributes'];
+            foreach ($fieldsToDecode as $field) {
+                if (isset($target[$field])) {
+                    $target[$field] = $this->safeJsonDecode($target[$field]);
+                }
+            }
+        }
+
         return $this->respond([
             'qr' => $qr,
             'target' => $target,
             'message' => 'Thành công'
         ]);
     }
+
 
     public function track(): ResponseInterface
     {
