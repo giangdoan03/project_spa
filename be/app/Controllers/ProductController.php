@@ -19,7 +19,7 @@ class ProductController extends ResourceController
 
     use AuthTrait; // 👈 Dùng trait
 
-    private function validateProduct($data)
+    private function validateProduct($data): ResponseInterface|bool
     {
         $rules = [
             'name' => 'required|min_length[3]',
@@ -140,6 +140,7 @@ class ProductController extends ResourceController
             'show_contact_price' => !empty($data['show_contact_price']) ? 1 : 0,
             'description' => $data['description'] ?? null,
             'status' => !empty($data['status']) ? 1 : 0,
+            'contact_phone' => $data['contact_phone'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
             'display_settings' => json_encode($data['display_settings'] ?? []),
@@ -230,6 +231,7 @@ class ProductController extends ResourceController
             'price_from' => $data['price_from'] ?? null,
             'price_to' => $data['price_to'] ?? null,
             'show_contact_price' => !empty($data['show_contact_price']) ? 1 : 0,
+            'contact_phone' => $data['contact_phone'] ?? null,
             'description' => $data['description'] ?? null,
             'status' => !empty($data['status']) ? 1 : 0,
             'updated_at' => date('Y-m-d H:i:s'),
@@ -356,13 +358,13 @@ class ProductController extends ResourceController
         }
 
         try {
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+            $spreadsheet = IOFactory::load($file->getTempName());
             $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
             // Bỏ dòng tiêu đề
             array_shift($sheet);
 
-            $productModel = new \App\Models\ProductModel();
+            $productModel = new ProductModel();
 
             foreach ($sheet as $row) {
                 $productData = [
@@ -381,6 +383,7 @@ class ProductController extends ResourceController
                     'user_id' => $userId,
                     'images' => $this->safeJson($row['L'] ?? ''),
                     'attributes' => $this->safeJson($row['K'] ?? ''),
+                    'contact_phone' => $row['M'] ?? 0,
                 ];
 
                 $productModel->insert($productData);

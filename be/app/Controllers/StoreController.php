@@ -17,8 +17,8 @@ class StoreController extends ResourceController
     public function index()
     {
         $userId = $this->getUserId();
-        $perPage = $this->request->getGet('per_page') ?? 10;
-        $page = $this->request->getGet('page') ?? 1;
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+        $page = (int) ($this->request->getGet('page') ?? 1);
         $search = $this->request->getGet('search');
 
         $builder = $this->model->where('user_id', $userId);
@@ -30,6 +30,17 @@ class StoreController extends ResourceController
         $data = $builder->paginate($perPage, 'default', $page);
         $pager = $this->model->pager;
 
+        // Decode các trường JSON và xử lý HTML
+        foreach ($data as &$item) {
+            // Decode các trường nếu có
+            $item['product_ids'] = json_decode($item['product_ids'] ?? '[]', true) ?? [];
+            $item['display_settings'] = json_decode($item['display_settings'] ?? '{}', true) ?? [];
+
+            // Xoá HTML khỏi description để hiển thị ngắn gọn (nếu cần)
+            $item['short_description'] = strip_tags($item['description'] ?? '');
+        }
+        unset($item);
+
         return $this->respond([
             'data' => $data,
             'pager' => [
@@ -39,6 +50,7 @@ class StoreController extends ResourceController
             ]
         ]);
     }
+
 
     public function show($id = null)
     {

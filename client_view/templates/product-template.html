@@ -1,0 +1,59 @@
+{{#if images.length}}
+{{#if (gt images.length 1)}}
+<div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+        {{#each images}}
+        <div class="swiper-slide">
+            <img src="{{this}}" class="w-full object-contain" style="max-height: 100vh;" alt="slide" />
+        </div>
+        {{/each}}
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+{{else}}
+<img src="{{images.[0]}}" class="w-full object-contain" style="max-height: 100vh;" alt="Ảnh sản phẩm" />
+{{/if}}
+{{/if}}
+
+<div class="p-4 overflow-y-auto flex-1">
+    <h1 class="text-xl font-semibold">{{product.name}}</h1>
+    <p class="text-green-700 font-bold text-lg mt-1">{{price}}</p>
+
+    {{#each attributes}}
+    <div class="inline-flex items-center mt-2 text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-full px-3 py-1 mr-2 mb-2 shadow-sm">
+        <span class="font-medium">{{this.name}}</span>:&nbsp;<span>{{this.value}}</span>
+    </div>
+    {{/each}}
+
+    <div class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md font-semibold">Thông tin</div>
+    <div class="mt-4">
+        <p class="font-medium">{{product.name}}</p>
+        <p class="text-sm text-gray-600">{{{product.description}}}</p>
+        {{#if product.contact_phone}}
+        <p class="text-sm text-gray-600 mt-2">📞 {{product.contact_phone}}</p>
+        {{/if}}
+    </div>
+
+    {{#if productLinks.length}}
+    <div class="mt-4 flex flex-wrap gap-2">
+        {{#each productLinks}}
+        <a href="{{this.url}}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+            {{this.platform}}
+        </a>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-4 py-3 flex justify-center gap-4 z-50">
+        <a href="https://shopee.vn" target="_blank"
+           class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200">
+            🛒 Đặt hàng
+        </a>
+        {{#if product.contact_phone}}
+        <a href="tel:{{product.contact_phone}}"
+           class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200">
+            📞 Liên hệ
+        </a>
+        {{/if}}
+    </div>
+</div>

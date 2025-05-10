@@ -13,7 +13,7 @@ class ProductModel extends Model
     protected $deletedField = 'deleted_at';
     protected $allowedFields = [
         'user_id', 'sku', 'name', 'category_id', 'price', 'price_from', 'price_to','price_mode',
-        'show_contact_price', 'avatar', 'images', 'video', 'certificate_file',
+        'show_contact_price','contact_phone', 'avatar', 'images', 'video', 'certificate_file',
         'description', 'attributes', 'status', 'created_at', 'updated_at', 'display_settings','product_links'
     ];
 

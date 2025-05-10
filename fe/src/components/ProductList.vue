@@ -1,7 +1,14 @@
 <template>
     <div>
         <a-space style="margin-bottom: 16px;">
-            <a-input v-model:value="search" placeholder="Tìm kiếm sản phẩm..." @pressEnter="fetchProducts" />
+            <a-input
+                v-model:value="search"
+                placeholder="Tìm kiếm sản phẩm..."
+                allow-clear
+                @pressEnter="handleSearch"
+                @change="onSearchChange"
+            />
+
             <a-button type="primary" @click="fetchProducts">Tìm kiếm</a-button>
             <a-button type="primary" @click="goToCreate">Thêm sản phẩm</a-button>
             <a-button type="primary" @click="openImportModal">Import sản phẩm</a-button>
@@ -82,21 +89,168 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import {getProducts, deleteProduct as apiDeleteProduct, updateProduct, updateProductStatus, importProducts } from '../api/product'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getProducts, deleteProduct as apiDeleteProduct, updateProductStatus, importProducts } from '../api/product'
 import { message } from 'ant-design-vue'
 
-// Router
 const router = useRouter()
+const route = useRoute()
 
-// State
 const products = ref([])
 const loading = ref(false)
-const search = ref('')
-const pagination = ref({ current: 1, pageSize: 10, total: 0 })
+const search = ref(route.query.search || '')
 
-// Columns table
+const currentPage = ref(parseInt(route.query.page) || 1)
+const pageSize = ref(10)
+const totalItems = ref(0)
+
+const pagination = computed(() => ({
+    current: currentPage.value,
+    pageSize: pageSize.value,
+    total: totalItems.value,
+}))
+
+const fetchProducts = async () => {
+    loading.value = true
+    try {
+        const response = await getProducts({
+            page: currentPage.value,
+            per_page: pageSize.value,
+            search: search.value,
+        })
+
+        const result = response.data?.data || []
+        products.value = result.filter(p => p && p.name)
+        totalItems.value = response.data?.pager?.total || 0
+    } catch (error) {
+        message.error('Lỗi tải sản phẩm')
+        console.error('Fetch Error:', error)
+    } finally {
+        loading.value = false
+    }
+}
+
+const handleSearch = () => {
+    currentPage.value = 1
+    const query = { page: 1 }
+    if (search.value.trim()) {
+        query.search = search.value.trim()
+    }
+
+    router.replace({
+        path: '/products',
+        query
+    })
+
+    fetchProducts()
+}
+
+const handleTableChange = (paginationParam) => {
+    currentPage.value = paginationParam.current
+    pageSize.value = paginationParam.pageSize
+
+    router.replace({
+        path: '/products',
+        query: {
+            page: currentPage.value,
+            search: search.value || ''
+        }
+    })
+
+    fetchProducts()
+}
+
+const goToCreate = () => {
+    router.push({
+        path: '/products/create',
+        query: { page: currentPage.value }
+    })
+}
+
+const goToEdit = (id) => {
+    router.push({
+        path: `/products/${id}/edit`,
+        query: { page: currentPage.value }
+    })
+}
+
+const deleteProduct = async (id) => {
+    try {
+        await apiDeleteProduct(id)
+        message.success('Đã xoá sản phẩm')
+        await fetchProducts()
+    } catch (error) {
+        message.error('Lỗi xoá sản phẩm')
+    }
+}
+
+const onSearchChange = () => {
+    if (!search.value.trim()) {
+        handleSearch()
+    }
+}
+
+const getAvatarUrl = (images) => {
+    if (!images) return null
+
+    let list = []
+
+    if (Array.isArray(images)) {
+        list = images
+    } else if (typeof images === 'string') {
+        try {
+            const parsed = JSON.parse(images)
+            if (Array.isArray(parsed)) {
+                list = parsed
+            }
+        } catch {
+            return null
+        }
+    }
+
+    const coverImage = list.find(img => img?.isCover === true)
+    if (coverImage?.url) return coverImage.url
+
+    if (list.length > 0) {
+        return list[0]?.url || (typeof list[0] === 'string' ? list[0] : null)
+    }
+
+    return null
+}
+
+const toggleStatus = async (record, checked) => {
+    try {
+        await updateProductStatus(record.id, { status: checked ? 1 : 0 })
+        record.status = checked ? 1 : 0
+        message.success(`Đã ${checked ? 'bật' : 'tắt'} sản phẩm`)
+    } catch (e) {
+        message.error('Không thể cập nhật trạng thái')
+    }
+}
+
+const formatCurrency = (value) => {
+    if (!value) return ''
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(value)
+}
+
+const formatDate = (value) => {
+    if (!value) return ''
+    const date = new Date(value)
+    return date.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    })
+}
+
 const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Ảnh đại diện', dataIndex: 'avatar', key: 'avatar' },
@@ -130,153 +284,24 @@ const columns = [
     { title: 'Hành động', key: 'action' }
 ]
 
-
-
-
-// Fetch data
-const fetchProducts = async () => {
-    loading.value = true
-    try {
-        const response = await getProducts({
-            page: pagination.value.current,
-            per_page: pagination.value.pageSize,
-            search: search.value,
-        })
-
-        const result = response.data?.data || []
-
-        result.forEach((p, i) => {
-            if (!p) console.warn(`Null product at index ${i}`)
-            if (!p?.price) console.warn(`Missing price at index ${i}`, p)
-        })
-
-        products.value = result.filter(p => p && p.name)
-
-        pagination.value.total = response.data?.pager?.total || 0
-    } catch (error) {
-        message.error('Lỗi tải sản phẩm')
-        console.error('Fetch Error:', error)
-    } finally {
-        loading.value = false
-    }
-}
-
-
-const getAvatarUrl = (images) => {
-    if (!images) return null
-
-    let list = []
-
-    // Nếu là mảng
-    if (Array.isArray(images)) {
-        list = images
-    }
-    // Nếu là chuỗi JSON
-    else if (typeof images === 'string') {
-        try {
-            const parsed = JSON.parse(images)
-            if (Array.isArray(parsed)) {
-                list = parsed
-            }
-        } catch {
-            return null
-        }
-    }
-
-    // Tìm ảnh có isCover: true
-    const coverImage = list.find(img => img?.isCover === true)
-    if (coverImage?.url) return coverImage.url
-
-    // Không có isCover → lấy ảnh đầu tiên nếu có
-    if (list.length > 0) {
-        return list[0]?.url || (typeof list[0] === 'string' ? list[0] : null)
-    }
-
-    return null
-}
-
-// Table change
-const handleTableChange = (paginationParam) => {
-    pagination.value.current = paginationParam.current
-    pagination.value.pageSize = paginationParam.pageSize
-    fetchProducts()
-}
-
-// Router actions
-const goToCreate = () => router.push('/products/create')
-const goToEdit = (id) => router.push(`/products/${id}/edit`)
-
-// Delete
-const deleteProduct = async (id) => {
-    try {
-        await apiDeleteProduct(id)
-        message.success('Đã xoá sản phẩm')
-        await fetchProducts()
-    } catch (error) {
-        message.error('Lỗi xoá sản phẩm')
-    }
-}
-
-// Parse JSON safely
-const parseJson = (value) => {
-    try {
-        return JSON.parse(value)
-    } catch {
-        return []
-    }
-}
-
-// Format tiền VND
-const formatCurrency = (value) => {
-    if (!value) return ''
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
-}
-
-// Format ngày giờ Việt Nam
-const formatDate = (value) => {
-    if (!value) return ''
-    const date = new Date(value)
-    return date.toLocaleString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-    })
-}
-
-const toggleStatus = async (record, checked) => {
-    try {
-        await updateProductStatus(record.id, { status: checked ? 1 : 0 })
-        record.status = checked ? 1 : 0
-        message.success(`Đã ${checked ? 'bật' : 'tắt'} sản phẩm`)
-    } catch (e) {
-        message.error('Không thể cập nhật trạng thái')
-    }
-}
-
+// IMPORT
 const importVisible = ref(false)
 const importing = ref(false)
 const importFileList = ref([])
 
-// Mở modal
 const openImportModal = () => {
     importVisible.value = true
 }
 
-// Chọn file
 const beforeUpload = (file) => {
     importFileList.value = [file]
-    return false // Ngăn auto upload
+    return false
 }
 
 const handleRemove = () => {
     importFileList.value = []
 }
 
-// Gửi file lên server
 const handleImport = async () => {
     if (!importFileList.value.length) {
         return message.warning('Vui lòng chọn file Excel')
@@ -287,7 +312,7 @@ const handleImport = async () => {
 
     importing.value = true
     try {
-        const response = await importProducts(formData)
+        await importProducts(formData)
         message.success('Import thành công 🎉')
         importVisible.value = false
         importFileList.value = []
@@ -304,6 +329,9 @@ const downloadSample = () => {
     window.open('http://assets.giang.test/image//import_sample.xlsx', '_blank')
 }
 
-// Init
-onMounted(fetchProducts)
+// INIT
+onMounted(() => {
+    fetchProducts()
+})
 </script>
+

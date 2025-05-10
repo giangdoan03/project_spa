@@ -1,6 +1,6 @@
 <template>
     <div class="content_box">
-        <a-button type="link" @click="router.back()" style="padding-left: 0; margin-bottom: 24px; color: #000000">
+        <a-button type="link" @click="router.push('/my-qr-codes')" style="padding-left: 0; margin-bottom: 24px; color: #000000">
             <template #icon><ArrowLeftOutlined /></template>
             Quay lại danh sách
         </a-button>
@@ -44,9 +44,22 @@
                                     <a-form-item label="Khoảng cách viền (margin)">
                                         <a-input-number v-model:value="form.settings.margin" :min="0" style="width: 100%;"/>
                                     </a-form-item>
-                                    <a-form-item label="Logo URL (tuỳ chọn)">
-                                        <a-input v-model:value="form.settings.image" placeholder="https://logo.png"/>
+                                    <a-form-item label="Logo QR (tuỳ chọn)">
+                                        <a-upload
+                                            list-type="picture-card"
+                                            :file-list="logoFile ? [logoFile] : []"
+                                            :on-preview="handlePreview"
+                                            :on-remove="handleRemoveFile"
+                                            :before-upload="(file) => handleBeforeUploadSingle('logo', file)"
+                                            :max-count="1"
+                                        >
+                                            <div v-if="!logoFile">
+                                                <plus-outlined />
+                                                <div style="margin-top: 8px">Tải logo</div>
+                                            </div>
+                                        </a-upload>
                                     </a-form-item>
+
                                 </a-tab-pane>
 
                                 <a-tab-pane key="dots" tab="Dots">
@@ -135,6 +148,13 @@
                             </div>
                             <a-button class="btn_save_qr_code" type="primary" block @click="handleSubmit" style="max-width: 334px;">Tạo và lưu QR
                             </a-button>
+                            <div class="flex items-center justify-center gap-2 mt-4 btn_download">
+                                <a-select v-model:value="downloadFormat" style="width: 100px; margin-right: 10px">
+                                    <a-select-option value="png">PNG</a-select-option>
+                                    <a-select-option value="jpeg">JPEG</a-select-option>
+                                </a-select>
+                                <a-button @click="downloadQRCode" type="default">Download</a-button>
+                            </div>
                         </a-card>
                     </a-col>
                 </a-row>
@@ -151,14 +171,16 @@ const route = useRoute()
 import QRCodeStyling from 'qr-code-styling'
 import { h } from 'vue'
 import {createQR, updateQR, getQR } from '@/api/qrcode'
+import {uploadFile} from '../api/product'
 import {message} from 'ant-design-vue'
 const isEditMode = computed(() => !!route.params.qr_id)
+const downloadFormat = ref('png')
 
 import {
     LinkOutlined, FontSizeOutlined, MessageOutlined, ContactsOutlined, CalendarOutlined,
     PhoneOutlined, MailOutlined, EnvironmentOutlined, WifiOutlined, AppstoreAddOutlined,
     AppstoreOutlined, PictureOutlined, FilePdfOutlined, AudioOutlined, PlayCircleOutlined,
-    ShopOutlined, ShoppingOutlined, UserOutlined, ApartmentOutlined, FlagOutlined, ArrowLeftOutlined
+    ShopOutlined, ShoppingOutlined, UserOutlined, ApartmentOutlined, FlagOutlined, ArrowLeftOutlined, PlusOutlined
 } from '@ant-design/icons-vue'
 
 // Giả sử các form đã import đúng ở đây:
@@ -166,9 +188,28 @@ import UrlForm from '@/components/forms/UrlForm.vue'
 import TextForm from '@/components/forms/TextForm.vue'
 import SmsForm from '@/components/forms/SmsForm.vue'
 import ProductForm from '@/components/forms/ProductForm.vue'
+import CompanyForm from '@/components/forms/CompanyForm.vue'
+import StoreForm from '@/components/forms/StoreForm.vue'
+import EventForm from '@/components/forms/EventForm.vue'
+import PersonForm from '@/components/forms/PersonForm.vue'
+import Persons from "@/components/templates/persons/index.js";
 
 
 const router = useRouter()
+
+
+const formMap = {
+    url: UrlForm,
+    text: TextForm,
+    sms: SmsForm,
+    product: ProductForm,
+    store: StoreForm,
+    event: EventForm,
+    person: PersonForm,
+    company: CompanyForm,
+    // thêm các form còn lại tại đây
+}
+
 
 const qrTypes = [
     { key: 'url', label: 'Liên kết/URL', icon: LinkOutlined, pro: false },
@@ -193,6 +234,44 @@ const qrTypes = [
     { key: 'event', label: 'Sự kiện', icon: FlagOutlined, pro: true },
 ]
 
+const logoFile = ref(null)
+
+const handleBeforeUploadSingle = async (field, file) => {
+    const { data } = await uploadFile(file)
+    form.value.settings.image = data.url
+    logoFile.value = {
+        uid: Date.now().toString(),
+        name: data.url.split('/').pop(),
+        status: 'done',
+        url: data.url
+    }
+    return false
+}
+
+
+const handleRemoveFile = () => {
+    form.value.settings.image = ''
+    logoFile.value = null
+}
+
+const previewImage = ref('')
+const previewVisible = ref(false)
+const previewTitle = ref('')
+
+const handlePreview = async (file) => {
+    previewImage.value = file.url || file.thumbUrl
+    previewVisible.value = true
+    previewTitle.value = file.name || ''
+}
+const downloadQRCode = () => {
+    if (qrCode) {
+        qrCode.download({
+            name: `qr_code_${Date.now()}`,
+            extension: downloadFormat.value
+        })
+    }
+}
+
 const selectedKey = ref('url')
 const selectItem = (key) => {
     selectedKey.value = key
@@ -203,16 +282,6 @@ const selectedLabel = computed(() => {
     const found = qrTypes.find(item => item.key === selectedKey.value)
     return found ? found.label : ''
 })
-
-const formMap = {
-    url: UrlForm,
-    text: TextForm,
-    sms: SmsForm,
-    product: ProductForm,
-    store: ProductForm,
-    event: ProductForm,
-    // thêm các form còn lại tại đây
-}
 
 const formComponent = computed(() => {
     return formMap[selectedKey.value] || null
@@ -264,23 +333,17 @@ watch(form, () => {
 
     const config = {
         ...form.value.settings,
-        data: `https://qrcode.io/${form.value.short_code}`
+        data: `https://qrcode.io/${form.value.qr_id}`
     }
 
     qrCode.update(config)
 }, { deep: true })
 
-onMounted(() => {
-    qrCode = new QRCodeStyling({
-        ...form.value.settings,
-        data: form.value.short_code
-            ? `https://qrcode.io/${form.value.short_code}`
-            : 'https://qrcode.io/placeholder'
-    })
-    qrCode.append(qrRef.value)
-})
 
 
+const generateUniqueQrId = () => {
+    return Math.random().toString(36).substring(2, 10)
+}
 
 const handleSubmit = async () => {
     if (!form.value.target_id || !selectedKey.value) {
@@ -288,37 +351,53 @@ const handleSubmit = async () => {
         return
     }
 
+    // Tạo qr_id nếu chưa có (chỉ khi tạo mới)
+    if (!isEditMode.value && !form.value.qr_id) {
+        form.value.qr_id = generateUniqueQrId()
+    }
+
     const payload = {
         ...form.value,
         target_type: selectedKey.value,
-        qr_url: `https://qr-code.io/${form.value.short_code || 'placeholder'}`,
+        qr_url: `http://qrcode.io/${form.value.qr_id || 'placeholder'}`,
         settings_json: JSON.stringify(form.value.settings)
     }
 
     try {
         if (isEditMode.value) {
+            // Cập nhật QR
             await updateQR(route.params.qr_id, payload)
             message.success('Cập nhật mã QR thành công!')
         } else {
+            // Tạo mới QR
             const res = await createQR(payload)
+
+            const createdQrId = res.data?.qr_id
+            const createdShortCode = res.data?.short_code
+
             message.success('Tạo mã QR thành công!')
 
-            // Cập nhật short_code và qr_id để gán lại QR preview
-            form.value.short_code = res.data?.short_code
-            form.value.qr_id = res.data?.qr_id
+            // Cập nhật lại vào form để đồng bộ preview
+            form.value.qr_id = createdQrId
+            form.value.short_code = createdShortCode
 
-            if (qrCode && form.value.short_code) {
+            // Cập nhật QR code preview
+            if (qrCode && createdShortCode) {
                 qrCode.update({
                     ...form.value.settings,
-                    data: `https://qr-code.io/${form.value.short_code}`
+                    data: `https://qrcode.io/${createdShortCode}`
                 })
             }
+
+            // 👉 Điều hướng sang màn edit
+            router.push(`/my-qr-codes/${createdQrId}/edit`)
         }
     } catch (err) {
         console.error('Lỗi:', err.response?.data || err.message)
         message.error(isEditMode.value ? 'Cập nhật thất bại!' : 'Tạo mã QR thất bại!')
     }
 }
+
 
 
 onMounted(async () => {
@@ -337,14 +416,34 @@ onMounted(async () => {
                         : (data.settings_json || form.value.settings)
                 }
 
-                // Gọi đúng hàm để set selectedKey và form.target_type
+                if (form.value.settings?.image) {
+                    logoFile.value = {
+                        uid: Date.now().toString(),
+                        name: form.value.settings.image.split('/').pop(),
+                        status: 'done',
+                        url: form.value.settings.image,
+                    }
+                }
+
                 selectItem(data.target_type || 'url')
             }
         } catch (err) {
             message.error('Không thể tải thông tin mã QR')
         }
+    } else {
+        // 👇 Tạo mã qr_id tạm để dùng cho preview QR
+        form.value.qr_id = generateUniqueQrId()
     }
+
+    // ✅ Init QR code sau khi đã có qr_id
+    qrCode = new QRCodeStyling({
+        ...form.value.settings,
+        data: `https://qrcode.io/${form.value.qr_id || 'placeholder'}`
+    })
+    qrCode.append(qrRef.value)
 })
+
+
 
 </script>
 
@@ -416,5 +515,9 @@ onMounted(async () => {
         border-radius: 5px;
         white-space: nowrap;
         font-weight: 700;
+    }
+
+    .btn_download {
+        margin-top: 24px;
     }
 </style>

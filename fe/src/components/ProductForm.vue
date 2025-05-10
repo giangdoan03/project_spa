@@ -80,7 +80,7 @@
 
                         <!-- Mô tả sản phẩm -->
                         <a-form-item label="Mô tả sản phẩm">
-                            <div ref="editorRef" style="min-height: 200px; border: 1px solid #ccc; padding: 8px;"/>
+                            <div ref="editorRef" style="min-height: 200px; padding: 8px;"/>
                         </a-form-item>
 
                         <!-- Thuộc tính sản phẩm -->
@@ -93,6 +93,13 @@
                             </div>
                             <a-button type="dashed" block @click="addAttribute">Thêm thuộc tính</a-button>
                         </a-form-item>
+
+                        <a-form-item label="Số điện thoại liên hệ">
+                            <div v-if="form.contact_phone">
+                                <a-input v-model:value="form.contact_phone" style="width: 12%" placeholder="Số điện thoại liên hệ"/>
+                            </div>
+                        </a-form-item>
+
 
                         <!-- Trạng thái -->
                         <!--                    <a-form-item label="Trạng thái">-->
@@ -352,7 +359,8 @@
         description: '',
         attributes: [],
         status: true,
-        productLinks: []
+        productLinks: [],
+        contact_phone: '',
     })
 
     const selectedProductIds = ref([])
@@ -444,20 +452,6 @@
             console.error(err)
             message.error('Không thể cập nhật ảnh chính')
         }
-    }
-
-    const validateImages = () => {
-        if (!form.value.images || form.value.images.length === 0) {
-            message.error('Bạn cần thêm ít nhất 1 ảnh cho sự kiện')
-            return false
-        }
-
-        if (!form.value.banner || form.value.banner === '') {
-            message.error('Bạn cần chọn ảnh bìa cho sự kiện')
-            return false
-        }
-
-        return true
     }
 
     const normalizeToArray = (val) => {
@@ -554,9 +548,6 @@
         }
     };
 
-
-
-
     // Gọi API cửa hàng
     const fetchAllStores = async () => {
         const res = await getStores({ per_page: 1000 });
@@ -634,6 +625,8 @@
 
     const isEditMode = computed(() => !!route.params.id)
 
+    const currentPage = ref(route.query.page || 1)
+
     const selectedTemplateData = computed(() =>
         templateOptions.find(t => t.id === settings.value.selectedTemplate)
     )
@@ -659,8 +652,12 @@
         }
     }
 
+
     const fetchProduct = async () => {
         try {
+            // Gán lại page hiện tại từ query (nếu có)
+            currentPage.value = parseInt(route.query.page) || 1
+
             const response = await getProduct(route.params.id)
             const data = normalizeProductData(response.data)
 
@@ -669,23 +666,23 @@
             form.value.price_mode = data.price_mode || 'single'  // fallback nếu null
             form.value.show_contact_price = data.show_contact_price === '1'
 
+            // Parse display_settings
             if (typeof data.display_settings === 'string') {
                 try {
                     const parsedSettings = JSON.parse(data.display_settings)
-                    settings.value = {...settings.value, ...parsedSettings}
+                    settings.value = { ...settings.value, ...parsedSettings }
 
-                    // Nếu không có productLinks, đảm bảo là mảng rỗng
                     if (!settings.value.productLinks) {
                         settings.value.productLinks = []
                     }
-
                 } catch (e) {
                     console.warn('display_settings không hợp lệ:', e)
                 }
             } else if (typeof data.display_settings === 'object') {
-                settings.value = {...settings.value, ...data.display_settings}
+                settings.value = { ...settings.value, ...data.display_settings }
             }
 
+            // Parse các trường dạng file
             const fields = ['avatar', 'images', 'video', 'certificate_file']
             fields.forEach(field => {
                 let value = form.value[field]
@@ -697,14 +694,16 @@
                     }
                 }
 
-                form.value[field] = value  // cập nhật lại thành mảng
+                form.value[field] = value
                 value.forEach(file => updateFileList(field, file))
             })
+
         } catch (error) {
             message.error('Không tìm thấy sản phẩm')
             console.error('❌ Lỗi khi fetch sản phẩm:', error)
         }
     }
+
 
 
     const updateFileList = (field, fileData) => {
@@ -731,24 +730,6 @@
 
         lists[field]?.value.push(file)
     }
-
-
-    const handleBeforeUploadSingle = async (field, file) => {
-        const hide = message.loading('Đang tải lên...', 0)
-        try {
-            const response = await uploadFile(file)
-            const url = response.data.url
-            form.value[field] = url // 👈 chỉ gán 1 URL duy nhất cho field
-            updateFileList(field, url)
-            message.success('Tải lên thành công!')
-        } catch (error) {
-            message.error('Tải lên thất bại!')
-        } finally {
-            hide()
-        }
-        return false
-    }
-
 
     const handleBeforeUploadMultiple = async (field, file) => {
         const hide = message.loading('Đang tải lên...', 0)
@@ -875,7 +856,10 @@
                 message.success('Thêm sản phẩm thành công 🎉')
                 resetForm()
             }
-            router.push('/products')
+            router.push({
+                path: '/products',
+                query: { page: currentPage.value }
+            })
         } catch (e) {
             message.error('Có lỗi khi lưu sản phẩm 😢')
         } finally {
@@ -893,7 +877,10 @@
     }
 
     const goBack = () => {
-        router.push('/products')
+        router.push({
+            path: '/products',
+            query: { page: currentPage.value }
+        })
     }
 
     onMounted(async () => {
@@ -952,7 +939,7 @@
                         ['bold', 'italic', 'underline', 'strike'],
                         [{list: 'ordered'}, {list: 'bullet'}],
                         [{header: [1, 2, false]}],
-                        ['link', 'image'],
+                        ['link'],
                         ['clean']
                     ]
                 }
@@ -969,10 +956,6 @@
     })
 
 
-    const getEditorContent = () => {
-        const html = quillInstance.value.root.innerHTML
-        console.log('Nội dung mô tả:', html)
-    }
 
     // 🔧 Fix missing definition warning for surveyColumns
     const surveyColumns = ref([
@@ -996,11 +979,6 @@
         // Nếu không muốn thêm mặc định khi bật lại, xoá phần trên.
     }
 
-
-    // Thêm link mới
-    const addProductLink = () => {
-        settings.value.productLinks.push({platform: 'Sàn khác', url: ''})
-    }
 
     // Xoá link
     const removeProductLink = (index) => {

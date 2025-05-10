@@ -41,7 +41,7 @@
                         :href="httpOnlyUrl(record.qr_url)"
                         target="_blank"
                         rel="noopener noreferrer"
-                        style="color: #000000"
+                        style="color: #1677ff; text-decoration: underline"
                     >
                         {{ httpOnlyUrl(record.qr_url) }}
                     </a>

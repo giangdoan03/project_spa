@@ -201,10 +201,20 @@ class QrCodeController extends BaseController
             case 'event':
                 $target = model('EventModel')->find($qr['target_id']);
                 break;
+            case 'business':
+                $target = model('BusinessModel')->find($qr['target_id']);
+                break;
+            case 'person':
+                $target = model('PersonModel')->find($qr['target_id']);
+                break;
         }
 
         if ($target) {
-            $fieldsToDecode = ['image', 'images', 'avatar', 'video', 'certificate_file', 'display_settings', 'attributes'];
+            $fieldsToDecode = [
+                'image', 'images', 'avatar', 'video', 'certificate_file',
+                'display_settings', 'attributes', 'logo', 'cover_image',
+                'library_images', 'video_intro', 'social_links', 'other_links', 'extra_info', 'contact_phone'
+            ];
             foreach ($fieldsToDecode as $field) {
                 if (isset($target[$field])) {
                     $target[$field] = $this->safeJsonDecode($target[$field]);
@@ -218,6 +228,7 @@ class QrCodeController extends BaseController
             'message' => 'Thành công'
         ]);
     }
+
 
 
     public function track(): ResponseInterface
