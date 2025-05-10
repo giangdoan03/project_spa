@@ -46,14 +46,16 @@
 
     <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-4 py-3 flex justify-center gap-4 z-50">
         <a href="https://shopee.vn" target="_blank"
-           class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200">
-            🛒 Đặt hàng
+           class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200 flex items-center gap-2">
+            <i class="fas fa-cart-shopping"></i> Đặt hàng
         </a>
+
         {{#if product.contact_phone}}
         <a href="tel:{{product.contact_phone}}"
-           class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200">
-            📞 Liên hệ
+           class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200 flex items-center gap-2">
+            <i class="fas fa-phone"></i> Liên hệ
         </a>
         {{/if}}
     </div>
+
 </div>
