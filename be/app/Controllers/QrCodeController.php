@@ -163,6 +163,9 @@ class QrCodeController extends BaseController
             } elseif ($item['target_type'] === 'person') {
                 $person = model('PersonModel')->find($item['target_id']);
                 $item['target_name'] = $person['name'] ?? '';
+            } elseif ($item['target_type'] === 'business') {
+                $business = model('BusinessModel')->find($item['target_id']);
+                $item['target_name'] = $business['name'] ?? '';
             }
         }
 
@@ -246,6 +249,15 @@ class QrCodeController extends BaseController
                         }
                         unset($desc); // Giải phóng tham chiếu
                     }
+
+                    if (!empty($event['ticket_options']) && is_array($event['ticket_options'])) {
+                        foreach ($event['ticket_options'] as &$desc) {
+                            $desc['title'] = isset($desc['title']) ? strip_tags($desc['title']) : '';
+                            $desc['description'] = isset($desc['description']) ? strip_tags($desc['description']) : '';
+                        }
+                        unset($desc); // Giải phóng tham chiếu
+                    }
+
 
                 }
 

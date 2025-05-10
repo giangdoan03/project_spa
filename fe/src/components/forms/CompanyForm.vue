@@ -1,10 +1,10 @@
 <template>
     <a-form layout="vertical" v-if="form">
-        <a-form-item label="Chọn công ty">
+        <a-form-item label="Chọn doanh nghiệp">
             <a-select
                 v-model:value="form.target_id"
-                placeholder="Chọn công ty"
-                :options="productOptions"
+                placeholder="Chọn doanh nghiệp"
+                :options="businessOptions"
                 show-search
                 :filter-option="filterOption"
             >
@@ -16,8 +16,6 @@
                     </div>
                 </template>
             </a-select>
-
-
         </a-form-item>
 
         <a-form-item label="Nhập tên cho QR của bạn (tuỳ chọn)">
@@ -28,80 +26,68 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getProducts } from '@/api/product.js'
+import { getBusinesses } from '@/api/business.js' // 👈 thay bằng API doanh nghiệp
 
-// Model nhận từ component cha
 const form = defineModel()
-
-// Danh sách sản phẩm
-const productOptions = ref([])
+const businessOptions = ref([])
 
 const filterOption = (input, option) => {
     return option.label.toLowerCase().includes(input.toLowerCase())
 }
 
+const parseAvatar = (logo) => {
+    if (!logo) return null
 
-const getCoverImageFromImages = (images) => {
-    let list = []
+    if (Array.isArray(logo)) return logo[0] || null
 
-    if (Array.isArray(images)) {
-        list = images
-    } else if (typeof images === 'string') {
+    if (typeof logo === 'string') {
         try {
-            const parsed = JSON.parse(images)
-            if (Array.isArray(parsed)) list = parsed
-        } catch {
-            return null
-        }
-    }
-
-    const cover = list.find(img => img?.isCover === true)
-    return cover?.url || (list[0]?.url || (typeof list[0] === 'string' ? list[0] : null)) || null
-}
-
-
-// Tải sản phẩm từ API
-const parseAvatar = (avatar) => {
-    if (!avatar) return null
-
-    if (Array.isArray(avatar)) return avatar[0] || null
-
-    if (typeof avatar === 'string') {
-        try {
-            const parsed = JSON.parse(avatar)
+            const parsed = JSON.parse(logo)
             if (Array.isArray(parsed)) return parsed[0] || null
-            return avatar // fallback nếu là chuỗi ảnh đơn
+            return logo
         } catch {
-            return avatar // fallback nếu parse lỗi
+            return logo
         }
     }
 
     return null
 }
 
-const fetchProducts = async () => {
+const fetchBusinesses = async () => {
     try {
-        const res = await getProducts({ per_page: 1000 })
-        productOptions.value = (res.data?.data || []).map(product => ({
-            label: product.name,
-            value: Number(product.id),
-            avatar: getCoverImageFromImages(product.images),
-            status: Number(product.status),
-            disabled: Number(product.status) !== 1,
-        }))
+        const res = await getBusinesses({ per_page: 1000 })
 
+        console.log('res',res)
+        businessOptions.value = (res.data?.data || []).map(b => ({
+            label: b.name,
+            value: Number(b.id),
+            avatar: parseAvatar(b.logo),
+            status: Number(b.status),
+            disabled: Number(b.status) !== 1,
+        }))
     } catch (err) {
-        console.error('Lỗi tải sản phẩm:', err)
+        console.error('Lỗi tải doanh nghiệp:', err)
     }
 }
 
+onMounted(async () => {
+    await fetchBusinesses();
 
-// Đảm bảo target_id luôn là số
+    // Nếu form.target_id đã có, cố gắng tìm lại label đúng
+    if (form?.target_id) {
+        const matched = businessOptions.value.find(b => b.value === Number(form.target_id));
+        if (!matched && typeof form.target_id === 'string') {
+            form.target_id = Number(form.target_id); // ép kiểu nếu chưa đúng
+        }
+    }
+});
+
+
 watch(() => form?.target_id, (val) => {
     if (typeof val === 'string') {
         form.target_id = Number(val)
     }
 })
 
-onMounted(fetchProducts)
+onMounted(fetchBusinesses)
 </script>

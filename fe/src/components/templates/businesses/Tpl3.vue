@@ -55,7 +55,7 @@
         </div>
 
         <div class="tpl3-powered">
-            <span>Powered by <strong>iCheckQR</strong></span>
+            <span>Powered by <strong>labit365.com</strong></span>
         </div>
     </div>
 </template>

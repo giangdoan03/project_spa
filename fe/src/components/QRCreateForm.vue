@@ -206,7 +206,7 @@ const formMap = {
     store: StoreForm,
     event: EventForm,
     person: PersonForm,
-    company: CompanyForm,
+    business: CompanyForm,
     // thêm các form còn lại tại đây
 }
 
@@ -230,7 +230,7 @@ const qrTypes = [
     { key: 'product', label: 'Sản phẩm', icon: ShoppingOutlined, pro: true },
     { key: 'store', label: 'Cửa hàng', icon: ShopOutlined, pro: true },
     { key: 'person', label: 'Cá nhân', icon: UserOutlined, pro: true },
-    { key: 'company', label: 'Công ty', icon: ApartmentOutlined, pro: true },
+    { key: 'business', label: 'Công ty', icon: ApartmentOutlined, pro: true },
     { key: 'event', label: 'Sự kiện', icon: FlagOutlined, pro: true },
 ]
 

@@ -433,12 +433,16 @@ const isActiveTemplate = (tplId) => {
 
 
 const parseAvatar = (avatar) => {
-    try {
-        const parsed = JSON.parse(avatar);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : ''
-    } catch {
-        return ''
+    if (Array.isArray(avatar)) return avatar[0]
+    if (typeof avatar === 'string') {
+        try {
+            const arr = JSON.parse(avatar)
+            return Array.isArray(arr) ? arr[0] : avatar
+        } catch {
+            return avatar
+        }
     }
+    return ''
 }
 const fetchBusiness = async () => {
     try {
@@ -826,13 +830,20 @@ onMounted(async () => {
 
         // 👇 Nếu có display_settings thì parse vào settings
         if (form.value.display_settings) {
-            try {
-                const parsedSettings = JSON.parse(form.value.display_settings)
-                Object.assign(settings.value, parsedSettings)
-            } catch (e) {
-                console.warn('⚠️ Lỗi parse display_settings:', e)
+            if (typeof form.value.display_settings === 'string') {
+                try {
+                    const parsedSettings = JSON.parse(form.value.display_settings)
+                    Object.assign(settings.value, parsedSettings)
+                } catch (e) {
+                    console.warn('⚠️ Lỗi parse display_settings:', e)
+                }
+            } else if (typeof form.value.display_settings === 'object') {
+                Object.assign(settings.value, form.value.display_settings)
+            } else {
+                console.warn('⚠️ display_settings không hợp lệ:', form.value.display_settings)
             }
         }
+
 
         // 👇 Sản phẩm liên quan
         if (settings.value.relatedProducts === 'selected') {

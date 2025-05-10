@@ -52,6 +52,7 @@ function formatVNDate(isoStr) {
     await loadTemplate('store-template', '/templates/store-template.html');
     await loadTemplate('person-template', '/templates/person-template.html');
     await loadTemplate('event-template', '/templates/event-template.html');
+    await loadTemplate('business-template', '/templates/business-template.html');
     await renderQRPage(); // chỉ gọi khi template đã load xong
 })();
 
