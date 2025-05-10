@@ -15,8 +15,7 @@ class PersonController extends ResourceController
 
     public function index()
     {
-        $userId = $this->getUserId();
-        $data = $this->model->where('user_id', $userId)->findAll();
+        $data = $this->model->findAll(); // ⚠️ Không lọc theo user
 
         // 👉 Giải mã display_settings cho từng item
         foreach ($data as &$item) {
@@ -27,6 +26,7 @@ class PersonController extends ResourceController
 
         return $this->respond($data);
     }
+
 
 
     public function show($id = null)

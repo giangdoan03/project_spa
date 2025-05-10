@@ -10,6 +10,10 @@ Handlebars.registerHelper("formatPrice", function (value) {
     return isNaN(p) ? '' : `${p.toLocaleString("vi-VN")} ₫`;
 });
 
+Handlebars.registerHelper('lowercase', function (str) {
+    return (str || '').toLowerCase();
+});
+
 Handlebars.registerHelper("safeImage", val => {
     try {
         const parsed = typeof val === 'string' ? JSON.parse(val) : val;
@@ -32,6 +36,7 @@ async function loadTemplate(id, url) {
 (async () => {
     await loadTemplate('product-template', '/templates/product-template.html');
     await loadTemplate('store-template', '/templates/store-template.html');
+    await loadTemplate('person-template', '/templates/person-template.html');
     await renderQRPage(); // chỉ gọi khi template đã load xong
 })();
 
@@ -181,14 +186,28 @@ async function renderQRPage() {
         }
 
         const template = Handlebars.compile(templateEl.innerHTML);
-        infoEl.innerHTML = template({
+        const context = {
             qr,
             product: target,
             images,
             attributes: safeParse(target.attributes, []),
-            productLinks, // 👉 chỉ còn những link có url
-            price: formatPrice(target.price)
-        });
+            productLinks,
+            price: formatPrice(target.price),
+        };
+
+        // 👇 Nếu là person thì bổ sung person_detail
+        if (qr.target_type === 'person') {
+            context.person = {
+                ...target.person_detail,
+                selectedProducts: target.selectedProducts,
+                selectedCompanies: target.selectedCompanies,
+                selectedStores: target.selectedStores,
+            };
+        }
+
+        infoEl.innerHTML = template(context);
+
+
 
         // 👉 Gọi sau khi đã gắn vào DOM
         initProductTabs();
@@ -246,6 +265,41 @@ async function renderQRPage() {
                 },
             });
         });
+
+        // Sau khi infoEl.innerHTML = template(...) hoàn tất
+
+        requestAnimationFrame(() => {
+            // ✅ Slider sản phẩm liên quan
+            new Swiper(".swiper-selected-products", {
+                slidesPerView: 2.1,
+                spaceBetween: 16,
+                pagination: {
+                    el: ".swiper-selected-products .swiper-pagination",
+                    clickable: true,
+                },
+            });
+
+            // ✅ Slider công ty liên quan
+            new Swiper(".swiper-selected-companies", {
+                slidesPerView: 1.3,
+                spaceBetween: 16,
+                pagination: {
+                    el: ".swiper-selected-companies .swiper-pagination",
+                    clickable: true,
+                },
+            });
+
+            // ✅ Slider cửa hàng liên quan
+            new Swiper(".swiper-selected-stores", {
+                slidesPerView: 1.3,
+                spaceBetween: 16,
+                pagination: {
+                    el: ".swiper-selected-stores .swiper-pagination",
+                    clickable: true,
+                },
+            });
+        });
+
 
 
     } catch (err) {

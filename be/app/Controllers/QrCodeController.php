@@ -160,6 +160,9 @@ class QrCodeController extends BaseController
             } elseif ($item['target_type'] === 'event') {
                 $event = model('EventModel')->find($item['target_id']);
                 $item['target_name'] = $event['name'] ?? '';
+            } elseif ($item['target_type'] === 'person') {
+                $person = model('PersonModel')->find($item['target_id']);
+                $item['target_name'] = $person['name'] ?? '';
             }
         }
 
@@ -221,6 +224,7 @@ class QrCodeController extends BaseController
         $productModel = model('ProductModel');
         $businessModel = model('BusinessModel');
         $storeModel = model('StoreModel');
+        $personModel = model('PersonModel');
 
         if (!empty($target['display_settings']) && is_array($target['display_settings'])) {
             $ds = &$target['display_settings'];
@@ -302,6 +306,26 @@ class QrCodeController extends BaseController
                     'images', 'video'
                 ]);
             }
+
+            // ✅ Nếu QR trỏ đến person → bổ sung thêm phần person chi tiết luôn
+            if ($qr['target_type'] === 'person') {
+                $person = $personModel
+                    ->where('id', $qr['target_id'])
+                    ->first();
+
+                if ($person) {
+                    // Decode avatar, social_links nếu là JSON
+                    foreach (['avatar', 'social_links', 'video_url', 'certificate_file', 'display_settings'] as $field) {
+                        if (!empty($person[$field]) && is_string($person[$field])) {
+                            $decoded = json_decode($person[$field], true);
+                            $person[$field] = is_array($decoded) ? $decoded : $person[$field];
+                        }
+                    }
+
+                    $target['person_detail'] = $person;
+                }
+            }
+
         }
 
         return $this->respond([
@@ -493,12 +517,4 @@ class QrCodeController extends BaseController
 
         return view('qr/scan_detail', ['qr' => $qr]); // có thể thay bằng API JSON nếu dùng Vue
     }
-
-
-
-
-
-
-
-
 }
