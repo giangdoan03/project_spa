@@ -4,19 +4,20 @@
             <a-select
                 v-model:value="form.target_id"
                 placeholder="Chọn sự kiện"
-                :options="productOptions"
                 show-search
                 :filter-option="filterOption"
             >
-                <template #option="{ label, avatar, status, disabled }">
-                    <div style="display: flex; align-items: center; gap: 8px;" :style="{ opacity: disabled ? 0.5 : 1 }">
-                        <img :src="avatar" alt="avatar" style="width: 28px; height: 28px; object-fit: cover; border-radius: 4px;" />
-                        <div style="flex: 1;">{{ label }}</div>
-                        <a-tag :color="status === 1 ? 'green' : 'red'">{{ status === 1 ? 'Đang kích hoạt' : 'Chưa kích hoạt' }}</a-tag>
+                <a-select-option
+                    v-for="event in eventOptions"
+                    :key="event.value"
+                    :value="event.value"
+                >
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img :src="event.banner" style="width: 28px; height: 28px; object-fit: cover; border-radius: 4px;" />
+                        <div>{{ event.label }}</div>
                     </div>
-                </template>
+                </a-select-option>
             </a-select>
-
 
         </a-form-item>
 
@@ -26,20 +27,18 @@
     </a-form>
 </template>
 
+
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getProducts } from '@/api/product.js'
+import { getEvents } from '@/api/event.js' // bạn cần chắc chắn file này tồn tại
 
-// Model nhận từ component cha
 const form = defineModel()
 
-// Danh sách sản phẩm
-const productOptions = ref([])
+const eventOptions = ref([])
 
 const filterOption = (input, option) => {
-    return option.label.toLowerCase().includes(input.toLowerCase())
+    return option.label.text.toLowerCase().includes(input.toLowerCase())
 }
-
 
 const getCoverImageFromImages = (images) => {
     let list = []
@@ -59,49 +58,44 @@ const getCoverImageFromImages = (images) => {
     return cover?.url || (list[0]?.url || (typeof list[0] === 'string' ? list[0] : null)) || null
 }
 
+const parseAvatar = (banner) => {
+    if (!banner) return null
 
-// Tải sản phẩm từ API
-const parseAvatar = (avatar) => {
-    if (!avatar) return null
+    if (Array.isArray(banner)) return banner[0] || null
 
-    if (Array.isArray(avatar)) return avatar[0] || null
-
-    if (typeof avatar === 'string') {
+    if (typeof banner === 'string') {
         try {
-            const parsed = JSON.parse(avatar)
+            const parsed = JSON.parse(banner)
             if (Array.isArray(parsed)) return parsed[0] || null
-            return avatar // fallback nếu là chuỗi ảnh đơn
+            return banner
         } catch {
-            return avatar // fallback nếu parse lỗi
+            return banner
         }
     }
 
     return null
 }
 
-const fetchProducts = async () => {
+const fetchEvents = async () => {
     try {
-        const res = await getProducts({ per_page: 1000 })
-        productOptions.value = (res.data?.data || []).map(product => ({
-            label: product.name,
-            value: Number(product.id),
-            avatar: getCoverImageFromImages(product.images),
-            status: Number(product.status),
-            disabled: Number(product.status) !== 1,
+        const res = await getEvents({ per_page: 1000 })
+        eventOptions.value = (res.data?.data || []).map(event => ({
+            value: Number(event.id),
+            label: event.name, // label chỉ là chuỗi
+            banner: event.banner || getCoverImageFromImages(event.images),
         }))
-
     } catch (err) {
-        console.error('Lỗi tải sản phẩm:', err)
+        console.error('Lỗi tải sự kiện:', err)
     }
 }
 
 
-// Đảm bảo target_id luôn là số
 watch(() => form?.target_id, (val) => {
     if (typeof val === 'string') {
         form.target_id = Number(val)
     }
 })
 
-onMounted(fetchProducts)
+onMounted(fetchEvents)
 </script>
+

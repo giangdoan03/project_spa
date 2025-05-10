@@ -335,7 +335,7 @@
     import ImageUploader from './ImageUploader.vue' // đường dẫn đúng tới file bạn lưu
     import Quill from 'quill'
     import 'quill/dist/quill.snow.css'
-    import templateOptions from "@/components/templates/stores";
+    import templateOptions from "@/components/templates/events";
     import {parseFieldsForList} from '@/utils/formUtils'
 
     const ticketEditorRefs = ref([])

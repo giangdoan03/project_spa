@@ -37,6 +37,7 @@ async function loadTemplate(id, url) {
     await loadTemplate('product-template', '/templates/product-template.html');
     await loadTemplate('store-template', '/templates/store-template.html');
     await loadTemplate('person-template', '/templates/person-template.html');
+    await loadTemplate('event-template', '/templates/event-template.html');
     await renderQRPage(); // chỉ gọi khi template đã load xong
 })();
 
@@ -98,7 +99,36 @@ async function renderQRPage() {
             return;
         }
 
-        const {qr, target} = data;
+        const { qr, target } = data;
+
+        // 👉 Làm sạch dữ liệu event nếu là sự kiện
+        if (qr.target_type === 'event') {
+            target.description = safeParse(target.description, []).filter(d => {
+                const title = (d.title || '').trim();
+                const content = (d.content || '').replace(/<p><br\s*\/?><\/p>/gi, '').trim();
+                return title || content;
+            });
+
+
+            target.ticket_options = Array.isArray(safeParse(target.ticket_options, []))
+                ? safeParse(target.ticket_options, [])
+                : [];
+
+            target.social_links = Array.isArray(safeParse(target.social_links, []))
+                ? safeParse(target.social_links, [])
+                : [];
+
+            const parsedImages = safeParse(target.images, []);
+            target.images = Array.isArray(parsedImages)
+                ? parsedImages.map(img => typeof img === 'string' ? img : img.url)
+                : [];
+
+            const parsedVideo = safeParse(target.video, []);
+            target.video = Array.isArray(parsedVideo)
+                ? parsedVideo.map(v => typeof v === 'string' ? { url: v } : v)
+                : [];
+        }
+
         const images = Array.isArray(target.images)
             ? target.images.map(img => typeof img === 'string' ? img : img?.url)
             : [];
@@ -204,6 +234,33 @@ async function renderQRPage() {
                 selectedStores: target.selectedStores,
             };
         }
+
+        // Nếu là event
+        if (qr.target_type === 'event') {
+            const eventDetail = target.event_detail || target;
+
+            const context = {
+                qr,
+                event: {
+                    ...eventDetail,
+                    selectedProducts: target.selectedProducts || [],
+                    selectedCompanies: target.selectedCompanies || [],
+                    selectedStores: target.selectedStores || []
+                },
+                price: formatPrice(eventDetail.price),
+                images: (() => {
+                    const imgs = safeParse(eventDetail.images, []);
+                    return Array.isArray(imgs)
+                        ? imgs.map(img => typeof img === 'string' ? img : img.url)
+                        : [];
+                })()
+            };
+
+            infoEl.innerHTML = template(context);
+            return;
+        }
+
+
 
         infoEl.innerHTML = template(context);
 

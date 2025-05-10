@@ -225,6 +225,7 @@ class QrCodeController extends BaseController
         $businessModel = model('BusinessModel');
         $storeModel = model('StoreModel');
         $personModel = model('PersonModel');
+        $eventModel = model('EventModel');
 
         if (!empty($target['display_settings']) && is_array($target['display_settings'])) {
             $ds = &$target['display_settings'];
@@ -326,6 +327,28 @@ class QrCodeController extends BaseController
                 }
             }
 
+            if ($qr['target_type'] === 'event') {
+                $event = $eventModel->where('id', $qr['target_id'])->first();
+
+                if ($event) {
+                    foreach (['description', 'ticket_options', 'social_links', 'images', 'video', 'display_settings'] as $field) {
+                        if (!empty($event[$field]) && is_string($event[$field])) {
+                            $decoded = json_decode($event[$field], true);
+                            if (is_string($decoded)) {
+                                $decoded = json_decode($decoded, true);
+                            }
+                            $event[$field] = is_array($decoded) ? $decoded : [];
+                        }
+                    }
+
+                    // Chuyển đổi thời gian thành ISO string
+                    $event['start_time'] = date('c', strtotime($event['start_time']));
+                    $event['end_time'] = date('c', strtotime($event['end_time']));
+
+                    // ⚠ Gán lại toàn bộ
+                    $target = $event;
+                }
+            }
         }
 
         return $this->respond([

@@ -24,7 +24,15 @@
 
             <div class="tpl-description-block">
                 <div class="tpl-desc-title">Mô tả</div>
-                <div class="tpl-desc-content" v-html="product.description"></div>
+                <div class="tab-content" v-if="Array.isArray(product.description)">
+                    <div v-for="(section, idx) in product.description" :key="idx" class="mb-4">
+                        <div class="font-semibold mb-1">{{ section.title }}</div>
+                        <div v-html="section.content" class="text-sm text-gray-700"></div>
+                    </div>
+                </div>
+
+                <!-- fallback nếu là chuỗi HTML thuần -->
+                <div class="tab-content" v-else v-html="product.description"></div>
             </div>
 
             <div class="tpl-company" v-if="businessItem">
