@@ -33,6 +33,20 @@ async function loadTemplate(id, url) {
     document.body.appendChild(script);
 }
 
+function formatVNDate(isoStr) {
+    const date = new Date(isoStr);
+    return date.toLocaleString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour12: false,
+        timeZone: 'Asia/Ho_Chi_Minh'
+    });
+}
+
+
 (async () => {
     await loadTemplate('product-template', '/templates/product-template.html');
     await loadTemplate('store-template', '/templates/store-template.html');
@@ -102,32 +116,6 @@ async function renderQRPage() {
         const { qr, target } = data;
 
         // 👉 Làm sạch dữ liệu event nếu là sự kiện
-        if (qr.target_type === 'event') {
-            target.description = safeParse(target.description, []).filter(d => {
-                const title = (d.title || '').trim();
-                const content = (d.content || '').replace(/<p><br\s*\/?><\/p>/gi, '').trim();
-                return title || content;
-            });
-
-
-            target.ticket_options = Array.isArray(safeParse(target.ticket_options, []))
-                ? safeParse(target.ticket_options, [])
-                : [];
-
-            target.social_links = Array.isArray(safeParse(target.social_links, []))
-                ? safeParse(target.social_links, [])
-                : [];
-
-            const parsedImages = safeParse(target.images, []);
-            target.images = Array.isArray(parsedImages)
-                ? parsedImages.map(img => typeof img === 'string' ? img : img.url)
-                : [];
-
-            const parsedVideo = safeParse(target.video, []);
-            target.video = Array.isArray(parsedVideo)
-                ? parsedVideo.map(v => typeof v === 'string' ? { url: v } : v)
-                : [];
-        }
 
         const images = Array.isArray(target.images)
             ? target.images.map(img => typeof img === 'string' ? img : img?.url)
@@ -238,22 +226,56 @@ async function renderQRPage() {
         // Nếu là event
         if (qr.target_type === 'event') {
             const eventDetail = target.event_detail || target;
+            eventDetail.description = safeParse(eventDetail.description, []).map(d => {
+                const title = (d.title || '').trim();
+                const raw = (d.content || '').trim();
 
+                // Kiểm tra xem nội dung có chứa các thực thể HTML không
+                const hasEscapedTags = /&lt;|&gt;|&quot;|&#39;|&amp;/.test(raw);
+                let content = raw;
+
+                if (hasEscapedTags) {
+                    const textarea = document.createElement('textarea');
+                    textarea.innerHTML = raw;
+                    content = textarea.value; // giải mã các thực thể HTML
+                }
+
+                return {
+                    title,
+                    content
+                };
+            }).filter(d => d.title || d.content.replace(/<p><br\s*\/?><\/p>/gi, '').trim());
+
+
+            eventDetail.ticket_options = safeParse(eventDetail.ticket_options, []);
+            eventDetail.social_links = safeParse(eventDetail.social_links, []);
+            eventDetail.images = safeParse(eventDetail.images, []).map(img => typeof img === 'string' ? img : img.url);
+            eventDetail.video = safeParse(eventDetail.video, []).map(v => {
+                const url = (v.url || '').trim();
+                const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+                const videoId = match ? match[1] : null;
+                const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+
+                return {
+                    ...v,
+                    embedUrl
+                };
+            });
+
+
+            // Render template
             const context = {
                 qr,
                 event: {
                     ...eventDetail,
                     selectedProducts: target.selectedProducts || [],
                     selectedCompanies: target.selectedCompanies || [],
-                    selectedStores: target.selectedStores || []
+                    selectedStores: target.selectedStores || [],
+                    start_time: formatVNDate(eventDetail.start_time),
+                    end_time: formatVNDate(eventDetail.end_time),
                 },
                 price: formatPrice(eventDetail.price),
-                images: (() => {
-                    const imgs = safeParse(eventDetail.images, []);
-                    return Array.isArray(imgs)
-                        ? imgs.map(img => typeof img === 'string' ? img : img.url)
-                        : [];
-                })()
+                images: Array.isArray(eventDetail.images) ? eventDetail.images : []
             };
 
             infoEl.innerHTML = template(context);

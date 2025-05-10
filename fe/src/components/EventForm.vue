@@ -63,6 +63,40 @@
                                         <a-input v-model:value="form.location"/>
                                     </a-form-item>
                                 </a-card>
+                                <!-- Tùy chọn vé -->
+                                <a-card class="mb_24" title="Tùy chọn vé">
+                                    <div v-for="(ticket, index) in form.ticket_options" :key="index" class="mb-4 p-4 border border-gray-200 rounded">
+                                        <a-card class="mb_24">
+                                            <a-form-item label="Tiêu đề vé">
+                                                <a-input v-model:value="ticket.title" placeholder="Nhập tiêu đề vé" />
+                                            </a-form-item>
+
+                                            <a-form-item label="Giá vé">
+                                                <a-input-number v-model:value="ticket.price" :min="0" style="width: 100%;" placeholder="Nhập giá vé" />
+                                            </a-form-item>
+
+                                            <a-form-item label="Mô tả vé">
+                                                <div :ref="el => ticketEditorRefs[index] = el" style="min-height: 150px; padding: 8px;" />
+                                            </a-form-item>
+
+                                            <a-button
+                                                danger
+                                                @click="removeTicketOption(index)"
+                                                v-if="form.ticket_options.length > 1"
+                                            >
+                                                Xoá vé
+                                            </a-button>
+                                        </a-card>
+                                    </div>
+
+                                    <a-button
+                                        type="dashed"
+                                        block
+                                        @click="addNewTicketOption"
+                                    >
+                                        + Thêm loại vé
+                                    </a-button>
+                                </a-card>
                                 <a-card title="Trạng thái">
                                     <a-form-item>
                                         <a-switch v-model:checked="form.is_enabled" checked-children="Bật"
@@ -154,7 +188,7 @@
                                     </a-button>
                                 </a-card>
 
-                                <!-- Tùy chọn vé -->
+                                <!-- Mạng xã hội -->
                                 <a-card class="mb_24" title="Mạng xã hội">
                                     <div
                                             v-for="(item, index) in form.social_links"
@@ -565,6 +599,73 @@
             console.error('Lỗi lấy sự kiện:', error)
             message.error('Không tìm thấy thông tin sự kiện')
         }
+    }
+
+    const addNewTicketOption = async () => {
+        // Thêm block mới vào form
+        form.value.ticket_options.push({
+            title: '',
+            description: '',
+            price: 0
+        })
+
+        await nextTick()
+
+        // Mount editor cho block vừa thêm
+        const index = form.value.ticket_options.length - 1
+        const container = ticketEditorRefs.value[index]
+
+        if (container && !ticketEditorInstances.value[index]) {
+            const quill = new Quill(container, {
+                theme: 'snow',
+                placeholder: 'Nhập mô tả vé...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        [{ header: [1, 2, false] }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                }
+            })
+
+            ticketEditorInstances.value[index] = quill
+        }
+    }
+
+    const removeTicketOption = async (index) => {
+        form.value.ticket_options.splice(index, 1)
+        ticketEditorRefs.value.splice(index, 1)
+        ticketEditorInstances.value.splice(index, 1)
+
+        await nextTick()
+
+        // Mount lại editor cho tất cả khối còn lại
+        form.value.ticket_options.forEach((ticket, idx) => {
+            const container = ticketEditorRefs.value[idx]
+            if (container && !ticketEditorInstances.value[idx]) {
+                const quill = new Quill(container, {
+                    theme: 'snow',
+                    placeholder: 'Nhập mô tả vé...',
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            [{ header: [1, 2, false] }],
+                            ['link', 'image'],
+                            ['clean']
+                        ]
+                    }
+                })
+
+                if (ticket.description) {
+                    quill.root.innerHTML = ticket.description
+                }
+
+                ticketEditorInstances.value[idx] = quill
+            }
+        })
     }
 
 

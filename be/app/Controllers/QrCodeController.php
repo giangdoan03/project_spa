@@ -227,6 +227,37 @@ class QrCodeController extends BaseController
         $personModel = model('PersonModel');
         $eventModel = model('EventModel');
 
+        if ($qr['target_type'] === 'event') {
+            $event = $eventModel->where('id', $qr['target_id'])->first();
+
+            if ($event) {
+                foreach (['description', 'ticket_options', 'social_links', 'images', 'video', 'display_settings'] as $field) {
+                    if (!empty($event[$field]) && is_string($event[$field])) {
+                        $decoded = json_decode($event[$field], true);
+                        if (is_string($decoded)) {
+                            $decoded = json_decode($decoded, true);
+                        }
+                        $event[$field] = is_array($decoded) ? $decoded : [];
+                    }
+                    if (!empty($event['description']) && is_array($event['description'])) {
+                        foreach ($event['description'] as &$desc) {
+                            $desc['title'] = isset($desc['title']) ? strip_tags($desc['title']) : '';
+                            $desc['content'] = isset($desc['content']) ? strip_tags($desc['content']) : '';
+                        }
+                        unset($desc); // Giải phóng tham chiếu
+                    }
+
+                }
+
+                // Chuyển đổi thời gian thành ISO string
+                $event['start_time'] = date('c', strtotime($event['start_time']));
+                $event['end_time'] = date('c', strtotime($event['end_time']));
+
+                // ⚠ Gán lại toàn bộ
+                $target = $event;
+            }
+        }
+
         if (!empty($target['display_settings']) && is_array($target['display_settings'])) {
             $ds = &$target['display_settings'];
             $userId = $target['user_id'] ?? null;
@@ -327,28 +358,7 @@ class QrCodeController extends BaseController
                 }
             }
 
-            if ($qr['target_type'] === 'event') {
-                $event = $eventModel->where('id', $qr['target_id'])->first();
 
-                if ($event) {
-                    foreach (['description', 'ticket_options', 'social_links', 'images', 'video', 'display_settings'] as $field) {
-                        if (!empty($event[$field]) && is_string($event[$field])) {
-                            $decoded = json_decode($event[$field], true);
-                            if (is_string($decoded)) {
-                                $decoded = json_decode($decoded, true);
-                            }
-                            $event[$field] = is_array($decoded) ? $decoded : [];
-                        }
-                    }
-
-                    // Chuyển đổi thời gian thành ISO string
-                    $event['start_time'] = date('c', strtotime($event['start_time']));
-                    $event['end_time'] = date('c', strtotime($event['end_time']));
-
-                    // ⚠ Gán lại toàn bộ
-                    $target = $event;
-                }
-            }
         }
 
         return $this->respond([
