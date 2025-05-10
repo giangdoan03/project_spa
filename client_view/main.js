@@ -141,12 +141,13 @@ async function renderQRPage() {
             return typeof p.avatar === 'string' ? p.avatar : '';
         };
 
-// Trong phần xử lý selectedProducts (giữ nguyên map structure)
-        target.selectedProducts = target.selectedProducts.map(p => ({
-            ...p,
-            image: getProductImage(p)
-        }));
-
+        // Trong phần xử lý selectedProducts (giữ nguyên map structure)
+        target.selectedProducts = Array.isArray(target.selectedProducts)
+            ? target.selectedProducts.map(p => ({
+                ...p,
+                image: getProductImage(p)
+            }))
+            : [];
         target.topProducts = Array.isArray(target.topProducts)
             ? target.topProducts.map(p => ({
                 ...p,
@@ -189,10 +190,10 @@ async function renderQRPage() {
             price: formatPrice(target.price)
         });
 
-// 👉 Gọi sau khi đã gắn vào DOM
+        // 👉 Gọi sau khi đã gắn vào DOM
         initProductTabs();
 
-// ✅ Swiper ảnh chính
+        // ✅ Swiper ảnh chính
         requestAnimationFrame(() => {
             new Swiper(".imageProductAvatarSwiper", {
                 slidesPerView: 1,
@@ -203,7 +204,7 @@ async function renderQRPage() {
                 },
             });
         });
-// ✅ Swiper sản phẩm liên quan
+        // ✅ Swiper sản phẩm liên quan
         requestAnimationFrame(() => {
             new Swiper(".relatedProductsSwiper", {
                 slidesPerView: 2.1,
