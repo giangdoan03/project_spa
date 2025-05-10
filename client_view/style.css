@@ -42,21 +42,26 @@
 
 
 .swiper.mySwiperNew,
-.swiper.mySwiperTop, .relatedProductsSwiper, .mySwiper {
+.swiper.mySwiperTop, .relatedProductsSwiper, .mySwiper,  .swiper-selected-products, .relatedCompaniesSwiper {
     width: 100%;
     padding-bottom: 32px;
 }
 
 .mySwiperNew .swiper-slide,
 .mySwiperTop .swiper-slide,
-.mySwiper .swiper-slide {
+.mySwiper .swiper-slide,
+.swiper-selected-products .swiper-slide,
+.relatedCompaniesSwiper .swiper-slide {
     width: auto !important;
     flex-shrink: 0;
 }
 
 .mySwiperNew .swiper-pagination,
 .mySwiperTop .swiper-pagination,
-.mySwiper .swiper-pagination{
+.mySwiper .swiper-pagination,
+.swiper-selected-products .swiper-pagination,
+.relatedCompaniesSwiper .swiper-pagination
+{
     display: flex !important;
     justify-content: center;
     margin-top: 12px;
