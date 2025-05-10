@@ -192,35 +192,106 @@ class QrCodeController extends BaseController
 
         $target = null;
         switch ($qr['target_type']) {
-            case 'product':
-                $target = model('ProductModel')->find($qr['target_id']);
-                break;
-            case 'store':
-                $target = model('StoreModel')->find($qr['target_id']);
-                break;
-            case 'event':
-                $target = model('EventModel')->find($qr['target_id']);
-                break;
-            case 'business':
-                $target = model('BusinessModel')->find($qr['target_id']);
-                break;
-            case 'person':
-                $target = model('PersonModel')->find($qr['target_id']);
-                break;
+            case 'product':  $target = model('ProductModel')->find($qr['target_id']); break;
+            case 'store':    $target = model('StoreModel')->find($qr['target_id']); break;
+            case 'event':    $target = model('EventModel')->find($qr['target_id']); break;
+            case 'business': $target = model('BusinessModel')->find($qr['target_id']); break;
+            case 'person':   $target = model('PersonModel')->find($qr['target_id']); break;
         }
 
         if ($target) {
+            // Danh sách các field cần decode an toàn
             $fieldsToDecode = [
                 'image', 'images', 'avatar', 'video', 'certificate_file',
                 'display_settings', 'attributes', 'logo', 'cover_image',
-                'library_images', 'video_intro', 'social_links', 'other_links', 'extra_info', 'contact_phone'
+                'library_images', 'video_intro', 'social_links', 'other_links',
+                'extra_info', 'contact_phone', 'product_ids'
             ];
+
             foreach ($fieldsToDecode as $field) {
                 if (isset($target[$field])) {
                     $target[$field] = $this->safeJsonDecode($target[$field]);
                 }
             }
+
+            // Models
+            $productModel = model('ProductModel');
+            $businessModel = model('BusinessModel');
+            $storeModel = model('StoreModel');
+
+            if (!empty($target['display_settings']) && is_array($target['display_settings'])) {
+                $ds = $target['display_settings'];
+
+                // selectedProducts
+                if (!empty($ds['selectedProducts'])) {
+                    $rawSelected = $productModel
+                        ->whereIn('id', $ds['selectedProducts'])
+                        ->where('status', 1)
+                        ->orderBy('created_at', 'DESC')
+                        ->findAll(5);
+
+                    $target['selectedProducts'] = array_map(function ($p) {
+                        $p['avatar'] = isset($p['avatar']) ? (json_decode($p['avatar'], true)[0] ?? '') : '';
+                        $p['images'] = isset($p['images']) ? json_decode($p['images'], true) ?? [] : [];
+                        $p['video'] = isset($p['video']) ? json_decode($p['video'], true) ?? [] : [];
+                        $p['certificate_file'] = isset($p['certificate_file']) ? json_decode($p['certificate_file'], true) ?? [] : [];
+                        $p['attributes'] = isset($p['attributes']) ? json_decode($p['attributes'], true) ?? [] : [];
+                        return $p;
+                    }, $rawSelected);
+                }
+
+                // topProducts
+                if (!empty($ds['topProducts'])) {
+                    $rawTop = $productModel
+                        ->whereIn('id', $ds['topProducts'])
+                        ->where('status', 1)
+                        ->findAll();
+
+                    $target['topProducts'] = array_map(function ($p) {
+                        $p['avatar'] = isset($p['avatar']) ? (json_decode($p['avatar'], true)[0] ?? '') : '';
+                        $p['images'] = isset($p['images']) ? json_decode($p['images'], true) ?? [] : [];
+                        $p['video'] = isset($p['video']) ? json_decode($p['video'], true) ?? [] : [];
+                        $p['certificate_file'] = isset($p['certificate_file']) ? json_decode($p['certificate_file'], true) ?? [] : [];
+                        $p['attributes'] = isset($p['attributes']) ? json_decode($p['attributes'], true) ?? [] : [];
+                        return $p;
+                    }, $rawTop);
+                }
+
+                // selectedCompanies
+                if (!empty($ds['selectedCompanies'])) {
+                    $rawCompanies = $businessModel
+                        ->whereIn('id', $ds['selectedCompanies'])
+                        ->where('status', 1)
+                        ->findAll();
+
+                    $target['selectedCompanies'] = array_map(function ($c) {
+                        $c['logo'] = isset($c['logo']) ? (json_decode($c['logo'], true)[0] ?? '') : '';
+                        $c['cover_image'] = isset($c['cover_image']) ? (json_decode($c['cover_image'], true)[0] ?? '') : '';
+                        $c['library_images'] = isset($c['library_images']) ? json_decode($c['library_images'], true) ?? [] : [];
+                        $c['video_intro'] = isset($c['video_intro']) ? json_decode($c['video_intro'], true) ?? [] : [];
+                        $c['certificate_file'] = isset($c['certificate_file']) ? json_decode($c['certificate_file'], true) ?? [] : [];
+                        return $c;
+                    }, $rawCompanies);
+                }
+
+                // selectedStores
+                if (!empty($ds['selectedStores'])) {
+                    $rawStores = $storeModel
+                        ->whereIn('id', $ds['selectedStores'])
+                        ->where('status', 1)
+                        ->findAll();
+
+                    $target['selectedStores'] = array_map(function ($s) {
+                        $s['logo'] = isset($s['logo']) ? (json_decode($s['logo'], true)[0] ?? '') : '';
+                        $s['cover_image'] = isset($s['cover_image']) ? (json_decode($s['cover_image'], true)[0] ?? '') : '';
+                        $s['images'] = isset($s['images']) ? json_decode($s['images'], true) ?? [] : [];
+                        $s['video'] = isset($s['video']) ? json_decode($s['video'], true) ?? [] : [];
+                        return $s;
+                    }, $rawStores);
+                }
+            }
         }
+
 
         return $this->respond([
             'qr' => $qr,
@@ -228,6 +299,7 @@ class QrCodeController extends BaseController
             'message' => 'Thành công'
         ]);
     }
+
 
 
 
