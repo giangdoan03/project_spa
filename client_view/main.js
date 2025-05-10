@@ -121,11 +121,11 @@ async function renderQRPage() {
         }
 
 
-        const productRes = await fetch(`${API_BASE}/products`);
-        const productData = await productRes.json();
-        const allProducts = Array.isArray(productData.data) ? productData.data : [];
-
-        const displaySettings = safeParse(target.display_settings, {});
+        // const productRes = await fetch(`${API_BASE}/products`);
+        // const productData = await productRes.json();
+        // const allProducts = Array.isArray(productData.data) ? productData.data : [];
+        //
+        // const displaySettings = safeParse(target.display_settings, {});
 
         // 1. Sản phẩm mới nhất
         // Dùng dữ liệu trả sẵn từ backend nếu có

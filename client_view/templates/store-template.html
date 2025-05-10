@@ -11,14 +11,37 @@
         <p class="text-sm text-gray-600 mb-4">{{{product.description}}}</p>
 
         <div class="mt-4 grid grid-cols-1 gap-2 text-sm">
-            {{#if product.phone}}<p class="flex items-center gap-2"><span>📞</span>{{product.phone}}</p>{{/if}}
-            {{#if product.email}}<p class="flex items-center gap-2"><span>📧</span>{{product.email}}</p>{{/if}}
-            {{#if product.address}}<p class="flex items-center gap-2"><span>📍</span>{{product.address}}</p>{{/if}}
-            {{#if product.website}}<p class="flex items-center gap-2">
-            <span>🌐</span>
-            <a href="{{product.website}}" class="text-blue-600 underline" target="_blank">{{product.website}}</a>
-        </p>{{/if}}
+            {{#if product.phone}}
+            <p class="flex items-center gap-2">
+                <i class="fas fa-phone text-gray-600"></i>
+                {{product.phone}}
+            </p>
+            {{/if}}
+
+            {{#if product.email}}
+            <p class="flex items-center gap-2">
+                <i class="fas fa-envelope text-gray-600"></i>
+                {{product.email}}
+            </p>
+            {{/if}}
+
+            {{#if product.address}}
+            <p class="flex items-center gap-2">
+                <i class="fas fa-map-marker-alt text-gray-600"></i>
+                {{product.address}}
+            </p>
+            {{/if}}
+
+            {{#if product.website}}
+            <p class="flex items-center gap-2">
+                <i class="fas fa-globe text-gray-600"></i>
+                <a href="{{product.website}}" class="text-blue-600 underline" target="_blank">
+                    {{product.website}}
+                </a>
+            </p>
+            {{/if}}
         </div>
+
     </div>
     <div class="mt-6">
         <!-- Tabs -->
@@ -78,11 +101,25 @@
             </div>
 
             <div class="mt-3 text-sm text-gray-700 space-y-1">
-                {{#if this.phone}}<p>📞 {{this.phone}}</p>{{/if}}
-                {{#if this.email}}<p>📧 {{this.email}}</p>{{/if}}
-                {{#if this.website}}<p>🌐 <a href="https://{{this.website}}" target="_blank" class="text-blue-600 underline">{{this.website}}</a></p>{{/if}}
-                {{#if this.facebook_link}}<p>📘 Facebook: {{this.facebook_link}}</p>{{/if}}
+                {{#if this.phone}}
+                <p><i class="fas fa-phone mr-1 text-gray-600"></i> {{this.phone}}</p>
+                {{/if}}
+                {{#if this.email}}
+                <p><i class="fas fa-envelope mr-1 text-gray-600"></i> {{this.email}}</p>
+                {{/if}}
+                {{#if this.website}}
+                <p>
+                    <i class="fas fa-globe mr-1 text-gray-600"></i>
+                    <a href="https://{{this.website}}" target="_blank" class="text-blue-600 underline">
+                        {{this.website}}
+                    </a>
+                </p>
+                {{/if}}
+                {{#if this.facebook_link}}
+                <p><i class="fab fa-facebook mr-1 text-blue-600"></i> Facebook: {{this.facebook_link}}</p>
+                {{/if}}
             </div>
+
 
             {{#if this.description}}
             <div class="mt-3 text-sm text-gray-600">

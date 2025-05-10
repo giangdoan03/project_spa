@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Models\BusinessModel;
 use App\Models\ProductModel;
 use App\Models\ProductAttributeModel;
+use App\Models\StoreModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
@@ -110,8 +112,31 @@ class ProductController extends ResourceController
             }
         }
 
+        // ✅ Tự động gán danh sách nếu giá trị là "all"
+        $settings = &$product['display_settings'];
+
+        // Tạo các model liên quan
+        $businessModel = new BusinessModel();
+        $storeModel = new StoreModel();
+
+        if (isset($settings['company']) && $settings['company'] === 'all') {
+            $companies = $businessModel->select('id')->where('user_id', $userId)->findAll();
+            $settings['selectedCompanies'] = array_column($companies, 'id');
+        }
+
+        if (isset($settings['store']) && $settings['store'] === 'all') {
+            $stores = $storeModel->select('id')->where('user_id', $userId)->findAll();
+            $settings['selectedStores'] = array_column($stores, 'id');
+        }
+
+        if (isset($settings['relatedProducts']) && $settings['relatedProducts'] === 'all') {
+            $products = $productModel->select('id')->where('user_id', $userId)->findAll();
+            $settings['selectedProducts'] = array_column($products, 'id');
+        }
+
         return $this->respond($product);
     }
+
 
 
     public function create()
