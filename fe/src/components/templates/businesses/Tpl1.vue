@@ -1,7 +1,7 @@
 <template>
     <div class="tpl-wrapper">
         <div class="tpl-image">
-            <img src="http://assets.giang.test/image/1745030161_1629c049dd5304b986df.jpg" alt="Sản phẩm" class="slide-img"/>
+            <img src="https://assets.labit365.com/image/1745030161_1629c049dd5304b986df.jpg" alt="Sản phẩm" class="slide-img"/>
         </div>
 
         <div class="tpl-info">
