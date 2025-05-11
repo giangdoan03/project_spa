@@ -258,7 +258,6 @@ const columns = [
         title: 'Tên sản phẩm',
         dataIndex: 'name',
         key: 'name',
-        ellipsis: true,
         customRender: ({ text }) => text || 'Không có tên'
     },
     { title: 'SKU', dataIndex: 'sku', key: 'sku' },
