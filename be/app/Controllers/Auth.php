@@ -19,11 +19,11 @@ class Auth extends Controller
         log_message('debug', 'Email received: ' . $email);
         log_message('debug', 'Password received: ' . $password);
     
-        $userModel = new \App\Models\UserModel();
+        $userModel = new UserModel();
         $user = $userModel->where('email', $email)->first();
     
         log_message('debug', 'User from DB: ' . print_r($user, true));
-    
+
         if ($user && password_verify($password, $user['password'])) {
             $session->regenerate();
             $session->set([
@@ -31,10 +31,22 @@ class Auth extends Controller
                 'user_email' => $user['email'],
                 'logged_in'  => true,
             ]);
-    
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Login successful']);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Login successful',
+                'user' => [
+                    'id'       => $user['id'],
+                    'email'    => $user['email'],
+                    'name'     => $user['name'] ?? '',
+                    'role'     => $user['role'] ?? '',
+                    'role_id'  => $user['role_id'] ?? null,
+                    'avatar'   => $user['avatar'] ?? null,
+                ]
+            ]);
         }
-    
+
+
         return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid credentials']);
     }
     

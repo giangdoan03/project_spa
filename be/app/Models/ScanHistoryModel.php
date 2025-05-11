@@ -6,10 +6,18 @@ use CodeIgniter\Model;
 
 class ScanHistoryModel extends Model
 {
-    protected $table      = 'scan_histories';
+    protected $table = 'scan_histories';
     protected $primaryKey = 'id';
+
     protected $allowedFields = [
-        'user_id', 'object_type', 'object_id', 'scanned_at', 'ip_address', 'device'
+        'qr_id',
+        'tracking_code',
+        'ip_address',
+        'user_agent',
+        'referrer',
+        'created_at',
+        'updated_at',
     ];
+
     protected $useTimestamps = true;
 }

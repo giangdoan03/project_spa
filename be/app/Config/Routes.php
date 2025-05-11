@@ -48,7 +48,10 @@ $routes->group('api', function ($routes) {
 
     $routes->resource('landing-pages', ['controller' => 'LandingPageController']);
     $routes->resource('scan-history', ['controller' => 'ScanHistoryController']);
-    $routes->resource('customer', ['controller' => 'CustomerController']);
+    $routes->resource('users', ['controller' => 'UserController']);
+    $routes->post('users/update/(:num)', 'UserController::update/$1');
+    $routes->post('users/change-password', 'UserController::changePassword');
+    $routes->resource('customers', ['controller' => 'CustomerController']);
     $routes->resource('setting', ['controller' => 'SettingController']);
     $routes->resource('purchase-history', ['controller' => 'PurchaseHistoryController']);
 
@@ -63,7 +66,7 @@ $routes->group('api', function ($routes) {
     });
 
     // 1. Truy cập QR gốc → sinh tracking_code → redirect
-    $routes->get('(:alphanum)', 'QrCodeController::redirectWithTrack/$1');
+    $routes->get('qr/(:alphanum)', 'QrCodeController::redirectWithTrack/$1');
 
 // 2. Truy cập sau khi redirect → xử lý tracking + hiển thị
     $routes->get('scan/(:alphanum)', 'QrCodeController::handleScan/$1');
@@ -73,7 +76,6 @@ $routes->group('api', function ($routes) {
 
 // 4. API tracking thủ công (nếu dùng fetch)
     $routes->post('qr-codes/track', 'QrCodeController::track');
-
 
 
 });

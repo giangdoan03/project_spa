@@ -37,6 +37,7 @@ import VoucherForm from '../components/VoucherForm.vue'
 import LandingPageList from '../components/LandingPageList.vue'
 
 import UserPermissionManager from '../components/UserPermissionManager.vue'
+import UserList from '../components/UserList.vue'
 
 const routes = [
     {
@@ -96,7 +97,10 @@ const routes = [
             { path: 'stores/:id/edit', name: 'stores-edit', component: StoreForm, meta: { breadcrumb: 'Sửa cửa hàng', parent: 'stores' } },
 
             // Permissions
+            { path: 'user-list', name: 'user-list', component: UserList, meta: { breadcrumb: 'Quản lý user' } },
+
             { path: 'permissions', name: 'permissions', component: UserPermissionManager, meta: { breadcrumb: 'Phân quyền' } },
+
 
             // Loyalty Programs
             { path: 'loyalty/programs', name: 'chuong-trinh', component: LoyaltyProgramList, meta: { breadcrumb: 'Chương trình Loyalty', parent: 'dashboard' } },

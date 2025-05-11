@@ -5,6 +5,7 @@ use App\Controllers\BaseController;
 use App\Models\{QrCodeModel, QrScanLogModel};
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Models\CustomerModel;
 
 class QrCodeController extends BaseController
 {

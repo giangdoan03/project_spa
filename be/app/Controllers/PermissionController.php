@@ -48,7 +48,7 @@ class PermissionController extends ResourceController
         $roleId = $input['role_id'] ?? null;
         $permissions = $input['permissions'] ?? [];
 
-        $rolePermModel = new \App\Models\RolePermissionModel();
+        $rolePermModel = new RolePermissionModel();
 
         if (! $roleId || ! is_array($permissions)) {
             return $this->response->setStatusCode(400)->setJSON(['message' => 'Thiếu dữ liệu']);
@@ -59,7 +59,7 @@ class PermissionController extends ResourceController
 
         // Lưu mới
         $insertData = [];
-        $permModel = new \App\Models\PermissionModel();
+        $permModel = new PermissionModel();
 
         foreach ($permissions as $module => $actions) {
             foreach ($actions as $action => $allowed) {

@@ -9,7 +9,7 @@
         <a-layout>
             <Header
                 :collapsed="collapsed"
-                :user="user"
+                :user="userStore.user"
                 @toggle="toggleCollapsed"
                 @logout="handleLogout"
             />
@@ -19,10 +19,11 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '../stores/user'
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { logout } from '../api/auth'
 
 import Sidebar from './Sidebar.vue'
 import Header from './Header.vue'
@@ -32,29 +33,18 @@ const collapsed = ref(false)
 const selectedKeys = ref(['1'])
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
-
 const router = useRouter()
 
-
-// Toggle menu
 const toggleCollapsed = () => {
     collapsed.value = !collapsed.value
 }
 
-// Check session user khi load layout
-// onMounted(async () => {
-//     await fetchUser()
-// })
-
-// Hàm fetch user từ API
-
-
-// Xử lý logout
 const handleLogout = async () => {
     try {
-        await fetch('http://api.giang.test/logout', { credentials: 'include' })
-        user.value = null
-        router.push('/')
+        await logout()
+        userStore.clearUser()
+        localStorage.removeItem('role_id')
+        router.push('/login')
     } catch (error) {
         console.error('Logout error:', error)
     }
@@ -62,7 +52,7 @@ const handleLogout = async () => {
 </script>
 
 <style>
-    .bg_card_gray {
-        background: #f3f4f5;
-    }
+.bg_card_gray {
+    background: #f3f4f5;
+}
 </style>

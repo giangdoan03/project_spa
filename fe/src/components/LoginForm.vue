@@ -59,12 +59,19 @@
         try {
             const response = await loginApi(formState.email, formState.password)
 
-            if (response.data.status === 'success') {
-                userStore.setUser(response.data.user)
-                router.push('/dashboard')
+            if (response.data.status === 'success' && response.data.user) {
+                const user = response.data.user
+                userStore.setUser(user)
+
+                if (user.role_id !== undefined) {
+                    localStorage.setItem('role_id', user.role_id)
+                }
+
+                await router.push('/dashboard')
             } else {
-                alert(response.data.message)
+                alert(response.data.message || 'Đăng nhập không thành công')
             }
+
         } catch (error) {
             console.error(error)
             alert('Login failed. Please try again.')

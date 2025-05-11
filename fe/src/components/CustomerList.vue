@@ -26,16 +26,16 @@
 
         <a-button @click="exportExcel" style="margin-bottom: 12px;">Export</a-button>
 
-        <!-- Bảng danh sách -->
+        <!-- Danh sách khách hàng -->
         <a-table
             :columns="columns"
             :data-source="customers"
             :loading="loading"
             row-key="id"
-            :pagination="false"
+            :pagination="pagination"
+            @change="handleTableChange"
         >
             <template #bodyCell="{ column, record, index }">
-                <!-- Ảnh đại diện -->
                 <template v-if="column.key === 'avatar'">
                     <img
                         v-if="record.avatar"
@@ -44,9 +44,8 @@
                         style="width: 50px; height: 50px; object-fit: cover;"
                     />
                 </template>
-                <!-- STT -->
                 <template v-else-if="column.key === 'stt'">
-                    {{ index + 1 }}
+                    {{ (pagination.current - 1) * pagination.pageSize + index + 1 }}
                 </template>
             </template>
         </a-table>
@@ -57,7 +56,7 @@
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import axios from 'axios'
+import { getCustomers } from '../api/customer'
 
 const customers = ref([])
 const loading = ref(false)
@@ -68,6 +67,12 @@ const filters = ref({
     email: '',
     city: '',
     dateRange: [],
+})
+
+const pagination = ref({
+    current: 1,
+    pageSize: 10,
+    total: 0,
 })
 
 const columns = [
@@ -85,6 +90,8 @@ const fetchCustomers = async () => {
     loading.value = true
     try {
         const params = {
+            page: pagination.value.current,
+            per_page: pagination.value.pageSize,
             search: filters.value.name,
             phone: filters.value.phone,
             email: filters.value.email,
@@ -97,12 +104,9 @@ const fetchCustomers = async () => {
                 : undefined,
         }
 
-        const response = await axios.get('http://api.giang.test/api/customer', {
-            params,
-            withCredentials: true,
-        })
-
-        customers.value = response.data.data
+        const res = await getCustomers(params)
+        customers.value = res.data.data
+        pagination.value.total = res.data.pager.total
     } catch (e) {
         message.error('Không thể tải danh sách khách hàng')
     } finally {
@@ -110,8 +114,13 @@ const fetchCustomers = async () => {
     }
 }
 
+const handleTableChange = (pager) => {
+    pagination.value.current = pager.current
+    pagination.value.pageSize = pager.pageSize
+    fetchCustomers()
+}
+
 const exportExcel = () => {
-    // Gọi API hoặc sử dụng thư viện export nếu cần
     message.info('Đang phát triển chức năng export...')
 }
 

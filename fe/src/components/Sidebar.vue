@@ -121,9 +121,14 @@
                 <ClockCircleOutlined/>
                 <span>Lịch sử mua gói</span>
             </a-menu-item>
-            <a-menu-item key="quan-ly-user">
+            <a-menu-item v-if="isSuperAdmin" key="quan-ly-user">
                 <TeamOutlined/>
                 <span>Quản lý người dùng</span>
+            </a-menu-item>
+
+            <a-menu-item v-if="isSuperAdmin" key="phan-quyen">
+                <SafetyOutlined/>
+                <span>Phân quyền</span>
             </a-menu-item>
         </a-menu>
     </a-layout-sider>
@@ -134,11 +139,12 @@ import {
     PieChartOutlined, AppstoreOutlined, ShoppingOutlined, BankOutlined, QrcodeOutlined,
     GiftOutlined, TrophyOutlined, ShoppingCartOutlined, HistoryOutlined, EditOutlined,
     SearchOutlined, EnvironmentOutlined, TeamOutlined, SettingOutlined, ClockCircleOutlined,
-    UserOutlined, ShopOutlined, CalendarOutlined
+    UserOutlined, ShopOutlined, CalendarOutlined, SafetyOutlined
 } from '@ant-design/icons-vue'
 
 import {useRouter, useRoute} from 'vue-router'
 import {ref, watch, onMounted} from 'vue'
+import { computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -146,6 +152,9 @@ const route = useRoute()
 const props = defineProps({
     collapsed: Boolean
 })
+
+const roleId = Number(localStorage.getItem('role_id') || 0)
+const isSuperAdmin = computed(() => roleId === 1)
 
 const emit = defineEmits(['update:collapsed'])
 
@@ -171,7 +180,8 @@ const pathToKeyMap = {
     '/customers': 'quan-ly-khach-hang',
     '/settings': 'cau-hinh',
     '/purchase-history': 'lich-su-mua-goi',
-    '/permissions': 'quan-ly-user'
+    '/user-list': 'quan-ly-user',
+    '/permissions': 'phan-quyen',
 }
 
 const keyToParentMap = {
@@ -196,6 +206,8 @@ const keyToParentMap = {
     'cau-hinh': 'dashboard',
     'lich-su-mua-goi': 'dashboard',
     'quan-ly-user': 'dashboard',
+    'phan-quyen': 'dashboard',
+
 }
 
 
