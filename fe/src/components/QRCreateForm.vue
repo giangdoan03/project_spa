@@ -337,7 +337,7 @@ watch(form, () => {
 
     const config = {
         ...form.value.settings,
-        data: `https://qrcode.io/${form.value.qr_id}`
+        data: `https://qrcode.labit365.com/${form.value.qr_id}`
     }
 
     qrCode.update(config)
@@ -363,7 +363,7 @@ const handleSubmit = async () => {
     const payload = {
         ...form.value,
         target_type: selectedKey.value,
-        qr_url: `http://qrcode.io/${form.value.qr_id || 'placeholder'}`,
+        qr_url: `https://qrcode.labit365.com/${form.value.qr_id || 'placeholder'}`,
         settings_json: JSON.stringify(form.value.settings)
     }
 
@@ -389,7 +389,7 @@ const handleSubmit = async () => {
             if (qrCode && createdShortCode) {
                 qrCode.update({
                     ...form.value.settings,
-                    data: `https://qrcode.io/${createdShortCode}`
+                    data: `https://qrcode.labit365.com/${createdShortCode}`
                 })
             }
 
@@ -440,7 +440,7 @@ onMounted(async () => {
     // ✅ Init QR code sau khi đã có qr_id
     qrCode = new QRCodeStyling({
         ...form.value.settings,
-        data: `https://qrcode.io/${form.value.qr_id || 'placeholder'}`
+        data: `https://qrcode.labit365.com/${form.value.qr_id || 'placeholder'}`
     })
     qrCode.append(qrRef.value)
 })
