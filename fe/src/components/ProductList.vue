@@ -325,7 +325,7 @@ const handleImport = async () => {
 }
 
 const downloadSample = () => {
-    window.open('http://assets.giang.test/image//import_sample.xlsx', '_blank')
+    window.open('https://assets.labit365.com/image/import_sample.xlsx', '_blank')
 }
 
 // INIT
