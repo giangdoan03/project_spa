@@ -126,8 +126,8 @@ const columns = [
 ]
 
 const httpOnlyUrl = (url) => {
-    const isLocal = ['localhost', '127.0.0.1', 'giang.test'].includes(window.location.hostname)
-    return isLocal && url.startsWith('https://') ? url.replace('https://', 'http://') : url
+    const isLocal = ['localhost', '127.0.0.1', 'admin-qrcode.labit365.com'].includes(window.location.hostname)
+    return isLocal && url.startsWith('https://') ? url.replace('https://', 'https://') : url
 }
 
 const download = (record, format = 'png') => {
@@ -146,7 +146,7 @@ const download = (record, format = 'png') => {
         ...config,
         width: 600,
         height: 600,
-        data: httpOnlyUrl(record.qr_url || config?.data || 'https://example.com')
+        data: httpOnlyUrl(record.qr_url || config?.data || 'https://labit365.com')
     })
 
     largeQR.download({
@@ -246,7 +246,7 @@ const appendQRCode = (el, record) => {
             ...config,
             width: 60,
             height: 60,
-            data: httpOnlyUrl(record.qr_url || config?.data || 'https://example.com'),
+            data: httpOnlyUrl(record.qr_url || config?.data || 'https://labit365.com'),
         })
 
         qrCode.append(el)
