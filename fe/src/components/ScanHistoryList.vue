@@ -68,7 +68,7 @@ const columns = [
 const fetchData = async () => {
     loading.value = true
     try {
-        const response = await axios.get('http://api.giang.test/api/scan-history', {
+        const response = await axios.get('https://api-qrcode.labit365.com/api/scan-history', {
             params: {
                 search: search.value,
                 page: pagination.value.current,

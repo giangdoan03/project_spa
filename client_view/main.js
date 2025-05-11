@@ -103,7 +103,7 @@ async function renderQRPage() {
         return;
     }
 
-    const API_BASE = 'http://api.giang.test/api';
+    const API_BASE = 'https://api-qrcode.labit365.com/api';
 
     try {
         const res = await fetch(`${API_BASE}/qr-codes/detail/${qrId}`);
