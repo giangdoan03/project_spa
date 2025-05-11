@@ -33,7 +33,7 @@
                 </a-card>
             </a-col>
             <a-col :xs="24" :lg="8">
-                <a-card title="Danh sách doanh nghiệp" :bordered="false">
+                <a-card title="Danh sách doanh nghiệp" :bordered="false" class="list_company">
                     <!-- Alert và Button -->
                     <div style="display: flex; justify-content: space-between; align-items: center;" class="mb-2">
                         <a-alert message="Không có kết nối" type="error" show-icon style="margin-bottom: 0;" />
@@ -52,7 +52,7 @@
                                 </template>
                                 <a-list-item-meta>
                                     <template #avatar>
-                                        <a-avatar shape="square" size="large" src="https://via.placeholder.com/60x60?text=IMG" />
+                                        <a-avatar shape="square" size="large" src="https://placehold.co/100x100" />
                                     </template>
                                     <template #title>
                                         {{ item.name }}
@@ -305,6 +305,11 @@ const option = ref({
 
 .card :deep(.ant-card-body) {
     padding: 12px;
+}
+
+.list_company .ant-list-item {
+    padding-left: 0;
+    padding-right: 0;
 }
 
 @media (max-width: 576px) {

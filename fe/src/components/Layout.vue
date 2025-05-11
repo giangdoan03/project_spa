@@ -44,7 +44,7 @@ const handleLogout = async () => {
         await logout()
         userStore.clearUser()
         localStorage.removeItem('role_id')
-        router.push('/login')
+        await router.push('/login')
     } catch (error) {
         console.error('Logout error:', error)
     }

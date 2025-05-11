@@ -41,8 +41,13 @@ import UserList from '../components/UserList.vue'
 
 const routes = [
     {
-        path: '/',
+        path: '/login',
+        name: 'login',
         component: LoginForm
+    },
+    {
+        path: '/',
+        redirect: '/login' // optional nếu cần
     },
     {
         path: '/',
@@ -152,6 +157,10 @@ const routes = [
                 name: 'purchase-history',
                 component: () => import('../components/PurchaseHistoryList.vue'),
                 meta: { breadcrumb: 'Lịch sử mua gói', parent: 'dashboard' }
+            },
+            {
+                path: '/:catchAll(.*)',
+                redirect: '/login'
             }
         ]
     }
@@ -173,9 +182,9 @@ router.beforeEach(async (to, from, next) => {
             userStore.setUser(data.user)
         }
 
-        if (!isLoggedIn && to.path !== '/') {
-            next('/')
-        } else if (isLoggedIn && to.path === '/') {
+        if (!isLoggedIn && to.path !== '/login') {
+            next('/login')
+        } else if (isLoggedIn && to.path === '/login') {
             next('/dashboard')
         } else {
             next()

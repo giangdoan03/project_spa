@@ -32,3 +32,6 @@ export const uploadFile = (file) => {
     return instance.post('/upload', formData)
 }
 
+export const changePasswordAPI = (data) => instance.post('/users/change-password', data)
+
+

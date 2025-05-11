@@ -94,4 +94,40 @@ class UserController extends ResourceController
         $this->model->delete($id);
         return $this->respondDeleted(['id' => $id, 'message' => 'Đã xoá']);
     }
+
+    public function changePassword()
+    {
+        $request = $this->request->getJSON(true);
+        $userId = session('user_id'); // hoặc lấy từ token nếu dùng JWT
+
+        if (!$userId) {
+            return $this->failUnauthorized('Không xác thực');
+        }
+
+        $currentPassword = $request['current_password'] ?? '';
+        $newPassword     = $request['new_password'] ?? '';
+
+        if (!$newPassword) {
+            return $this->failValidationErrors('Mật khẩu mới không được để trống');
+        }
+
+        $user = $this->model->find($userId);
+        if (!$user) {
+            return $this->failNotFound('Không tìm thấy người dùng');
+        }
+
+        // Nếu không phải super admin thì phải kiểm tra mật khẩu cũ
+        if (($user['role'] ?? '') !== 'super admin') {
+            if (!password_verify($currentPassword, $user['password'])) {
+                return $this->failValidationErrors('Mật khẩu hiện tại không đúng');
+            }
+        }
+
+        $this->model->update($userId, [
+            'password' => password_hash($newPassword, PASSWORD_BCRYPT),
+        ]);
+
+        return $this->respond(['message' => 'Đã đổi mật khẩu thành công']);
+    }
+
 }

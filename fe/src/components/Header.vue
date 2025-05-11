@@ -3,16 +3,8 @@
         style="background: #fff; padding: 0; display: flex; justify-content: space-between; align-items: center;"
     >
         <div>
-            <MenuUnfoldOutlined
-                v-if="collapsed"
-                class="trigger"
-                @click="emit('toggle')"
-            />
-            <MenuFoldOutlined
-                v-else
-                class="trigger"
-                @click="emit('toggle')"
-            />
+            <MenuUnfoldOutlined v-if="collapsed" class="trigger" @click="emit('toggle')" />
+            <MenuFoldOutlined v-else class="trigger" @click="emit('toggle')" />
         </div>
 
         <!-- Breadcrumb -->
@@ -27,34 +19,52 @@
             </a-breadcrumb>
         </div>
 
-        <div style="margin-right: 24px; display: flex; align-items: center;">
-            <span v-if="user" style="margin-right: 12px;">
-                {{ user.email }}
-            </span>
-            <a-button
-                v-if="user"
-                type="text"
-                danger
-                shape="circle"
-                @click="emit('logout')"
-            >
-                <template #icon>
-                    <LogoutOutlined/>
+        <!-- User dropdown -->
+        <div style="margin-right: 24px;">
+            <a-dropdown>
+                <a class="ant-dropdown-link" @click.prevent>
+                    {{ user?.email }} <DownOutlined />
+                </a>
+                <template #overlay>
+                    <a-menu>
+                        <a-menu-item key="profile">
+                            <router-link :to="{ name: 'settings' }">Thông tin cá nhân</router-link>
+                        </a-menu-item>
+                        <a-menu-item key="change-password">
+                            <router-link :to="{ name: 'settings' }">Đổi mật khẩu</router-link>
+                        </a-menu-item>
+                        <a-menu-divider />
+                        <a-menu-item key="logout" @click="confirmLogout">Đăng xuất</a-menu-item>
+                    </a-menu>
                 </template>
-            </a-button>
+            </a-dropdown>
         </div>
+
+        <!-- Xác nhận đăng xuất -->
+        <a-modal
+            v-model:open="logoutConfirmVisible"
+            title="Xác nhận đăng xuất"
+            @ok="emit('logout')"
+            @cancel="logoutConfirmVisible = false"
+            okText="Đăng xuất"
+            cancelText="Huỷ"
+        >
+            <p>Bạn chắc chắn muốn đăng xuất?</p>
+        </a-modal>
     </a-layout-header>
 </template>
 
+
 <script setup>
-import {useRoute, useRouter} from 'vue-router'
-import {computed} from 'vue'
-import {storeToRefs} from 'pinia'
-import {useUserStore} from '../stores/user'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useUserStore } from '../stores/user'
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    DownOutlined
 } from '@ant-design/icons-vue'
 
 const props = defineProps({
@@ -65,10 +75,15 @@ const props = defineProps({
 const emit = defineEmits(['toggle', 'logout'])
 
 const userStore = useUserStore()
-const {user} = storeToRefs(userStore)
+const { user } = storeToRefs(userStore)
 
 const currentRoute = useRoute()
 const router = useRouter()
+
+const logoutConfirmVisible = ref(false)
+const confirmLogout = () => {
+    logoutConfirmVisible.value = true
+}
 
 const breadcrumbs = computed(() => {
     const matched = []

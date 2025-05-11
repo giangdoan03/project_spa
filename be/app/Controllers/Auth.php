@@ -4,10 +4,11 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use CodeIgniter\Controller;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class Auth extends Controller
 {
-    public function login()
+    public function login(): ResponseInterface
     {
         $session = session();
         $request = service('request');
@@ -29,6 +30,7 @@ class Auth extends Controller
             $session->set([
                 'user_id'    => $user['id'],
                 'user_email' => $user['email'],
+                'role'       => $user['role'], // 👉 nên thêm dòng này
                 'logged_in'  => true,
             ]);
 
@@ -47,11 +49,12 @@ class Auth extends Controller
         }
 
 
+
         return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid credentials']);
     }
     
 
-    public function check()
+    public function check(): ResponseInterface
     {
         $session = session();
 
@@ -68,11 +71,10 @@ class Auth extends Controller
         return $this->response->setJSON(['status' => 'error', 'message' => 'Not logged in']);
     }
 
-    public function logout()
+    public function logout(): ResponseInterface
     {
         $session = session();
-        $session->destroy();
-
+        $session->destroy(); // ✅ phải có dòng này
         return $this->response->setJSON(['status' => 'success', 'message' => 'Logged out']);
     }
 }

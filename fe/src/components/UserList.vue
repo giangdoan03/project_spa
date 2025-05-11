@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-page-header title="Quản lý người dùng" class="title-no-pd-l-r" />
+        <a-page-header :title="modalTitle" class="title-no-pd-l-r" />
 
         <a-row justify="space-between" style="margin-bottom: 16px">
             <a-col>
@@ -45,7 +45,7 @@
         <!-- Modal tạo/sửa -->
         <a-modal
             :open="showCreateModal"
-            title="Tạo người dùng mới"
+            :title="modalTitle"
             @ok="saveUser"
             @cancel="closeCreateModal"
             :maskClosable="true"
@@ -88,18 +88,33 @@
                         </div>
                     </a-upload>
                 </a-form-item>
-                <a-form-item label="Mật khẩu" v-if="!form.id">
+
+                <!-- Mật khẩu -->
+                <a-form-item label="Mật khẩu mới" v-if="!form.id">
                     <a-input-password v-model:value="form.password" />
                 </a-form-item>
+
+                <template v-else-if="canEditPassword">
+                    <a-form-item>
+                        <a-checkbox v-model:checked="showPasswordField">Đặt lại mật khẩu</a-checkbox>
+                    </a-form-item>
+                    <a-form-item v-if="showPasswordField">
+                        <a-space direction="vertical" style="width: 100%">
+                            <a-input-password v-model:value="form.password" placeholder="Để trống nếu không thay đổi" />
+                            <a-button @click="form.password = generateRandomPassword()">Tạo mật khẩu ngẫu nhiên</a-button>
+
+                        </a-space>
+                    </a-form-item>
+                </template>
             </a-form>
         </a-modal>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import {UploadOutlined} from '@ant-design/icons-vue'
+import { UploadOutlined } from '@ant-design/icons-vue'
 import {
     getUsers,
     createUser,
@@ -108,6 +123,7 @@ import {
     uploadFile
 } from '../api/user'
 import { getRoles } from '../api/permission'
+import { useUserStore } from '../stores/user'
 
 const users = ref([])
 const loading = ref(false)
@@ -116,8 +132,15 @@ const showCreateModal = ref(false)
 const form = ref({})
 const roles = ref([])
 const avatarFileList = ref([])
+const isEditing = ref(false)
+const showPasswordField = ref(false)
+
+const userStore = useUserStore()
+const canEditPassword = computed(() => userStore.user?.role === 'super admin')
 
 const pagination = ref({ total: 0, pageSize: 10, current: 1 })
+
+const modalTitle = computed(() => isEditing.value ? 'Sửa người dùng' : 'Tạo người dùng mới')
 
 const columns = [
     { title: 'Avatar', key: 'avatar' },
@@ -145,6 +168,12 @@ const fetchUsers = async () => {
     }
 }
 
+const generateRandomPassword = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
+    return Array.from({ length: 16 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+
 const handleTableChange = (paginationData) => {
     pagination.value.current = paginationData.current
     pagination.value.pageSize = paginationData.pageSize
@@ -157,11 +186,17 @@ const saveUser = async () => {
         if (Array.isArray(form.value.avatar)) {
             form.value.avatar = form.value.avatar[0]
         }
+
+        const payload = { ...form.value }
+        if (isEditing.value && (!payload.password || !showPasswordField.value)) {
+            delete payload.password
+        }
+
         if (form.value.id) {
-            await updateUser(form.value.id, form.value)
+            await updateUser(form.value.id, payload)
             message.success('Đã cập nhật người dùng')
         } else {
-            await createUser(form.value)
+            await createUser(payload)
             message.success('Đã thêm người dùng')
         }
         closeCreateModal()
@@ -174,8 +209,10 @@ const saveUser = async () => {
 }
 
 const editUser = (record) => {
+    isEditing.value = true
     form.value = { ...record, avatar: record.avatar ? [record.avatar] : [] }
     avatarFileList.value = record.avatar ? [{ url: record.avatar, name: 'avatar', status: 'done' }] : []
+    showPasswordField.value = false
     showCreateModal.value = true
 }
 
@@ -193,8 +230,10 @@ const deleteUser = async (id) => {
 }
 
 const openCreateModal = () => {
+    isEditing.value = false
     form.value = {}
     avatarFileList.value = []
+    showPasswordField.value = true
     showCreateModal.value = true
 }
 

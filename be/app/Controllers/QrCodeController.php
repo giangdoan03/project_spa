@@ -6,9 +6,12 @@ use App\Models\{QrCodeModel, QrScanLogModel};
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\CustomerModel;
+use App\Traits\AuthTrait;
+
 
 class QrCodeController extends BaseController
 {
+    use AuthTrait;
     use ResponseTrait;
     protected QrCodeModel $model;
 
@@ -126,9 +129,11 @@ class QrCodeController extends BaseController
      */
     public function list(): ResponseInterface
     {
-        $userId = $this->request->getGet('user_id');
+        $userId = $this->getUserId(); // 👈 Lấy user_id từ session đăng nhập
         $search = $this->request->getGet('search');
         $type = $this->request->getGet('type');
+
+        $builder = $this->model->where('user_id', $userId); // 👈 Luôn lọc theo user_id
 
         $builder = $this->model;
 
