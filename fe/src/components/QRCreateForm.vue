@@ -1,6 +1,10 @@
 <template>
     <div class="content_box">
-        <a-button type="link" @click="router.push('/my-qr-codes')" style="padding-left: 0; margin-bottom: 24px; color: #000000">
+        <a-button
+            type="link"
+            @click="goBackToList"
+            style="padding-left: 0; margin-bottom: 24px; color: #000000"
+        >
             <template #icon><ArrowLeftOutlined /></template>
             Quay lại danh sách
         </a-button>
@@ -398,8 +402,6 @@ const handleSubmit = async () => {
     }
 }
 
-
-
 onMounted(async () => {
     if (isEditMode.value) {
         try {
@@ -442,6 +444,15 @@ onMounted(async () => {
     })
     qrCode.append(qrRef.value)
 })
+
+const goBackToList = () => {
+    router.push({
+        path: '/my-qr-codes',
+        query: {
+            ...route.query // giữ nguyên page, search, type
+        }
+    })
+}
 
 
 

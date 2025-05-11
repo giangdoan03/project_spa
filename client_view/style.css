@@ -42,7 +42,13 @@
 
 
 .swiper.mySwiperNew,
-.swiper.mySwiperTop, .relatedProductsSwiper, .mySwiper,  .swiper-selected-products, .relatedCompaniesSwiper {
+.swiper.mySwiperTop,
+.relatedProductsSwiper,
+.mySwiper,
+.swiper-selected-products,
+.relatedCompaniesSwiper,
+.swiper-selected-products_company
+{
     width: 100%;
     padding-bottom: 32px;
 }
@@ -51,7 +57,9 @@
 .mySwiperTop .swiper-slide,
 .mySwiper .swiper-slide,
 .swiper-selected-products .swiper-slide,
-.relatedCompaniesSwiper .swiper-slide {
+.relatedCompaniesSwiper .swiper-slide,
+.swiper-selected-products_company .swiper-slide
+{
     width: auto !important;
     flex-shrink: 0;
 }
@@ -60,7 +68,8 @@
 .mySwiperTop .swiper-pagination,
 .mySwiper .swiper-pagination,
 .swiper-selected-products .swiper-pagination,
-.relatedCompaniesSwiper .swiper-pagination
+.relatedCompaniesSwiper .swiper-pagination,
+.swiper-selected-products_company .swiper-pagination
 {
     display: flex !important;
     justify-content: center;

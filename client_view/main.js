@@ -114,7 +114,7 @@ async function renderQRPage() {
             return;
         }
 
-        const { qr, target } = data;
+        const {qr, target} = data;
 
         // 👉 Làm sạch dữ liệu event nếu là sự kiện
 
@@ -139,6 +139,9 @@ async function renderQRPage() {
                 break;
             case 'company':
                 templateId = 'company-template';
+                break;
+            case 'business':
+                templateId = 'business-template';
                 break;
             default:
                 templateId = 'product-template';
@@ -190,13 +193,9 @@ async function renderQRPage() {
             }))
             : [];
 
-        console.log('target', target)
 
         const rawLinks = safeParse(target.display_settings, {}).productLinks || [];
         const productLinks = rawLinks.filter(link => link.url?.trim());
-
-        console.log('productLinks', productLinks)
-
 
         const templateEl = document.getElementById(templateId);
         if (!templateEl) {
@@ -208,6 +207,7 @@ async function renderQRPage() {
         const context = {
             qr,
             product: target,
+            business: target, // ✅ Thêm dòng này để template business hoạt động
             images,
             attributes: safeParse(target.attributes, []),
             productLinks,
@@ -284,9 +284,7 @@ async function renderQRPage() {
         }
 
 
-
         infoEl.innerHTML = template(context);
-
 
 
         // 👉 Gọi sau khi đã gắn vào DOM
@@ -378,8 +376,17 @@ async function renderQRPage() {
                     clickable: true,
                 },
             });
-        });
 
+            // ✅ Slider cửa hàng liên quan
+            new Swiper(".swiper-selected-products_company", {
+                slidesPerView: 1.3,
+                spaceBetween: 16,
+                pagination: {
+                    el: ".swiper-selected-products_company .swiper-pagination",
+                    clickable: true,
+                },
+            });
+        });
 
 
     } catch (err) {
