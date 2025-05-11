@@ -468,6 +468,10 @@ const goBackToList = () => {
     .preview {
         margin-bottom: 24px;
     }
+
+    .preview canvas {
+        width: 100%;
+    }
     .qr_code_image .ant-card-head-title {
         text-align: center;
         width: 100%;
