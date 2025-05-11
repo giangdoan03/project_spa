@@ -65,13 +65,18 @@ class BusinessController extends ResourceController
 
         $business = $this->formatBusinessItem($business);
 
-        // Giải mã JSON từ cột 'display_settings'
-        $business['display_settings'] = json_decode($business['display_settings'], true);
+       $rawSettings = $business['display_settings'] ?? '';
 
-        // Kiểm tra lỗi JSON
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->fail('Dữ liệu display_settings không hợp lệ');
-        }
+       if (is_string($rawSettings) && strlen(trim($rawSettings)) > 0) {
+           $parsed = json_decode($rawSettings, true);
+           if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
+               $business['display_settings'] = $parsed;
+           } else {
+               return $this->fail('Dữ liệu display_settings không hợp lệ');
+           }
+       } else {
+           $business['display_settings'] = [];
+       }
 
         $business['extra_info'] = $extraInfoModel->where('business_id', $id)->findAll();
 
