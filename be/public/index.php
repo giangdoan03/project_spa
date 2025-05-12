@@ -1,8 +1,22 @@
 <?php
 
 // --- CORS FIX lấy từ ENV ---
-$corsOrigins = getenv('CORS_ALLOWED_ORIGINS'); // Lấy từ .env
 
+// === LOAD .env THỦ CÔNG SỚM ===
+$dotenvPath = realpath(__DIR__ . '/../');
+if (file_exists($dotenvPath . '/.env')) {
+    $lines = file($dotenvPath . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0 || strpos($line, '=') === false) continue;
+        list($name, $value) = array_map('trim', explode('=', $line, 2));
+        if (!getenv($name)) {
+            putenv("$name=$value");
+        }
+    }
+}
+
+// === CORS FIX: đọc từ biến môi trường ===
+$corsOrigins = getenv('CORS_ALLOWED_ORIGINS'); // Lấy từ .env
 $allowedOrigins = $corsOrigins ? array_map('trim', explode(',', $corsOrigins)) : [];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
