@@ -40,9 +40,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 
-import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
-
 
 import {
     createLoyaltyProgram,

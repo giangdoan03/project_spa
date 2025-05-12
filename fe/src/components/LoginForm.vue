@@ -18,12 +18,10 @@
                 >
                     <a-input v-model:value="formState.email" placeholder="Enter your email"/>
                 </a-form-item>
-
                 <a-form-item label="Password" name="password"
                              :rules="[{ required: true, message: 'Please input your password!' }]">
                     <a-input-password v-model:value="formState.password" placeholder="Enter your password"/>
                 </a-form-item>
-
                 <a-form-item name="remember">
                     <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
                 </a-form-item>
