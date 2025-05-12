@@ -21,11 +21,31 @@ class QrCodeController extends BaseController
     }
 
     /**
+     * Lấy mã QR thuộc về người dùng
+     */
+    private function getOwnedQR($qr_id)
+    {
+        $userId = $this->getUserId();
+        $qr = $this->model->where('qr_id', $qr_id)->first();
+
+        if (!$qr) {
+            return $this->failNotFound('Không tìm thấy mã QR');
+        }
+
+        if ($qr['user_id'] != $userId) {
+            return $this->failForbidden('Bạn không có quyền với mã QR này');
+        }
+
+        return $qr;
+    }
+
+    /**
      * Tạo QR Code mới
      */
     public function create(): ResponseInterface
     {
         $data = $this->request->getJSON(true);
+        $userId = $this->getUserId();
 
         if (empty($data['short_code'])) {
             $data['short_code'] = bin2hex(random_bytes(4));
@@ -40,6 +60,8 @@ class QrCodeController extends BaseController
         if (isset($data['settings_json']) && is_array($data['settings_json'])) {
             $data['settings_json'] = json_encode($data['settings_json']);
         }
+
+        $data['user_id'] = $userId;
 
         if (!$this->model->insert($data)) {
             log_message('error', 'QR Insert Failed: ' . json_encode($data));
@@ -59,14 +81,11 @@ class QrCodeController extends BaseController
     public function update(string $qr_id): ResponseInterface
     {
         $data = $this->request->getJSON(true);
+        $qr = $this->getOwnedQR($qr_id);
+        if ($qr instanceof ResponseInterface) return $qr;
 
         if (isset($data['settings_json']) && is_array($data['settings_json'])) {
             $data['settings_json'] = json_encode($data['settings_json']);
-        }
-
-        $qr = $this->model->where('qr_id', $qr_id)->first();
-        if (!$qr) {
-            return $this->failNotFound('Không tìm thấy mã QR');
         }
 
         if (!$this->model->update($qr['id'], $data)) {
@@ -81,10 +100,8 @@ class QrCodeController extends BaseController
      */
     public function delete(string $qr_id): ResponseInterface
     {
-        $qr = $this->model->where('qr_id', $qr_id)->first();
-        if (!$qr) {
-            return $this->failNotFound('Không tìm thấy mã QR');
-        }
+        $qr = $this->getOwnedQR($qr_id);
+        if ($qr instanceof ResponseInterface) return $qr;
 
         if (!$this->model->delete($qr['id'])) {
             return $this->fail('Không xoá được mã QR');
@@ -98,8 +115,9 @@ class QrCodeController extends BaseController
      */
     public function show($qr_id): ResponseInterface
     {
-        $qr = $this->model->where('qr_id', $qr_id)->first();
-        if (!$qr) return $this->failNotFound('Không tìm thấy mã QR');
+        $qr = $this->getOwnedQR($qr_id);
+        if ($qr instanceof ResponseInterface) return $qr;
+
         $qr['settings_json'] = json_decode($qr['settings_json'], true);
         return $this->respond(['data' => $qr]);
     }
@@ -119,7 +137,6 @@ class QrCodeController extends BaseController
             return redirect()->to('/not-found');
         }
 
-        // Redirect về trang hiển thị QR với qr_id
         return redirect()->to(base_url("/" . $qrId));
     }
 

@@ -12,12 +12,12 @@ export default defineConfig({
     ],
     base: '/', // quan trọng để đúng path
     server: {
-        host: 'admin-qrcode.labit365.com',
+        host: 'giang.test',
         port: 5173,
     },
     proxy: {
         '/api': {
-            target: 'https://api-qrcode.labit365.com',
+            target: 'http://api.giang.test',
             changeOrigin: true,
             credentials: true,
         },

@@ -5,11 +5,13 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->post('/login', 'Auth::login');
-$routes->get('/check', 'Auth::check');
-$routes->get('/logout', 'Auth::logout');
+
 
 $routes->group('api', function ($routes) {
+    $routes->post('login', 'Auth::login');
+    $routes->get('check', 'Auth::check');
+    $routes->get('logout', 'Auth::logout');
+
     $routes->resource('products', ['controller' => 'ProductController']);
     $routes->post('products/import', 'ProductController::import'); // ✅ dùng dấu /
     $routes->get('products-export-excel', 'ProductController::exportExcel');
@@ -68,13 +70,13 @@ $routes->group('api', function ($routes) {
     // 1. Truy cập QR gốc → sinh tracking_code → redirect
     $routes->get('qr/(:alphanum)', 'QrCodeController::redirectWithTrack/$1');
 
-// 2. Truy cập sau khi redirect → xử lý tracking + hiển thị
+    // 2. Truy cập sau khi redirect → xử lý tracking + hiển thị
     $routes->get('scan/(:alphanum)', 'QrCodeController::handleScan/$1');
 
-// 3. API chi tiết QR (dành cho frontend gọi)
+    // 3. API chi tiết QR (dành cho frontend gọi)
     $routes->get('qr-codes/detail/(:segment)', 'QrCodeController::detail/$1');
 
-// 4. API tracking thủ công (nếu dùng fetch)
+    // 4. API tracking thủ công (nếu dùng fetch)
     $routes->post('qr-codes/track', 'QrCodeController::track');
 
 
