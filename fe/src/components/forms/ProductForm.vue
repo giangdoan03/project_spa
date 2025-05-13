@@ -33,6 +33,10 @@ import { getProducts } from '@/api/product.js'
 // Model nhận từ component cha
 const form = defineModel()
 
+defineExpose({
+    requireTarget: true
+})
+
 // Danh sách sản phẩm
 const productOptions = ref([])
 

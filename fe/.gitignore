@@ -20,6 +20,9 @@ coverage/
 .env.*       # ← chặn mọi .env.production, .env.development...
 be/.env.*
 fe/.env.*
+fe/.env.production
+fe/.gitignore
+
 
 # Ignore specific files
 fe/vite.config.js

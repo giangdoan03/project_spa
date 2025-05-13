@@ -34,6 +34,10 @@ import { getEvents } from '@/api/event.js' // bạn cần chắc chắn file nà
 
 const form = defineModel()
 
+defineExpose({
+    requireTarget: true
+})
+
 const eventOptions = ref([])
 
 const filterOption = (input, option) => {
