@@ -1,10 +1,10 @@
 <template>
     <a-form layout="vertical">
-        <a-form-item label="Số điện thoại">
-            <a-input v-model:value="phone" placeholder="Nhập số điện thoại" />
+        <a-form-item label="Liên kết/URL">
+            <a-input v-model:value="phone" placeholder="Nhập URL/Liên kết" />
         </a-form-item>
-        <a-form-item label="Tin nhắn">
-            <a-textarea v-model:value="message" :rows="3" placeholder="Nhập nội dung tin nhắn..." />
+        <a-form-item label="Tên QR">
+            <a-textarea v-model:value="message" :rows="3" placeholder="Nhập tên cho QR của bạn" />
         </a-form-item>
     </a-form>
 </template>
