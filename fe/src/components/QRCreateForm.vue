@@ -33,7 +33,12 @@
                     <!-- Bên trái: Tabs cấu hình -->
                     <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="14">
                         <a-card v-if="formComponent" :title="selectedLabel" style="margin-bottom: 24px;">
-                            <component :is="formComponent" :key="selectedKey" v-model="form"/>
+                            <component
+                                :is="formComponent"
+                                :key="selectedKey"
+                                ref="formComponentRef"
+                                v-model="form"
+                            />
                         </a-card>
 
                         <a-card title="Cấu hình mã QR" bordered>
@@ -166,10 +171,8 @@
         </a-form>
     </div>
 </template>
-
-
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, onMounted, computed, nextTick } from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 const route = useRoute()
 import QRCodeStyling from 'qr-code-styling'
@@ -179,6 +182,10 @@ import {uploadFile} from '../api/product'
 import {message} from 'ant-design-vue'
 const isEditMode = computed(() => !!route.params.qr_id)
 const downloadFormat = ref('png')
+
+const requireTarget = ref(false)
+const formComponentRef = ref()
+const QR_BASE_URL = import.meta.env.VITE_QR_BASE
 
 import {
     LinkOutlined, FontSizeOutlined, MessageOutlined, ContactsOutlined, CalendarOutlined,
@@ -277,9 +284,26 @@ const downloadQRCode = () => {
 }
 
 const selectedKey = ref('url')
-const selectItem = (key) => {
+const selectItem = async (key) => {
     selectedKey.value = key
-    form.value.target_type = key // Gán key làm target_type
+    form.value.target_type = key
+
+    await nextTick()
+    const componentInstance = formComponentRef.value
+    requireTarget.value = componentInstance?.requireTarget || false
+}
+
+const updateQrPreview = () => {
+    if (!qrCode) return
+
+    const dataValue = requireTarget.value
+        ? `https://qrcode.labit365.com/${form.value.short_code || form.value.qr_id}`
+        : form.value.settings.data
+
+    qrCode.update({
+        ...form.value.settings,
+        data: dataValue
+    })
 }
 
 const selectedLabel = computed(() => {
@@ -334,6 +358,7 @@ let qrCode = null
 
 watch(form, () => {
     if (!qrCode || !form.value.short_code) return
+    updateQrPreview()
 
     const config = {
         ...form.value.settings,
@@ -350,10 +375,18 @@ const generateUniqueQrId = () => {
 }
 
 const handleSubmit = async () => {
-    if (!form.value.target_id || !selectedKey.value) {
-        message.warning('Vui lòng chọn đối tượng trước')
-        return
+    if (requireTarget.value) {
+        if (!form.value.target_id) {
+            message.warning('Vui lòng chọn đối tượng trước')
+            return
+        }
+    } else {
+        if (!form.value.settings?.data) {
+            message.warning('Vui lòng nhập nội dung QR')
+            return
+        }
     }
+
 
     // Tạo qr_id nếu chưa có (chỉ khi tạo mới)
     if (!isEditMode.value && !form.value.qr_id) {
@@ -363,44 +396,53 @@ const handleSubmit = async () => {
     const payload = {
         ...form.value,
         target_type: selectedKey.value,
-        qr_url: `https://qrcode.labit365.com/${form.value.qr_id || 'placeholder'}`,
+        qr_url: requireTarget.value
+            ? `${QR_BASE_URL}/${form.value.qr_id || 'placeholder'}`
+            : form.value.settings.data,
         settings_json: JSON.stringify(form.value.settings)
     }
 
     try {
         if (isEditMode.value) {
-            // Cập nhật QR
             await updateQR(route.params.qr_id, payload)
             message.success('Cập nhật mã QR thành công!')
-        } else {
-            // Tạo mới QR
-            const res = await createQR(payload)
+            updateQrPreview() // 👈 cập nhật preview động
 
+            // ✅ Cập nhật QR preview đúng kiểu
+            qrCode.update({
+                ...form.value.settings,
+                data: requireTarget.value
+                    ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}`
+                    : form.value.settings.data
+            })
+
+        } else {
+            const res = await createQR(payload)
             const createdQrId = res.data?.qr_id
             const createdShortCode = res.data?.short_code
 
             message.success('Tạo mã QR thành công!')
-
-            // Cập nhật lại vào form để đồng bộ preview
             form.value.qr_id = createdQrId
             form.value.short_code = createdShortCode
 
-            // Cập nhật QR code preview
-            if (qrCode && createdShortCode) {
-                qrCode.update({
-                    ...form.value.settings,
-                    data: `https://qrcode.labit365.com/${createdShortCode}`
-                })
-            }
+            // ✅ Cập nhật QR preview đúng kiểu
 
-            // 👉 Điều hướng sang màn edit
+            qrCode.update({
+                ...form.value.settings,
+                data: requireTarget.value
+                    ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}`
+                    : form.value.settings.data
+            })
+            updateQrPreview() // 👈 cập nhật preview động
             router.push(`/my-qr-codes/${createdQrId}/edit`)
         }
+
     } catch (err) {
         console.error('Lỗi:', err.response?.data || err.message)
         message.error(isEditMode.value ? 'Cập nhật thất bại!' : 'Tạo mã QR thất bại!')
     }
 }
+
 
 onMounted(async () => {
     if (isEditMode.value) {
@@ -440,8 +482,11 @@ onMounted(async () => {
     // ✅ Init QR code sau khi đã có qr_id
     qrCode = new QRCodeStyling({
         ...form.value.settings,
-        data: `https://qrcode.labit365.com/${form.value.qr_id || 'placeholder'}`
+        data: requireTarget.value
+            ? `${QR_BASE_URL}/${form.value.qr_id || 'placeholder'}`
+            : form.value.settings.data
     })
+
     qrCode.append(qrRef.value)
 })
 
@@ -453,8 +498,6 @@ const goBackToList = () => {
         }
     })
 }
-
-
 
 </script>
 

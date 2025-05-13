@@ -20,6 +20,11 @@ class QrCodeController extends BaseController
         $this->model = new QrCodeModel();
     }
 
+    private const QR_TYPES_NO_TARGET = [
+        'url', 'text', 'sms', 'email', 'phone', 'vcard', 'map', 'calendar',
+        'wifi', 'pdf', 'audio', 'video', 'image', 'custom-url', 'app-store'
+    ];
+
     /**
      * Lấy mã QR thuộc về người dùng
      */
@@ -61,6 +66,11 @@ class QrCodeController extends BaseController
             $data['settings_json'] = json_encode($data['settings_json']);
         }
 
+        // 👇 Xử lý target_id cho các loại QR không cần đối tượng
+        if (in_array($data['target_type'], self::QR_TYPES_NO_TARGET)) {
+            $data['target_id'] = null;
+        }
+
         $data['user_id'] = $userId;
 
         if (!$this->model->insert($data)) {
@@ -88,12 +98,18 @@ class QrCodeController extends BaseController
             $data['settings_json'] = json_encode($data['settings_json']);
         }
 
+        // 👇 Xử lý target_id nếu không cần thiết
+        if (in_array($data['target_type'], self::QR_TYPES_NO_TARGET)) {
+            $data['target_id'] = null;
+        }
+
         if (!$this->model->update($qr['id'], $data)) {
             return $this->fail($this->model->errors());
         }
 
         return $this->respondUpdated(['qr_id' => $qr_id]);
     }
+
 
     /**
      * Xoá QR Code

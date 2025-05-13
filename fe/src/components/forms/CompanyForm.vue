@@ -31,6 +31,10 @@ import { getBusinesses } from '@/api/business.js'
 const form = defineModel()
 const businessOptions = ref([])
 
+defineExpose({
+    requireTarget: true
+})
+
 const filterOption = (input, option) => {
     return option.label.toLowerCase().includes(input.toLowerCase())
 }

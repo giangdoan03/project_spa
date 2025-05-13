@@ -31,6 +31,10 @@ import { getStores } from '@/api/store.js'
 // Nhận props từ cha
 const form = defineModel()
 
+defineExpose({
+    requireTarget: true
+})
+
 // Danh sách cửa hàng
 const storeOptions = ref([])
 

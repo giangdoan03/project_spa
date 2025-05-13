@@ -42,6 +42,10 @@ import { getPersons } from '@/api/person.js'
 // Nhận form từ component cha
 const form = defineModel()
 
+defineExpose({
+    requireTarget: true
+})
+
 // Danh sách người dùng hiển thị trong select
 const personOptions = ref([])
 
