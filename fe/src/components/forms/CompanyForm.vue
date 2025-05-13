@@ -26,7 +26,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getBusinesses } from '@/api/business.js' // 👈 thay bằng API doanh nghiệp
+import { getBusinesses } from '@/api/business.js'
 
 const form = defineModel()
 const businessOptions = ref([])
