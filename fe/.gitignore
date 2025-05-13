@@ -18,7 +18,12 @@ coverage/
 .env
 .env.*.local
 .env.*       # ← chặn mọi .env.production, .env.development...
+be/.env.*
+fe/.env.*
 
+# Ignore specific files
+fe/vite.config.js
+be/public/index.php
 # System files
 .DS_Store
 
