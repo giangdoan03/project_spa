@@ -1,23 +1,10 @@
 <?php
 
-// --- CORS FIX lấy từ ENV ---
-
-// === LOAD .env THỦ CÔNG SỚM ===
-$dotenvPath = realpath(__DIR__ . '/../');
-if (file_exists($dotenvPath . '/.env')) {
-    $lines = file($dotenvPath . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0 || strpos($line, '=') === false) continue;
-        list($name, $value) = array_map('trim', explode('=', $line, 2));
-        if (!getenv($name)) {
-            putenv("$name=$value");
-        }
-    }
-}
-
-// === CORS FIX: đọc từ biến môi trường ===
-$corsOrigins = getenv('CORS_ALLOWED_ORIGINS'); // Lấy từ .env
-$allowedOrigins = $corsOrigins ? array_map('trim', explode(',', $corsOrigins)) : [];
+$allowedOrigins = [
+    'http://giang.test:5173',
+    'http://localhost:3000',
+    'https://admin-qrcode.labit365.com'
+];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowedOrigins)) {
@@ -32,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
+
 
 // --- END CORS FIX ---
 

@@ -95,8 +95,8 @@
                         </a-form-item>
 
                         <a-form-item label="Số điện thoại liên hệ">
-                            <div v-if="form.contact_phone">
-                                <a-input v-model:value="form.contact_phone" style="width: 12%" placeholder="Số điện thoại liên hệ"/>
+                            <div>
+                                <a-input v-model:value="form.contact_phone" style="width: 20%" placeholder="Số điện thoại liên hệ"/>
                             </div>
                         </a-form-item>
 
