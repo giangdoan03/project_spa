@@ -6,14 +6,32 @@ use CodeIgniter\RESTful\ResourceController;
 
 class UploadController extends ResourceController
 {
+    private function getUploadConfig(): array
+    {
+        return [
+            'upload_dir'    => rtrim(env('UPLOAD_DIR', WRITEPATH . '../public/uploads/'), '/') . '/',
+            'assets_domain' => rtrim(env('ASSETS_DOMAIN', 'http://assets.giang.test/image/'), '/')
+        ];
+    }
+
+    private function getAllowedOrigins(): array
+    {
+        // Cho phép origin động tuỳ theo môi trường
+        return [
+            // Localhost
+            'http://giang.test:5173',
+            'http://api.giang.test',
+
+            // Trên VPS / production
+            'https://admin-qrcode.labit365.com',
+            'https://qrcode.labit365.com',
+            'https://api-qrcode.labit365.com',
+        ];
+    }
+
     public function upload()
     {
-        // Giới hạn chỉ upload từ domain api.giang.test
-        $allowedOrigins = [
-            'http://giang.test:5173',   // Frontend đang chạy local
-            'http://api.giang.test'     // API chính
-        ];
-
+        $allowedOrigins = $this->getAllowedOrigins();
         $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 
         if ($origin && !in_array($origin, $allowedOrigins)) {
@@ -21,27 +39,22 @@ class UploadController extends ResourceController
         }
 
         $file = $this->request->getFile('file');
-
         if (!$file || !$file->isValid()) {
             return $this->fail('Không tìm thấy file hoặc file không hợp lệ.');
         }
 
-        // ✅ Lấy upload dir từ .env, fallback mặc định nếu chưa khai báo
-        $customUploadDir = getenv('UPLOAD_DIR') ?: 'C:/php82/htdocs/assets/image/';
-        if (!is_dir($customUploadDir)) {
-            mkdir($customUploadDir, 0777, true);
+        $config = $this->getUploadConfig();
+
+        if (!is_dir($config['upload_dir'])) {
+            mkdir($config['upload_dir'], 0777, true);
         }
 
         $newName = $file->getRandomName();
-        $file->move($customUploadDir, $newName);
+        $file->move($config['upload_dir'], $newName);
 
-        // ✅ Lấy domain ảnh public từ .env
-        $assetsDomain = getenv('ASSETS_DOMAIN') ?: 'http://assets.giang.test/image/';
-        $publicUrl = rtrim($assetsDomain, '/') . '/' . $newName;
+        $publicUrl = $config['assets_domain'] . '/' . $newName;
 
-        return $this->respond([
-            'url' => $publicUrl
-        ]);
+        return $this->respond(['url' => $publicUrl]);
     }
 
     public function uploadFromUrl()
@@ -52,14 +65,12 @@ class UploadController extends ResourceController
             return $this->fail('URL không hợp lệ.');
         }
 
-        // Lấy nội dung file từ URL
         try {
             $imageContents = file_get_contents($url);
         } catch (\Exception $e) {
             return $this->fail('Không thể tải ảnh từ URL.');
         }
 
-        // Tạo tên file ngẫu nhiên
         $pathInfo = pathinfo($url);
         $extension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : 'jpg';
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -69,21 +80,16 @@ class UploadController extends ResourceController
         }
 
         $filename = uniqid() . '.' . $extension;
+        $config = $this->getUploadConfig();
 
-        // Lưu file
-        $uploadDir = getenv('UPLOAD_DIR') ?: 'C:/php82/htdocs/assets/image/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+        if (!is_dir($config['upload_dir'])) {
+            mkdir($config['upload_dir'], 0777, true);
         }
 
-        file_put_contents($uploadDir . $filename, $imageContents);
+        file_put_contents($config['upload_dir'] . $filename, $imageContents);
 
-        // Trả về URL công khai
-        $publicUrl = rtrim(getenv('ASSETS_DOMAIN') ?: 'http://assets.giang.test/image/', '/') . '/' . $filename;
+        $publicUrl = $config['assets_domain'] . '/' . $filename;
 
-        return $this->respond([
-            'url' => $publicUrl
-        ]);
+        return $this->respond(['url' => $publicUrl]);
     }
-
 }
