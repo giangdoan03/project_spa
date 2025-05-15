@@ -101,6 +101,9 @@ import { getQRList, deleteQR } from '@/api/qrcode'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import QRCodeStyling from 'qr-code-styling'
 
+import { h } from 'vue'
+import { Tooltip } from 'ant-design-vue'
+
 const router = useRouter()
 const route = useRoute()
 
@@ -117,7 +120,27 @@ const currentPage = computed(() => parseInt(route.query.page || '1'))
 
 const columns = [
     { title: 'Mã', key: 'qr', dataIndex: 'qr_image_url' },
-    { title: 'Liên kết', key: 'qr_url', dataIndex: 'qr_url' },
+    {
+        title: 'Liên kết',
+        key: 'qr_url',
+        dataIndex: 'qr_url',
+        ellipsis: true,
+        customRender: ({ text }) => {
+            return h(Tooltip, { title: text }, {
+                default: () => h('span', {
+                    style: {
+                        display: 'inline-block',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '250px',
+                        verticalAlign: 'middle',
+                        cursor: 'pointer', // ✅ để tooltip trigger được khi hover
+                    }
+                }, text)
+            })
+        }
+    },
     { title: 'Tên mã QR', key: 'qr_name', dataIndex: 'qr_name' },
     { title: 'Tên đối tượng', key: 'target_name', dataIndex: 'target_name' },
     { title: 'Kiểu', key: 'target_type', dataIndex: 'target_type' },
@@ -125,10 +148,14 @@ const columns = [
     { title: 'Hành động', key: 'action' },
 ]
 
+const allowedHosts = import.meta.env.VITE_ALLOWED_HOSTS?.split(',') || []
+const defaultQRUrl = import.meta.env.VITE_DEFAULT_QR_URL || 'https://labit365.com'
+
 const httpOnlyUrl = (url) => {
-    const isLocal = ['localhost', '127.0.0.1', 'admin-qrcode.labit365.com'].includes(window.location.hostname)
+    const isLocal = allowedHosts.includes(window.location.hostname)
     return isLocal && url.startsWith('https://') ? url.replace('https://', 'https://') : url
 }
+
 
 const download = (record, format = 'png') => {
     const qrInstance = qrInstances.value[record.qr_id]
@@ -146,7 +173,7 @@ const download = (record, format = 'png') => {
         ...config,
         width: 600,
         height: 600,
-        data: httpOnlyUrl(record.qr_url || config?.data || 'https://labit365.com')
+        data: httpOnlyUrl(record.qr_url || config?.data || defaultQRUrl)
     })
 
     largeQR.download({
@@ -246,7 +273,7 @@ const appendQRCode = (el, record) => {
             ...config,
             width: 60,
             height: 60,
-            data: httpOnlyUrl(record.qr_url || config?.data || 'https://labit365.com'),
+            data: httpOnlyUrl(record.qr_url || config?.data || defaultQRUrl)
         })
 
         qrCode.append(el)
