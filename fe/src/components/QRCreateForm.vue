@@ -297,8 +297,8 @@ const updateQrPreview = () => {
     if (!qrCode) return
 
     const dataValue = requireTarget.value
-        ? `https://qrcode.labit365.com/${form.value.short_code || form.value.qr_id}`
-        : form.value.settings.data
+        ? `${import.meta.env.VITE_QR_BASE}/${form.value.short_code || form.value.qr_id}`
+        : form.value.settings.data;
 
     qrCode.update({
         ...form.value.settings,
@@ -362,8 +362,9 @@ watch(form, () => {
 
     const config = {
         ...form.value.settings,
-        data: `https://qrcode.labit365.com/${form.value.qr_id}`
-    }
+        data: `${import.meta.env.VITE_QR_BASE}/${form.value.qr_id}`
+    };
+
 
     qrCode.update(config)
 }, { deep: true })
@@ -469,7 +470,7 @@ onMounted(async () => {
                     }
                 }
 
-                selectItem(data.target_type || 'url')
+                await selectItem(data.target_type || 'url')
             }
         } catch (err) {
             message.error('Không thể tải thông tin mã QR')

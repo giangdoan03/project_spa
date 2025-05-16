@@ -103,7 +103,14 @@ async function renderQRPage() {
         return;
     }
 
-    const API_BASE = 'https://api-qrcode.labit365.com/api';
+    const isLocal =
+        ['localhost', '127.0.0.1', 'qrcode.io', 'giang.test'].includes(window.location.hostname);
+
+    const API_BASE = isLocal
+        ? 'http://api.giang.test/api'
+        : 'https://api-qrcode.labit365.com/api';
+
+    console.log('API_BASE', API_BASE)
 
     try {
         const res = await fetch(`${API_BASE}/qr-codes/detail/${qrId}`);
