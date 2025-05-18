@@ -7,20 +7,15 @@
                 placeholder="Nhập nội dung văn bản..."
             />
         </a-form-item>
+        <a-form-item label="Tên QR (tuỳ chọn)">
+            <a-input v-model:value="form.qr_name" placeholder="Nhập tên cho QR của bạn" />
+        </a-form-item>
     </a-form>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-
-// Nhận prop từ component cha qua v-model (defineModel)
 const form = defineModel()
-
-// Dùng computed để ánh xạ `form.settings.data`
-const text = computed({
-    get: () => form?.settings?.data || '',
-    set: (val) => {
-        if (form?.settings) form.settings.data = val
-    }
+defineExpose({
+    requireTarget: false,
 })
 </script>

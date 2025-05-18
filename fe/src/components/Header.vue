@@ -30,9 +30,9 @@
                         <a-menu-item key="profile">
                             <router-link :to="{ name: 'settings' }">Thông tin cá nhân</router-link>
                         </a-menu-item>
-                        <a-menu-item key="change-password">
-                            <router-link :to="{ name: 'settings' }">Đổi mật khẩu</router-link>
-                        </a-menu-item>
+<!--                        <a-menu-item key="change-password">-->
+<!--                            <router-link :to="{ name: 'settings' }">Đổi mật khẩu</router-link>-->
+<!--                        </a-menu-item>-->
                         <a-menu-divider />
                         <a-menu-item key="logout" @click="confirmLogout">Đăng xuất</a-menu-item>
                     </a-menu>

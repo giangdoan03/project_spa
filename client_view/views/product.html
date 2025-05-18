@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Thông tin sản phẩm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Thư viện -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./../style.css">
+
+    <!-- JS dùng chung -->
+    <script src="./js/api.js"></script>
+    <script src="./js/template-common.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-800">
+<div id="output" class="max-w-md mx-auto bg-white shadow-lg flex flex-col"></div>
+
+<!-- Handlebars template -->
+<script id="product-template" type="text/x-handlebars-template">
+    {{#with product}}
+        <!-- Danh sách ảnh -->
+        {{#if ../images.length}}
+            {{#if (gt ../images.length 1)}}
+                <div class="swiper imageProductAvatarSwiper h-60 w-full">
+                    <div class="swiper-wrapper h-full">
+                        {{#each ../images}}
+                            <div class="swiper-slide flex items-center justify-center h-full">
+                                <img src="{{this.url}}" onerror="this.src='https://placehold.co/600x400'" class="w-full object-contain" alt="slide"/>
+                            </div>
+                        {{/each}}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            {{else}}
+                <img src="{{safeImage ../images}}" class="w-full object-contain my-4" alt="Ảnh sản phẩm" onerror="this.src='https://placehold.co/600x400'" />
+            {{/if}}
+        {{/if}}
+        <div class="p-4 bg-[#f5f5f5] text-left">
+            <!-- Tên + Giá -->
+            <h1 class="text-xl font-bold mb-1">{{name}}</h1>
+            {{#if ../price}}<p class="text-lg font-semibold text-green-600">{{formatPrice price}}</p>
+            {{/if}}
+
+            <!-- Attributes -->
+            {{#if ../attributes.length}}
+                <div class="my-3">
+                    {{#each ../attributes}}
+                        <div class="inline-block text-sm bg-gray-100 text-gray-700 border px-3 py-1 rounded-full mr-2 mb-2">
+                            <strong>{{this.name}}</strong>: {{this.value}}
+                        </div>
+                    {{/each}}
+                </div>
+            {{/if}}
+
+            <!-- Mô tả -->
+            {{#if description}}
+                <div class="mt-4">
+                    <h2 class="font-semibold text-base mb-2">Mô tả sản phẩm</h2>
+                    <div class="text-sm text-gray-600">{{{description}}}</div>
+                </div>
+            {{/if}}
+
+            <!-- Số điện thoại -->
+            {{#if contact_phone}}
+                <p class="text-sm text-gray-600 mt-4"><i class="fas fa-phone text-gray-600"></i> {{contact_phone}}</p>
+            {{/if}}
+
+            <!-- Liên kết mua hàng -->
+            {{#if ../productLinks.length}}
+                <div class="mt-4">
+                    <h3 class="text-sm font-medium mb-2">Liên kết mua hàng</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {{#each ../productLinks}}
+                            {{#if this.url}}
+                                <a href="{{this.url}}" target="_blank"
+                                   class="px-4 py-2 bg-blue-600 text-white rounded text-sm">{{this.platform}}</a>
+                            {{/if}}
+                        {{/each}}
+                    </div>
+                </div>
+            {{/if}}
+
+            <!-- Sản phẩm liên quan -->
+            {{#if ../selectedProducts.length}}
+                <div class="mt-6">
+                    <h2 class="font-semibold text-base mb-2">Sản phẩm liên quan</h2>
+                    <div class="swiper relatedProductsSwiper mt-4">
+                        <div class="swiper-wrapper">
+                            {{#each ../selectedProducts}}
+                                <div class="swiper-slide bg-white rounded shadow text-left p-3 w-56">
+                                    <img src="{{this.avatar.url}}" alt="{{this.name}}"
+                                         class="mb-2 object-contain h-24 w-full rounded border"
+                                         onerror="this.src='https://placehold.co/600x400'">
+                                    <h3 class="text-sm font-semibold line-clamp-2">{{this.name}}</h3>
+                                    <p class="text-xs text-gray-500 truncate">SKU: {{this.sku}}</p>
+                                    <p class="text-sm font-medium text-orange-600 mt-1">{{formatPrice this.price}}</p>
+                                </div>
+                            {{/each}}
+                        </div>
+                        <div class="swiper-pagination mt-2"></div>
+                    </div>
+                </div>
+            {{/if}}
+            <!-- Công ty liên quan -->
+            {{#if ../selectedCompanies.length}}
+                <div class="mt-6">
+                    <h2 class="font-semibold text-base mb-2">Công ty liên quan</h2>
+                    <div class="swiper relatedCompaniesSwiper mt-4">
+                        <div class="swiper-wrapper">
+                            {{#each ../selectedCompanies}}
+                                <div class="swiper-slide bg-white rounded shadow p-4 w-64">
+                                    <img src="{{this.logo}}" alt="{{this.name}}"
+                                         class="h-16 w-16 rounded-full object-contain mb-3 mx-auto"
+                                         onerror="this.src='https://placehold.co/600x400'">
+                                    <p class="font-semibold">{{this.name}}</p>
+                                    <p class="text-xs text-gray-500r"><i
+                                            class="fas fa-phone text-gray-600"></i> {{this.phone}}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{this.address}}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{this.city}}
+                                        , {{this.country}}</p>
+                                </div>
+                            {{/each}}
+                        </div>
+                        <div class="swiper-pagination mt-2"></div>
+                    </div>
+                </div>
+            {{/if}}
+
+            <!-- Cửa hàng liên quan -->
+            {{#if ../selectedStores.length}}
+                <div class="mt-6">
+                    <h2 class="font-semibold text-base mb-2">Cửa hàng liên quan</h2>
+                    <div class="swiper relatedStoresSwiper mt-4">
+                        <div class="swiper-wrapper">
+                            {{#each ../selectedStores}}
+                                <div class="swiper-slide bg-white rounded shadow p-3 w-64">
+                                    <p class="text-sm font-bold truncate">{{this.name}}</p>
+                                    <p class="text-xs text-gray-600 truncate">{{this.address}}</p>
+                                </div>
+                            {{/each}}
+                        </div>
+                        <div class="swiper-pagination mt-2"></div>
+                    </div>
+                </div>
+            {{/if}}
+
+            <!-- Footer -->
+            <div class="mt-6 text-center text-xs text-gray-400">
+                Powered by <span class="font-semibold text-green-600">Goldenwin</span>
+            </div>
+        </div>
+        <!-- Footer buttons -->
+        <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-4 py-3 flex justify-center gap-4 z-50">
+            <a href="https://shopee.vn" target="_blank"
+               class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200 flex items-center gap-2">
+                <i class="fas fa-cart-shopping"></i> Đặt hàng
+            </a>
+
+            {{#if contact_phone}}
+                <a href="tel:{{contact_phone}}"
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md shadow transition-all duration-200 flex items-center gap-2">
+                    <i class="fas fa-phone"></i> Liên hệ
+                </a>
+            {{/if}}
+        </div>
+        <div class="h-24"></div>
+    {{/with}}
+</script>
+
+<!-- Load template -->
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrId = urlParams.keys().next().value || '';
+    const output = document.getElementById("output");
+
+    async function loadProductQR() {
+        try {
+            const json = await callApi(`/qr-codes/detail/${qrId}`);
+
+            if (!json.qr || !json.target || json.qr.target_type !== 'product') {
+                output.innerHTML = `<p class="text-center text-red-600 mt-10">Không tìm thấy sản phẩm hoặc QR không hợp lệ.</p>`;
+                return;
+            }
+
+            const tplSource = document.getElementById('product-template').innerHTML;
+            const template = Handlebars.compile(tplSource);
+
+            const productData = {
+                product: json.target,
+                price: json.target.price,
+                images: json.target.images || [],
+                attributes: json.target.attributes || [],
+                productLinks: json.target.productLinks || [],
+                selectedProducts: json.target.selectedProducts || [],
+                selectedCompanies: json.target.selectedCompanies || [],
+                selectedStores: json.target.selectedStores || []
+            };
+
+            output.innerHTML = template(productData);
+
+            const initSwiper = (selector) => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    new Swiper(selector, {
+                        pagination: {
+                            el: selector + ' .swiper-pagination',
+                        }
+                    });
+                }
+            };
+
+            initSwiper('.imageProductAvatarSwiper');
+            initSwiper('.relatedProductsSwiper');
+            initSwiper('.relatedCompaniesSwiper');
+            initSwiper('.relatedStoresSwiper');
+
+        } catch (err) {
+            console.error(err);
+            output.innerHTML = `<p class="text-center text-red-600 mt-10">Lỗi khi tải dữ liệu sản phẩm.</p>`;
+        }
+    }
+
+    loadProductQR();
+</script>
+</body>
+</html>

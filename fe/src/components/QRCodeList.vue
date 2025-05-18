@@ -48,14 +48,30 @@
         >
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'qr_url'">
-                    <a
-                        :href="httpOnlyUrl(record.qr_url)"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style="color: #1677ff; text-decoration: underline"
-                    >
-                        {{ httpOnlyUrl(record.qr_url) }}
-                    </a>
+                    <a-row type="flex" align="middle" :style="{ gap: '6px' }">
+                        <a-tooltip :title="buildQrLink(record)">
+                            <a
+                                :href="buildQrLink(record)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-blue-600 underline"
+                                style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: inline-block"
+                            >
+                                {{ record.short_code }}
+                            </a>
+                        </a-tooltip>
+
+                        <a-button
+                            type="link"
+                            size="small"
+                            @click="() => copyToClipboard(buildQrLink(record))"
+                            title="Sao chép liên kết"
+                        >
+                            <template #icon>
+                                <CopyOutlined />
+                            </template>
+                        </a-button>
+                    </a-row>
                 </template>
 
                 <template v-if="column.key === 'qr'">
@@ -100,6 +116,9 @@ import { message } from 'ant-design-vue'
 import { getQRList, deleteQR } from '@/api/qrcode'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import QRCodeStyling from 'qr-code-styling'
+import { CopyOutlined } from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
+
 
 import { h } from 'vue'
 import { Tooltip } from 'ant-design-vue'
@@ -124,27 +143,39 @@ const columns = [
         title: 'Liên kết',
         key: 'qr_url',
         dataIndex: 'qr_url',
-        ellipsis: true,
-        customRender: ({ text }) => {
-            return h(Tooltip, { title: text }, {
-                default: () => h('span', {
-                    style: {
-                        display: 'inline-block',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        maxWidth: '250px',
-                        verticalAlign: 'middle',
-                        cursor: 'pointer', // ✅ để tooltip trigger được khi hover
-                    }
-                }, text)
-            })
+        customRender: ({ record }) => {
+            const short = record.short_code || record.qr_url?.split('/').pop()
+            const fullUrl = httpOnlyUrl(record.qr_url)
+
+            return h('div', { class: 'flex items-center gap-2' }, [
+                h('a', {
+                    href: fullUrl,
+                    target: '_blank',
+                    class: 'text-blue-600 underline',
+                    title: fullUrl
+                }, `qrcode.io/${short}`),
+
+                h('button', {
+                    onClick: () => {
+                        navigator.clipboard.writeText(fullUrl)
+                        message.success('Đã sao chép liên kết')
+                    },
+                    title: 'Sao chép',
+                    class: 'text-gray-400 hover:text-blue-600'
+                }, [h('i', { class: 'fas fa-copy' })])
+            ])
         }
     },
     { title: 'Tên mã QR', key: 'qr_name', dataIndex: 'qr_name' },
     { title: 'Tên đối tượng', key: 'target_name', dataIndex: 'target_name' },
     { title: 'Kiểu', key: 'target_type', dataIndex: 'target_type' },
     { title: 'Nhật ký quét', key: 'scan_count', dataIndex: 'scan_count' },
+    {
+        title: 'Tạo lúc',
+        key: 'created_at',
+        dataIndex: 'created_at',
+        customRender: ({ text }) => dayjs(text).format('HH:mm DD/MM/YYYY')
+    },
     { title: 'Hành động', key: 'action' },
 ]
 
@@ -156,6 +187,10 @@ const httpOnlyUrl = (url) => {
     return isLocal && url.startsWith('https://') ? url.replace('https://', 'https://') : url
 }
 
+const buildQrLink = (record) => {
+    const baseUrl = import.meta.env.VITE_QR_BASE; // Lấy từ .env
+    return `${baseUrl}/views/${record.target_type}.html?${record.qr_id}`;
+};
 
 const download = (record, format = 'png') => {
     const qrInstance = qrInstances.value[record.qr_id]
@@ -260,6 +295,33 @@ const remove = async (qr_id) => {
         message.error('Xoá thất bại')
     }
 }
+
+const copyToClipboard = (text) => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            message.success("Đã sao chép vào clipboard!");
+        }).catch(err => {
+            message.error("Lỗi khi sao chép: " + err);
+        });
+    } else {
+        // Fallback cho trình duyệt cũ hoặc môi trường không hỗ trợ
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "absolute";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            const successful = document.execCommand("copy");
+            message.success("Đã sao chép (fallback).");
+        } catch (err) {
+            message.error("Không thể sao chép (fallback).");
+        }
+        document.body.removeChild(textarea);
+    }
+};
+
 
 const appendQRCode = (el, record) => {
     if (!el || qrInstances.value[record.qr_id]) return

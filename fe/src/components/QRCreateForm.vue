@@ -399,7 +399,7 @@ const handleSubmit = async () => {
         target_type: selectedKey.value,
         qr_url: requireTarget.value
             ? `${QR_BASE_URL}/${form.value.qr_id || 'placeholder'}`
-            : form.value.settings.data,
+            : `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}`,
         settings_json: JSON.stringify(form.value.settings)
     }
 
@@ -412,9 +412,7 @@ const handleSubmit = async () => {
             // ✅ Cập nhật QR preview đúng kiểu
             qrCode.update({
                 ...form.value.settings,
-                data: requireTarget.value
-                    ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}`
-                    : form.value.settings.data
+                data: requireTarget.value ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}` : form.value.settings.data
             })
 
         } else {
@@ -430,12 +428,10 @@ const handleSubmit = async () => {
 
             qrCode.update({
                 ...form.value.settings,
-                data: requireTarget.value
-                    ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}`
-                    : form.value.settings.data
+                data: requireTarget.value ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}` : form.value.settings.data
             })
             updateQrPreview() // 👈 cập nhật preview động
-            router.push(`/my-qr-codes/${createdQrId}/edit`)
+            await router.push(`/my-qr-codes/${createdQrId}/edit`)
         }
 
     } catch (err) {

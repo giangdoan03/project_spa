@@ -2,11 +2,13 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use CodeIgniter\HTTP\RedirectResponse;
 use App\Models\{QrCodeModel, QrScanLogModel};
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\CustomerModel;
 use App\Traits\AuthTrait;
+use Random\RandomException;
 
 
 class QrCodeController extends BaseController
@@ -28,7 +30,7 @@ class QrCodeController extends BaseController
     /**
      * Lấy mã QR thuộc về người dùng
      */
-    private function getOwnedQR($qr_id)
+    private function getOwnedQR($qr_id): object|array
     {
         $userId = $this->getUserId();
         $qr = $this->model->where('qr_id', $qr_id)->first();
@@ -46,6 +48,8 @@ class QrCodeController extends BaseController
 
     /**
      * Tạo QR Code mới
+     * @throws RandomException
+     * @throws \ReflectionException
      */
     public function create(): ResponseInterface
     {
@@ -87,6 +91,7 @@ class QrCodeController extends BaseController
 
     /**
      * Cập nhật QR Code
+     * @throws \ReflectionException
      */
     public function update(string $qr_id): ResponseInterface
     {
@@ -241,7 +246,9 @@ class QrCodeController extends BaseController
             'event'    => model('EventModel')->find($qr['target_id']),
             'business' => model('BusinessModel')->find($qr['target_id']),
             'person'   => model('PersonModel')->find($qr['target_id']),
-            default    => null
+            default => $qr['target_type'] === 'url' || $qr['target_type'] === 'custom'
+                ? ['url' => $qr['qr_url']]
+                : $qr,
         };
 
         if (!$target) {
@@ -555,7 +562,7 @@ class QrCodeController extends BaseController
         return 'Desktop';
     }
 
-    public function redirectWithTrack($shortCode)
+    public function redirectWithTrack($shortCode): RedirectResponse
     {
         $link = model('QrLinkModel')->where('short_code', $shortCode)->first();
         if (!$link) {
@@ -567,7 +574,7 @@ class QrCodeController extends BaseController
         return redirect()->to("/scan/{$trackCode}?type=scan&code={$shortCode}");
     }
 
-    public function handleScan($trackCode)
+    public function handleScan($trackCode): string|RedirectResponse
     {
         $shortCode = $this->request->getGet('code');
         if (!$shortCode) {

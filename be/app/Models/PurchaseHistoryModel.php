@@ -11,6 +11,7 @@ class PurchaseHistoryModel extends Model
     protected $allowedFields = [
         'user_id', 'customer_id', 'product_name',
         'amount', 'quantity', 'note', 'purchased_at',
+        'starts_at', 'expires_at', 'is_paid', 'is_active',
         'created_at', 'updated_at'
     ];
     protected $useTimestamps = true;

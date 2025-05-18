@@ -107,9 +107,9 @@
 <!--                <span>Lịch sử checkin</span>-->
 <!--            </a-menu-item>-->
 
-            <a-menu-item key="quan-ly-khach-hang">
+            <a-menu-item v-if="isSuperAdmin" key="quan-ly-khach-hang">
                 <TeamOutlined/>
-                <span>Quản lý khách hàng</span>
+                <span>Khách hàng</span>
             </a-menu-item>
 
             <a-menu-item key="cau-hinh">
@@ -123,7 +123,7 @@
             </a-menu-item>
             <a-menu-item v-if="isSuperAdmin" key="quan-ly-user">
                 <TeamOutlined/>
-                <span>Quản lý người dùng</span>
+                <span>Quản trị viên</span>
             </a-menu-item>
 
             <a-menu-item v-if="isSuperAdmin" key="phan-quyen">

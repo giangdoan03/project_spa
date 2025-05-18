@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Thông tin QR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Thư viện và CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ✅ JS dùng chung -->
+    <script src="./js/api.js"></script>
+    <script src="./js/template-common.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-800">
+<div id="output" class="max-w-2xl mx-auto"></div>
+
+<!-- Handlebars template -->
+<script id="person-template" type="text/x-handlebars-template">
+    {{#with person}}
+        <div class="p-4 text-center bg-[#f5f5f5]">
+            <!-- Banner + Avatar -->
+            <div class="relative">
+                <img src="{{cover_image}}" alt="cover" class="w-full h-40 object-cover rounded-lg mb-4" onerror="this.src='https://placehold.co/600x200?text=Cover'" />
+                <img
+                        src="{{avatar}}"
+                        alt="avatar"
+                        class="w-20 h-20 rounded-full border-4 border-white shadow -mt-10 mx-auto bg-white object-cover"
+                        onerror="this.src='https://placehold.co/100x100'"
+                />
+                <div class="absolute top-2 right-2 text-xs bg-white px-2 py-1 rounded-full shadow flex items-center gap-1 cursor-pointer">
+                    <img src="https://cdn-icons-png.flaticon.com/512/555/555417.png" alt="globe" class="w-4 h-4" /> EN
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Basic Info -->
+            <div class="mt-3 text-center">
+                <h1 class="text-xl font-bold">{{name}}</h1>
+                <p class="text-sm text-gray-500">{{job_title}}</p>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="mt-4 bg-white p-4 rounded-lg shadow text-left space-y-3 text-sm">
+                {{#if phone}}<p class="flex items-center gap-2"><i class="fas fa-phone text-gray-600"></i> {{phone}}</p>{{/if}}
+                {{#if email}}<p class="flex items-center gap-2"><i class="fas fa-envelope text-gray-600"></i> {{email}}</p>{{/if}}
+                {{#if address}}<p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-gray-600"></i> {{address}}</p>{{/if}}
+                {{#if website}}
+                    <p class="flex items-center gap-2">
+                        <i class="fas fa-globe text-gray-600"></i>
+                        <a href="{{website}}" target="_blank" class="text-blue-600 underline">{{website}}</a>
+                    </p>
+                {{/if}}
+                {{#if social_links}}
+                    <div class="flex gap-4 mt-2">
+                        {{#each social_links}}
+                            <a href="{{this.url}}" target="_blank" class="text-gray-600 hover:text-blue-600">
+                                <i class="fab fa-{{lowercase this.platform}} fa-lg"></i>
+                            </a>
+                        {{/each}}
+                    </div>
+                {{/if}}
+            </div>
+
+            <!-- Bio -->
+            {{#if bio}}
+                <div class="mt-4 text-sm text-gray-700 text-left">
+                    <p class="font-semibold mb-1">Giới thiệu:</p>
+                    <p>{{bio}}</p>
+                </div>
+            {{/if}}
+
+            <!-- Swiper: Sản phẩm liên quan -->
+            {{#if selectedProducts.length}}
+                <div class="mt-6 text-left">
+                    <p class="font-semibold text-base mb-2">Sản phẩm liên quan</p>
+                    <div class="swiper swiper-selected-products">
+                        <div class="swiper-wrapper">
+                            {{#each selectedProducts}}
+                                <div class="swiper-slide w-auto">
+                                    <div class="bg-white rounded shadow text-left p-3 w-48">
+                                        <img src="{{image}}" class="h-24 object-contain w-full mb-2 rounded border" alt="{{name}}" onerror="this.src='https://placehold.co/120x120'">
+                                        <h3 class="text-sm font-semibold truncate">{{name}}</h3>
+                                        <p class="text-xs text-gray-500 mb-1 truncate">SKU: {{sku}}</p>
+                                        <p class="text-sm font-medium text-orange-600">{{formatPrice price}}</p>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+                        <div class="swiper-pagination mt-2"></div>
+                    </div>
+                </div>
+            {{/if}}
+
+            <!-- Swiper: Công ty liên quan -->
+            {{#if selectedCompanies.length}}
+                <div class="mt-6 text-left">
+                    <p class="font-semibold text-base mb-2">Công ty liên quan</p>
+                    <div class="swiper swiper-selected-companies">
+                        <div class="swiper-wrapper">
+                            {{#each selectedCompanies}}
+                                <div class="swiper-slide w-auto">
+                                    <div class="bg-white rounded shadow text-left p-3 w-64">
+                                        <img src="{{logo}}" class="h-14 w-14 object-contain mb-2 rounded border" alt="logo">
+                                        <p class="text-sm font-bold truncate">{{name}}</p>
+                                        <p class="text-xs text-gray-600 truncate">{{address}}</p>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+                        <div class="swiper-pagination mt-2"></div>
+                    </div>
+                </div>
+            {{/if}}
+
+            <!-- Swiper: Cửa hàng liên quan -->
+            {{#if selectedStores.length}}
+                <div class="mt-6 text-left">
+                    <p class="font-semibold text-base mb-2">Cửa hàng liên quan</p>
+                    <div class="swiper swiper-selected-stores">
+                        <div class="swiper-wrapper">
+                            {{#each selectedStores}}
+                                <div class="swiper-slide w-auto">
+                                    <div class="bg-white rounded shadow text-left p-3 w-64">
+                                        <p class="text-sm font-bold truncate">{{name}}</p>
+                                        <p class="text-xs text-gray-600 truncate">{{address}}</p>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+                        <div class="swiper-pagination mt-2"></div>
+                    </div>
+                </div>
+            {{/if}}
+
+            <!-- Footer -->
+            <div class="mt-6 text-center text-xs text-gray-400">
+                Powered by <span class="font-semibold text-green-600">iCheckQR</span>
+            </div>
+        </div>
+    {{/with}}
+</script>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrId = urlParams.keys().next().value || '';
+    const output = document.getElementById("output");
+
+    async function loadPersonQR() {
+        try {
+            const json = await callApi(`/qr-codes/detail/${qrId}`);
+
+            if (!json.qr || !json.target || json.qr.target_type !== 'person') {
+                output.innerHTML = `<p class="text-center text-red-600 mt-10">Không tìm thấy mã QR hoặc dữ liệu người dùng.</p>`;
+                return;
+            }
+
+            const tplSource = document.getElementById('person-template').innerHTML;
+            const template = Handlebars.compile(tplSource);
+
+            const personData = {
+                person: json.target,
+                selectedProducts: json.target.selectedProducts || [],
+                selectedCompanies: json.target.selectedCompanies || [],
+                selectedStores: json.target.selectedStores || []
+            };
+
+            output.innerHTML = template(personData);
+
+            new Swiper('.swiper-selected-products', { pagination: { el: '.swiper-pagination' } });
+            new Swiper('.swiper-selected-companies', { pagination: { el: '.swiper-pagination' } });
+            new Swiper('.swiper-selected-stores', { pagination: { el: '.swiper-pagination' } });
+        } catch (err) {
+            console.error(err);
+            output.innerHTML = `<p class="text-center text-red-600 mt-10">Lỗi kết nối đến API.</p>`;
+        }
+    }
+
+    loadPersonQR();
+</script>
+</body>
+</html>

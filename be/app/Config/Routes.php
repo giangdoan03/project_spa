@@ -57,6 +57,8 @@ $routes->group('api', function ($routes) {
     $routes->resource('setting', ['controller' => 'SettingController']);
     $routes->resource('purchase-history', ['controller' => 'PurchaseHistoryController']);
 
+    $routes->resource('customers', ['controller' => 'CustomerController']);
+
     // ✅ QR Code Routes (Dùng qr_id dạng chữ + số, không dùng ID số)
     $routes->group('qr-codes', function ($routes) {
         $routes->post('', 'QrCodeController::create');

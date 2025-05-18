@@ -1,7 +1,47 @@
 <template>
     <div>
-        <a-page-header title="Lịch sử mua gói" />
+        <!-- Header + Button -->
+        <a-page-header title="Lịch sử mua gói">
+            <template #extra>
+                <a-button type="primary" @click="showModal = true">
+                    + Đăng ký mua gói
+                </a-button>
+            </template>
+        </a-page-header>
 
+        <!-- Modal -->
+        <a-modal
+            v-model:visible="showModal"
+            title="Đăng ký mua gói"
+            ok-text="Kích hoạt"
+            cancel-text="Hủy"
+            @ok="handleSubmit"
+        >
+            <a-form layout="vertical">
+                <!-- Chọn khách hàng -->
+                <a-form-item label="Khách hàng">
+                    <a-select
+                        v-model:value="form.customer_id"
+                        show-search
+                        placeholder="Chọn khách hàng"
+                        :options="customerOptions"
+                        option-filter-prop="label"
+                    />
+                </a-form-item>
+
+                <!-- Thêm mới khách hàng -->
+                <a-form-item>
+                    <a-button type="link" @click="handleAddCustomer">+ Thêm mới khách hàng</a-button>
+                </a-form-item>
+
+                <!-- Chọn số năm -->
+                <a-form-item label="Thời hạn gói (năm)">
+                    <a-input-number v-model:value="form.years" :min="1" :max="5" />
+                </a-form-item>
+            </a-form>
+        </a-modal>
+
+        <!-- Bảng dữ liệu -->
         <a-table
             :columns="columns"
             :data-source="data"
@@ -9,61 +49,34 @@
             row-key="id"
             :loading="loading"
         >
-            <template #bodyCell="{ column, record, index }">
-                <!-- STT -->
-                <template v-if="column.key === 'stt'">
-                    {{ index + 1 }}
-                </template>
-
-                <!-- Trạng thái gói -->
-                <template v-else-if="column.key === 'status'">
-                    <div>
-                        <a-tag :color="record.status === 'pending' ? 'orange' : 'green'">
-                            {{ record.status === 'pending' ? 'Chờ duyệt' : 'Kích hoạt' }}
-                        </a-tag>
-                        <br />
-                        <a-tag :color="record.paid ? 'green' : 'red'">
-                            {{ record.paid ? 'Đã thanh toán' : 'Chưa thanh toán' }}
-                        </a-tag>
-                    </div>
-                </template>
-
-                <!-- Trạng thái hết hạn -->
-                <template v-else-if="column.key === 'expired'">
-                    <a-tag :color="record.expired ? 'red' : 'green'">
-                        {{ record.expired ? 'Hết hạn' : 'Chưa hết hạn' }}
-                    </a-tag>
-                </template>
-
-                <!-- Hành động -->
-                <template v-else-if="column.key === 'action'">
-                    <a-space>
-                        <a-tooltip title="Chi tiết">
-                            <a-button type="link" icon="info-circle" />
-                        </a-tooltip>
-                        <a-tooltip title="Thanh toán">
-                            <a-button type="link" icon="dollar-circle" />
-                        </a-tooltip>
-                    </a-space>
-                </template>
-            </template>
+            <!-- bodyCell giữ nguyên -->
         </a-table>
     </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getPurchaseHistories } from '../api/purchaseHistory'
+import { getCustomers } from '../api/customer.js' // ví dụ gọi API
 import { message } from 'ant-design-vue'
 
 const data = ref([])
 const loading = ref(false)
+const showModal = ref(false)
 
 const pagination = ref({
     total: 0,
     current: 1,
     pageSize: 10
 })
+
+const form = ref({
+    customer_id: null,
+    years: 1
+})
+
+const customerOptions = ref([])
 
 const columns = [
     { title: 'STT', key: 'stt' },
@@ -76,7 +89,7 @@ const columns = [
     { title: 'Ngày bắt đầu hợp đồng', dataIndex: 'start_date', key: 'start_date' },
     { title: 'Ngày hết hạn theo hợp đồng', dataIndex: 'end_date', key: 'end_date' },
     { title: 'Người đăng ký', dataIndex: 'registered_by', key: 'registered_by' },
-    { title: 'Hành động', key: 'action' },
+    { title: 'Hành động', key: 'action' }
 ]
 
 const fetchData = async () => {
@@ -92,5 +105,43 @@ const fetchData = async () => {
     }
 }
 
-onMounted(fetchData)
+const fetchCustomers = async () => {
+    try {
+        const res = await getCustomers()
+        customerOptions.value = res.data.map((c) => ({
+            value: c.id,
+            label: c.name
+        }))
+    } catch (e) {
+        message.error('Không tải được danh sách khách hàng')
+    }
+}
+
+const handleAddCustomer = () => {
+    message.info('Tính năng thêm khách hàng sẽ được mở modal khác') // bạn có thể thêm modal riêng
+}
+
+const handleSubmit = async () => {
+    if (!form.value.customer_id || !form.value.years) {
+        return message.warning('Vui lòng điền đầy đủ thông tin')
+    }
+
+    try {
+        await createPurchase({
+            customer_id: form.value.customer_id,
+            years: form.value.years
+        })
+        message.success('Đăng ký gói thành công')
+        showModal.value = false
+        fetchData()
+    } catch (e) {
+        message.error('Đăng ký gói thất bại')
+    }
+}
+
+onMounted(() => {
+    fetchData()
+    fetchCustomers()
+})
+
 </script>

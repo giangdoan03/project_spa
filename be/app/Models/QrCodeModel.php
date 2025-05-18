@@ -10,7 +10,7 @@ class QrCodeModel extends Model
 
     protected $allowedFields = [
         'user_id', 'target_type', 'target_id',
-        'qr_name', 'qr_url', 'short_code',
+        'qr_name', 'qr_type', 'qr_url', 'short_code',
         'campaign', 'is_active', 'expires_at',
         'scan_count', 'last_scanned_at',
         'settings_json', 'note', 'qr_id'

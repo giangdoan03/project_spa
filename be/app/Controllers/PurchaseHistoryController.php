@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\PurchaseHistoryModel;
+use App\Models\CustomerModel;
 use CodeIgniter\RESTful\ResourceController;
 use App\Traits\AuthTrait;
 
@@ -23,8 +24,10 @@ class PurchaseHistoryController extends ResourceController
         $builder = $this->model->where('user_id', $userId);
 
         if ($search) {
-            $builder->like('product_name', $search)
-                ->orLike('note', $search);
+            $builder->groupStart()
+                ->like('product_name', $search)
+                ->orLike('note', $search)
+                ->groupEnd();
         }
 
         $data = $builder->paginate($perPage, 'default', $page);
@@ -42,7 +45,8 @@ class PurchaseHistoryController extends ResourceController
 
     public function show($id = null)
     {
-        $data = $this->model->find($id);
+        $userId = $this->getUserId();
+        $data = $this->model->where('user_id', $userId)->find($id);
         return $data ? $this->respond($data) : $this->failNotFound('Không tìm thấy lịch sử mua hàng');
     }
 
@@ -59,14 +63,39 @@ class PurchaseHistoryController extends ResourceController
 
     public function update($id = null)
     {
+        $userId = $this->getUserId();
+        $existing = $this->model->where('user_id', $userId)->find($id);
+
+        if (!$existing) {
+            return $this->failNotFound('Không tìm thấy lịch sử mua hàng');
+        }
+
         $data = $this->request->getJSON(true);
         $this->model->update($id, $data);
+
         return $this->respond(['id' => $id, 'message' => 'Đã cập nhật']);
     }
 
     public function delete($id = null)
     {
+        $userId = $this->getUserId();
+        $existing = $this->model->where('user_id', $userId)->find($id);
+
+        if (!$existing) {
+            return $this->failNotFound('Không tìm thấy lịch sử mua hàng');
+        }
+
         $this->model->delete($id);
+
         return $this->respondDeleted(['id' => $id, 'message' => 'Đã xoá']);
+    }
+
+    public function customers()
+    {
+        $userId = $this->getUserId();
+        $model = new CustomerModel();
+        $data = $model->where('user_id', $userId)->findAll();
+
+        return $this->respond($data);
     }
 }

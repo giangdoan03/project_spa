@@ -13,7 +13,7 @@ import ProductForm from '../components/ProductForm.vue'
 import BusinessList from '../components/BusinessList.vue'
 import BusinessForm from '../components/BusinessForm.vue'
 
-import MyQRCodes from '../components/MyQRCodes.vue'
+import QRCodeList from '../components/QRCodeList.vue'
 import QRCreateForm from '../components/QRCreateForm.vue'
 
 import PersonList from '../components/PersonList.vue'
@@ -50,6 +50,11 @@ const routes = [
         redirect: '/login' // optional nếu cần
     },
     {
+        path: '/error',
+        name: 'ErrorPage',
+        component: () =>  import('../components/ErrorPage.vue')
+    },
+    {
         path: '/',
         component: Layout,
         children: [
@@ -64,7 +69,7 @@ const routes = [
             {
                 path: 'my-qr-codes',
                 name: 'my-qr-codes',
-                component: MyQRCodes,
+                component: QRCodeList,
                 meta: { breadcrumb: 'Mã QR của tôi' }
             },
             {
@@ -172,6 +177,11 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+    // Nếu đang vào trang lỗi, bỏ qua check
+    if (to.path === '/error') {
+        return next()
+    }
+
     try {
         const response = await checkSession()
         const data = response.data
@@ -190,9 +200,33 @@ router.beforeEach(async (to, from, next) => {
             next()
         }
     } catch (error) {
-        console.error('Error in router guard:', error)
-        next('/')
+        console.error('Error in router guard:', {
+            code: error.code,
+            message: error.message,
+            response: error.response,
+            full: error
+        })
+
+        let errorMessage = 'Lỗi không xác định'
+        let code = 'ERR_UNKNOWN'
+
+        if (error.message?.includes('Network Error') || error.code === 'ERR_NETWORK') {
+            code = 'ERR_NETWORK'
+            errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng hoặc thử lại sau.'
+        } else if (error.response?.status === 403) {
+            code = 'ERR_403'
+            errorMessage = 'Bạn không có quyền truy cập.'
+        } else if (error.response?.status >= 500) {
+            code = 'ERR_500'
+            errorMessage = `Lỗi máy chủ: ${error.response.status}`
+        }
+
+        next({
+            path: '/error',
+            query: { code }
+        })
     }
+
 })
 
 export default router

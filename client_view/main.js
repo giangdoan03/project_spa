@@ -48,11 +48,6 @@ function formatVNDate(isoStr) {
 
 
 (async () => {
-    await loadTemplate('product-template', '/templates/product-template.html');
-    await loadTemplate('store-template', '/templates/store-template.html');
-    await loadTemplate('person-template', '/templates/person-template.html');
-    await loadTemplate('event-template', '/templates/event-template.html');
-    await loadTemplate('business-template', '/templates/business-template.html');
     await renderQRPage(); // chỉ gọi khi template đã load xong
 })();
 
@@ -133,25 +128,33 @@ async function renderQRPage() {
         let templateId;
         switch (qr.target_type) {
             case 'product':
-                templateId = 'product-template';
+                templateId = 'product';
                 break;
             case 'store':
-                templateId = 'store-template';
+                templateId = 'store';
                 break;
             case 'event':
-                templateId = 'event-template';
+                templateId = 'event';
                 break;
             case 'person':
-                templateId = 'person-template';
+                templateId = 'person';
                 break;
             case 'company':
-                templateId = 'company-template';
+                templateId = 'company';
                 break;
             case 'business':
-                templateId = 'business-template';
+                templateId = 'business';
+                break;
+            case 'text':
+                templateId = 'text';
                 break;
             default:
-                templateId = 'product-template';
+                templateId = 'product';
+        }
+
+        if (!document.getElementById(templateId)) {
+            const templatePath = `/views/${templateId}.html`;
+            await loadTemplate(templateId, templatePath);
         }
 
 
