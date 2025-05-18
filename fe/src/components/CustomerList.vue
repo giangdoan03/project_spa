@@ -76,14 +76,14 @@
             :footer-style="{ textAlign: 'right' }"
             @close="closeDrawer"
         >
-            <a-form layout="vertical">
-                <a-form-item label="Tên khách hàng">
+            <a-form layout="vertical" :model="form" :rules="rules" ref="formRef">
+                <a-form-item label="Tên khách hàng" name="name">
                     <a-input v-model:value="form.name" />
                 </a-form-item>
-                <a-form-item label="Số điện thoại">
+                <a-form-item label="Số điện thoại" name="phone">
                     <a-input v-model:value="form.phone" />
                 </a-form-item>
-                <a-form-item label="Email">
+                <a-form-item label="Email" name="email">
                     <a-input v-model:value="form.email" />
                 </a-form-item>
                 <a-form-item label="Địa chỉ">
@@ -92,7 +92,7 @@
                 <a-form-item label="Tỉnh/TP">
                     <a-input v-model:value="form.city" />
                 </a-form-item>
-                <a-form-item label="Trạng thái khách hàng">
+                <a-form-item label="Trạng thái khách hàng" name="customer_status">
                     <a-select v-model:value="form.customer_status">
                         <a-select-option value="new">Mới</a-select-option>
                         <a-select-option value="active">Đang hoạt động</a-select-option>
@@ -101,7 +101,6 @@
                         <a-select-option value="expired">Hết hạn</a-select-option>
                     </a-select>
                 </a-form-item>
-
                 <a-form-item label="Trạng thái thanh toán">
                     <a-select v-model:value="form.payment_status">
                         <a-select-option value="paid">Đã thanh toán</a-select-option>
@@ -114,13 +113,13 @@
                     </a-select>
                 </a-form-item>
                 <a-form-item label="Ghi chú">
-                    <a-textarea v-model:value="form.note" rows="3" />
+                    <a-textarea v-model:value="form.note" :rows="3" />
                 </a-form-item>
             </a-form>
             <template #extra>
                 <a-space>
                     <a-button @click="closeDrawer">Hủy</a-button>
-                    <a-button type="primary" @click="saveCustomer">Lưu</a-button>
+                    <a-button type="primary" @click="handleSubmit">Lưu</a-button>
                 </a-space>
             </template>
         </a-drawer>
@@ -144,6 +143,7 @@ const loading = ref(false)
 const drawerVisible = ref(false)
 const isEditing = ref(false)
 const form = ref({})
+const formRef = ref()
 
 const filters = ref({
     name: '', phone: '', email: '', city: '', dateRange: []
@@ -165,6 +165,33 @@ const columns = [
     { title: 'Ghi chú', key: 'note', dataIndex: 'note' },
     { title: 'Thao tác', key: 'action' },
 ]
+
+const rules = {
+    name: [
+        { required: true, message: 'Vui lòng nhập tên khách hàng', trigger: 'blur' }
+    ],
+    phone: [
+        {
+            validator: (_rule, value) => {
+                if (!value) return Promise.reject('Vui lòng nhập số điện thoại')
+                return /^(0|\+84)[0-9]{9,10}$/.test(value)
+                    ? Promise.resolve()
+                    : Promise.reject('Số điện thoại không hợp lệ')
+            },
+            trigger: 'blur'
+        }
+    ],
+    email: [
+        {
+            type: 'email',
+            message: 'Email không hợp lệ',
+            trigger: 'blur'
+        }
+    ],
+    customer_status: [
+        { required: true, message: 'Vui lòng chọn trạng thái khách hàng', trigger: 'change' }
+    ]
+}
 
 const fetchCustomers = async () => {
     loading.value = true
@@ -190,33 +217,9 @@ const fetchCustomers = async () => {
     }
 }
 
-const customerStatusColor = (status) => {
-    switch (status) {
-        case 'new': return 'blue'
-        case 'active': return 'green'
-        case 'inactive': return 'orange'
-        case 'vip': return 'purple'
-        case 'expired': return 'red'
-        default: return 'default'
-    }
-}
-
-const statusLabel = (status) => {
-    switch (status) {
-        case 'new': return 'Mới'
-        case 'active': return 'Đang hoạt động'
-        case 'inactive': return 'Ngừng hoạt động'
-        case 'vip': return 'VIP'
-        case 'expired': return 'Hết hạn'
-        default: return 'Không rõ'
-    }
-}
-
 const openDrawer = () => {
     isEditing.value = false
-    form.value = {
-        customer_status: 'new'
-    }
+    form.value = { customer_status: 'new' }
     drawerVisible.value = true
 }
 
@@ -230,10 +233,19 @@ const closeDrawer = () => {
     drawerVisible.value = false
 }
 
+const handleSubmit = () => {
+    formRef.value
+        .validate()
+        .then(saveCustomer)
+        .catch(() => {
+            message.warning('Vui lòng kiểm tra lại các trường bắt buộc')
+        })
+}
+
 const saveCustomer = async () => {
     try {
         const startDate = dayjs()
-        const endDate = startDate.add(form.value.package_duration_years, 'year')
+        const endDate = startDate.add(form.value.package_duration_years || 1, 'year')
 
         form.value.package_start_date = startDate.format('YYYY-MM-DD')
         form.value.package_end_date = endDate.format('YYYY-MM-DD')
@@ -263,14 +275,26 @@ const deleteCustomer = async (id) => {
     }
 }
 
-const toggleStatus = (record) => {
-    record.status = record.status === 'active' ? 'paused' : 'active'
-    updateCustomer(record.id, record)
-    fetchCustomers()
+const customerStatusColor = (status) => {
+    switch (status) {
+        case 'new': return 'blue'
+        case 'active': return 'green'
+        case 'inactive': return 'orange'
+        case 'vip': return 'purple'
+        case 'expired': return 'red'
+        default: return 'default'
+    }
 }
 
-const statusColor = (status) => {
-    return status === 'active' ? 'green' : status === 'paused' ? 'orange' : 'red'
+const statusLabel = (status) => {
+    switch (status) {
+        case 'new': return 'Mới'
+        case 'active': return 'Đang hoạt động'
+        case 'inactive': return 'Ngừng hoạt động'
+        case 'vip': return 'VIP'
+        case 'expired': return 'Hết hạn'
+        default: return 'Không rõ'
+    }
 }
 
 const handleTableChange = (pager) => {
