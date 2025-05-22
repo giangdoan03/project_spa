@@ -86,6 +86,29 @@
                 <a-form-item label="Email" name="email">
                     <a-input v-model:value="form.email" />
                 </a-form-item>
+                <!-- Hiển thị checkbox khi đang sửa -->
+                <a-form-item v-if="isEditing" name="change_password">
+                    <a-checkbox v-model:checked="changePassword">Sửa mật khẩu</a-checkbox>
+                </a-form-item>
+
+                <!-- Hiển thị input mật khẩu nếu đang thêm hoặc đã chọn sửa mật khẩu -->
+                <a-form-item
+                    v-if="!isEditing || changePassword"
+                    label="Mật khẩu"
+                    name="password"
+                >
+                    <a-input-password v-model:value="form.password" />
+                </a-form-item>
+
+                <a-form-item
+                    v-if="!isEditing || changePassword"
+                    label="Xác nhận mật khẩu"
+                    name="confirm_password"
+                >
+                    <a-input-password v-model:value="form.confirm_password" />
+                </a-form-item>
+
+
                 <a-form-item label="Địa chỉ">
                     <a-input v-model:value="form.address" />
                 </a-form-item>
@@ -144,6 +167,8 @@ const drawerVisible = ref(false)
 const isEditing = ref(false)
 const form = ref({})
 const formRef = ref()
+const changePassword = ref(false)
+
 
 const filters = ref({
     name: '', phone: '', email: '', city: '', dateRange: []
@@ -190,7 +215,33 @@ const rules = {
     ],
     customer_status: [
         { required: true, message: 'Vui lòng chọn trạng thái khách hàng', trigger: 'change' }
+    ],
+    password: [
+        {
+            validator: (_rule, value) => {
+                if ((!isEditing.value || changePassword.value) && !value) {
+                    return Promise.reject('Vui lòng nhập mật khẩu')
+                }
+                if (value && value.length < 6) {
+                    return Promise.reject('Mật khẩu phải có ít nhất 6 ký tự')
+                }
+                return Promise.resolve()
+            },
+            trigger: 'blur'
+        }
+    ],
+    confirm_password: [
+        {
+            validator: (_rule, value) => {
+                if ((!isEditing.value || changePassword.value) && form.value.password && value !== form.value.password) {
+                    return Promise.reject('Mật khẩu không khớp')
+                }
+                return Promise.resolve()
+            },
+            trigger: 'blur'
+        }
     ]
+
 }
 
 const fetchCustomers = async () => {
@@ -225,9 +276,15 @@ const openDrawer = () => {
 
 const editCustomer = (record) => {
     isEditing.value = true
-    form.value = { ...record }
+    form.value = {
+        ...record,
+        package_duration_years: undefined // không gán lại thời hạn nếu không chọn
+    }
+    changePassword.value = false
     drawerVisible.value = true
 }
+
+
 
 const closeDrawer = () => {
     drawerVisible.value = false
@@ -244,16 +301,31 @@ const handleSubmit = () => {
 
 const saveCustomer = async () => {
     try {
-        const startDate = dayjs()
-        const endDate = startDate.add(form.value.package_duration_years || 1, 'year')
+        // Nếu có chọn số năm thời hạn gói
+        if (form.value.package_duration_years) {
+            const startDate = dayjs()
+            const endDate = startDate.add(form.value.package_duration_years, 'year')
+            form.value.duration_years = form.value.package_duration_years
+            form.value.package_start_date = startDate.format('YYYY-MM-DD')
+            form.value.package_end_date = endDate.format('YYYY-MM-DD')
+        }
 
-        form.value.package_start_date = startDate.format('YYYY-MM-DD')
-        form.value.package_end_date = endDate.format('YYYY-MM-DD')
+        // Xoá field không cần gửi
+        delete form.value.package_duration_years
+
+        // Nếu đang sửa và không đổi mật khẩu thì xoá cả password & confirm_password
+        if (isEditing.value) {
+            if (!changePassword.value) {
+                delete form.value.password
+                delete form.value.confirm_password
+            }
+        }
 
         if (isEditing.value) {
             await updateCustomer(form.value.id, form.value)
             message.success('Cập nhật thành công')
         } else {
+            // ✅ confirm_password vẫn còn khi tạo mới
             await createCustomer(form.value)
             message.success('Thêm thành công')
         }
@@ -261,9 +333,12 @@ const saveCustomer = async () => {
         drawerVisible.value = false
         await fetchCustomers()
     } catch (e) {
+        console.error(e)
         message.error('Lỗi khi lưu thông tin khách hàng')
     }
 }
+
+
 
 const deleteCustomer = async (id) => {
     try {

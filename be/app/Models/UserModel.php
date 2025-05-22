@@ -18,11 +18,20 @@ class UserModel extends Model
         'avatar',
         'role',
         'role_id',
+        'address',
+        'city',
+        'status',
+        'payment_status',
+        'is_expired',
+        'package_id',
+        'package_start_date',
+        'package_end_date',
+        'note',
         'created_at',
         'updated_at'
     ];
 
-    protected $useTimestamps = true; // Tự động set created_at và updated_at
+    protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 }

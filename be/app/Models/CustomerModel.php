@@ -10,7 +10,8 @@ class CustomerModel extends Model
     protected $primaryKey = 'id';
     protected $allowedFields = [
         'user_id',
-        'name', 'phone', 'email', 'address', 'city',
+        'name', 'phone', 'email', 'password', // ✅ thêm password
+        'address', 'city',
         'avatar', 'last_interaction',
         'payment_status',     // ✅ đã thanh toán hoặc chưa
         'is_expired',         // ✅ trạng thái hết hạn
@@ -22,4 +23,15 @@ class CustomerModel extends Model
     ];
 
     protected $useTimestamps = true;
+
+    protected $beforeInsert = ['hashPassword'];
+    protected $beforeUpdate = ['hashPassword'];
+
+    protected function hashPassword(array $data): array
+    {
+        if (!empty($data['data']['password'])) {
+            $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
+        }
+        return $data;
+    }
 }

@@ -2,25 +2,25 @@
 
 namespace App\Controllers;
 
-use App\Models\CustomerModel;
+use App\Models\UserModel;
 use CodeIgniter\RESTful\ResourceController;
 use App\Traits\AuthTrait;
+use Config\Services;
 
 class CustomerController extends ResourceController
 {
     use AuthTrait;
 
-    protected $modelName = CustomerModel::class;
-    protected $format = 'json';
+    protected $modelName = UserModel::class;
+    protected $format    = 'json';
 
     public function index()
     {
-        $userId = $this->getUserId();
-
-        $page = $this->request->getGet('page') ?? 1;
+        $page    = $this->request->getGet('page') ?? 1;
         $perPage = $this->request->getGet('per_page') ?? 10;
 
-        $query = $this->model->where('user_id', $userId);
+        $query = $this->model
+            ->where('role', 'customer'); // ✅ chỉ lấy khách hàng
 
         if ($search = $this->request->getGet('search')) {
             $query->groupStart()
@@ -50,15 +50,15 @@ class CustomerController extends ResourceController
             $query->where('created_at <=', $to);
         }
 
-        $data = $query->paginate($perPage, 'default', $page);
+        $data  = $query->paginate($perPage, 'default', $page);
         $pager = $this->model->pager;
 
         return $this->respond([
-            'data' => $data,
+            'data'  => $data,
             'pager' => [
-                'total' => $pager->getTotal(),
-                'per_page' => $perPage,
-                'current' => $page,
+                'total'     => $pager->getTotal(),
+                'per_page'  => $perPage,
+                'current'   => $page,
             ]
         ]);
     }
@@ -66,23 +66,67 @@ class CustomerController extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
-        $data['user_id'] = $this->getUserId();
+
+        $validation = Services::validation();
+
+        $rules = [
+            'name'              => 'required',
+            'email'             => 'required|valid_email|is_unique[users.email]',
+            'phone'             => 'required|regex_match[/^(0|\+84)[0-9]{9,10}$/]',
+            'password'          => 'required|min_length[6]',
+            'confirm_password'  => 'required|matches[password]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->failValidationErrors($validation->getErrors());
+        }
+
+        unset($data['confirm_password']);
+
+        // ✅ Băm mật khẩu trước khi lưu
+        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+
+        // ✅ Gán role là customer
+        $data['role'] = 'customer';
 
         $id = $this->model->insert($data);
-
         return $this->respondCreated(['id' => $id]);
     }
 
+
     public function update($id = null)
     {
-        $userId = $this->getUserId();
-        $existing = $this->model->where('user_id', $userId)->find($id);
+        $existing = $this->model->where('role', 'customer')->find($id);
 
         if (!$existing) {
             return $this->failNotFound('Không tìm thấy khách hàng');
         }
 
         $data = $this->request->getJSON(true);
+
+        $validation = Services::validation();
+
+        $rules = [
+            'name'  => 'required',
+            'email' => 'required|valid_email',
+            'phone' => 'required|regex_match[/^(0|\+84)[0-9]{9,10}$/]',
+        ];
+
+        if (!empty($data['password'])) {
+            $rules['password'] = 'min_length[6]';
+            $rules['confirm_password'] = 'matches[password]';
+        }
+
+        if (!$this->validate($rules)) {
+            return $this->failValidationErrors($validation->getErrors());
+        }
+
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
+
+        unset($data['confirm_password']);
+
         $this->model->update($id, $data);
 
         return $this->respondUpdated(['id' => $id]);
@@ -90,8 +134,7 @@ class CustomerController extends ResourceController
 
     public function delete($id = null)
     {
-        $userId = $this->getUserId();
-        $existing = $this->model->where('user_id', $userId)->find($id);
+        $existing = $this->model->where('role', 'customer')->find($id);
 
         if (!$existing) {
             return $this->failNotFound('Không tìm thấy khách hàng');

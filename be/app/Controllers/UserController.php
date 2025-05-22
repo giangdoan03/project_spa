@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class UserController extends ResourceController
@@ -17,6 +18,7 @@ class UserController extends ResourceController
         $search = $this->request->getGet('search');
 
         $builder = new UserModel();
+        $builder->where('role', 'admin'); // ✅ chỉ lấy admin
 
         if ($search) {
             $builder->groupStart()
@@ -39,29 +41,25 @@ class UserController extends ResourceController
         ]);
     }
 
-
     public function show($id = null)
     {
-        $data = $this->model->find($id);
-        return $data ? $this->respond($data) : $this->failNotFound('Không tìm thấy người dùng');
+        $user = $this->model->where('role', 'admin')->find($id); // ✅ chỉ admin
+        return $user ? $this->respond($user) : $this->failNotFound('Không tìm thấy tài khoản admin');
     }
 
     public function create()
     {
-        $data = $this->request->getPost();
+        $data = $this->getF();
 
-        // Xử lý file upload
-        $file = $this->request->getFile('avatar');
-        if ($file && $file->isValid()) {
-            $newName = $file->getRandomName();
-            $file->move(WRITEPATH . 'uploads', $newName);
-            $data['avatar'] = base_url('uploads/' . $newName);
-        }
-
-        // Hash mật khẩu nếu có
+        // Băm mật khẩu
         if (!empty($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         }
+
+        $data['role'] = 'admin'; // Luôn gán role admin
+
+        // Tính thời hạn gói nếu có truyền số năm
+        $data = $this->applyPackageDuration($data); // Không cần lưu
 
         $this->model->insert($data);
         $data['id'] = $this->model->getInsertID();
@@ -70,20 +68,22 @@ class UserController extends ResourceController
 
     public function update($id = null)
     {
-        $data = $this->request->getPost(); // lấy từ form-data
-
-        $file = $this->request->getFile('avatar');
-        if ($file && $file->isValid()) {
-            $newName = $file->getRandomName();
-            $file->move(WRITEPATH . 'uploads', $newName);
-            $data['avatar'] = base_url('uploads/' . $newName);
+        $existing = $this->model->where('role', 'admin')->find($id);
+        if (!$existing) {
+            return $this->failNotFound('Không tìm thấy tài khoản admin');
         }
 
+        $data = $this->getF();
+
+        // Băm mật khẩu nếu có
         if (!empty($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         } else {
             unset($data['password']);
         }
+
+        // Tính thời hạn gói nếu có thay đổi
+        $data = $this->applyPackageDuration($data); // Không lưu
 
         $this->model->update($id, $data);
         return $this->respond(['id' => $id, 'message' => 'Đã cập nhật']);
@@ -91,17 +91,27 @@ class UserController extends ResourceController
 
     public function delete($id = null)
     {
+        $existing = $this->model->where('role', 'admin')->find($id); // ✅ kiểm tra role admin
+        if (!$existing) {
+            return $this->failNotFound('Không tìm thấy tài khoản admin');
+        }
+
         $this->model->delete($id);
         return $this->respondDeleted(['id' => $id, 'message' => 'Đã xoá']);
     }
 
-    public function changePassword()
+    public function changePassword(): ResponseInterface
     {
         $request = $this->request->getJSON(true);
-        $userId = session('user_id'); // hoặc lấy từ token nếu dùng JWT
+        $userId = session('user_id');
 
         if (!$userId) {
             return $this->failUnauthorized('Không xác thực');
+        }
+
+        $user = $this->model->find($userId);
+        if (!$user || $user['role'] !== 'admin') { // ✅ chỉ cho phép admin đổi mật khẩu
+            return $this->failForbidden('Không có quyền đổi mật khẩu');
         }
 
         $currentPassword = $request['current_password'] ?? '';
@@ -111,16 +121,8 @@ class UserController extends ResourceController
             return $this->failValidationErrors('Mật khẩu mới không được để trống');
         }
 
-        $user = $this->model->find($userId);
-        if (!$user) {
-            return $this->failNotFound('Không tìm thấy người dùng');
-        }
-
-        // Nếu không phải super admin thì phải kiểm tra mật khẩu cũ
-        if (($user['role'] ?? '') !== 'super admin') {
-            if (!password_verify($currentPassword, $user['password'])) {
-                return $this->failValidationErrors('Mật khẩu hiện tại không đúng');
-            }
+        if (!password_verify($currentPassword, $user['password'])) {
+            return $this->failValidationErrors('Mật khẩu hiện tại không đúng');
         }
 
         $this->model->update($userId, [
@@ -128,6 +130,40 @@ class UserController extends ResourceController
         ]);
 
         return $this->respond(['message' => 'Đã đổi mật khẩu thành công']);
+    }
+
+    /**
+     * @return array|bool|float|int|object|string
+     */
+    public function getF(): string|array|bool|int|object|float
+    {
+        $data = $this->request->getPost();
+
+        // Xử lý avatar
+        $file = $this->request->getFile('avatar');
+        if ($file && $file->isValid()) {
+            $newName = $file->getRandomName();
+            $file->move(WRITEPATH . 'uploads', $newName);
+            $data['avatar'] = base_url('uploads/' . $newName);
+        }
+        return $data;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function applyPackageDuration(array $data): array
+    {
+        if (!empty($data['duration_years']) && is_numeric($data['duration_years'])) {
+            $years = (int) $data['duration_years'];
+            $today = date('Y-m-d');
+            $data['package_start_date'] = $today;
+            $data['package_end_date'] = date('Y-m-d', strtotime("+{$years} year", strtotime($today)));
+        }
+
+        unset($data['duration_years']);
+        return $data;
     }
 
 }
