@@ -19,8 +19,7 @@ class CustomerController extends ResourceController
         $page    = $this->request->getGet('page') ?? 1;
         $perPage = $this->request->getGet('per_page') ?? 10;
 
-        $query = $this->model
-            ->where('role', 'customer'); // ✅ chỉ lấy khách hàng
+        $query = $this->model->where('role', 'customer'); // ✅ chỉ lấy khách hàng
 
         if ($search = $this->request->getGet('search')) {
             $query->groupStart()

@@ -52,23 +52,33 @@ class Auth extends Controller
 
         return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid credentials']);
     }
-    
+
 
     public function check(): ResponseInterface
     {
         $session = session();
 
         if ($session->get('logged_in')) {
+            $userModel = new UserModel();
+            $user = $userModel->find($session->get('user_id'));
+
+            if ($user) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'user'   => $user, // trả toàn bộ user record
+                ]);
+            }
+
             return $this->response->setJSON([
-                'status' => 'success',
-                'user'   => [
-                    'id'    => $session->get('user_id'),
-                    'email' => $session->get('user_email'),
-                ],
+                'status' => 'error',
+                'message' => 'User not found'
             ]);
         }
 
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Not logged in']);
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Not logged in'
+        ]);
     }
 
     public function logout(): ResponseInterface

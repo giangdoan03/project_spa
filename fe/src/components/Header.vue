@@ -23,7 +23,7 @@
         <div style="margin-right: 24px;">
             <a-dropdown>
                 <a class="ant-dropdown-link" @click.prevent>
-                    {{ user?.email }} <DownOutlined />
+                    <p style="width: 200px; text-align: right">Xin chào, {{ user?.name }} <DownOutlined /></p>
                 </a>
                 <template #overlay>
                     <a-menu>
