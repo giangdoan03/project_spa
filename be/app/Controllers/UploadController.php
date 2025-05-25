@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class UploadController extends ResourceController
@@ -29,7 +30,7 @@ class UploadController extends ResourceController
         ];
     }
 
-    public function upload()
+    public function upload(): ResponseInterface
     {
         $allowedOrigins = $this->getAllowedOrigins();
         $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
@@ -57,7 +58,7 @@ class UploadController extends ResourceController
         return $this->respond(['url' => $publicUrl]);
     }
 
-    public function uploadFromUrl()
+    public function uploadFromUrl(): ResponseInterface
     {
         $url = $this->request->getJSON()->url ?? null;
 
