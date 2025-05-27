@@ -53,6 +53,7 @@ $routes->group('api', function ($routes) {
     $routes->resource('users', ['controller' => 'UserController']);
     $routes->post('users/update/(:num)', 'UserController::update/$1');
     $routes->post('users/change-password', 'UserController::changePassword');
+    $routes->get('me', 'UserController::me'); // ✅ thêm dòng này
     $routes->resource('customers', ['controller' => 'CustomerController']);
     $routes->resource('setting', ['controller' => 'SettingController']);
     $routes->resource('purchase-history', ['controller' => 'PurchaseHistoryController']);

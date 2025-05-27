@@ -7,6 +7,8 @@ const instance = axios.create({
 
 export const getUsers = (params = {}) => instance.get('/users', { params })
 export const getUser = (id) => instance.get(`/users/${id}`)
+
+
 export const createUser = (data) => {
     const formData = new FormData()
     for (const key in data) {
@@ -33,5 +35,8 @@ export const uploadFile = (file) => {
 }
 
 export const changePasswordAPI = (data) => instance.post('/users/change-password', data)
+
+export const getCurrentUser = () => instance.get('/me')
+
 
 

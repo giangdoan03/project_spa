@@ -43,9 +43,35 @@ class UserController extends ResourceController
 
     public function show($id = null)
     {
-        $user = $this->model->where('role', 'admin')->find($id); // ✅ chỉ admin
-        return $user ? $this->respond($user) : $this->failNotFound('Không tìm thấy tài khoản admin');
+        $user = $this->model->find($id); // ❌ bỏ lọc role
+        return $user
+            ? $this->respond($user)
+            : $this->failNotFound('Không tìm thấy tài khoản');
     }
+
+
+    public function me(): ResponseInterface
+    {
+        $session = session();
+        $userId = $session->get('user_id');
+
+        if (!$userId) {
+            return $this->failUnauthorized('Chưa đăng nhập');
+        }
+
+        $user = $this->model->find($userId);
+
+        if (!$user) {
+            return $this->failNotFound('Không tìm thấy người dùng');
+        }
+
+        // ✅ Xoá trường password trước khi trả về
+        unset($user['password']);
+
+        return $this->respond($user);
+    }
+
+
 
     public function create()
     {
@@ -68,9 +94,9 @@ class UserController extends ResourceController
 
     public function update($id = null)
     {
-        $existing = $this->model->where('role', 'admin')->find($id);
+        $existing = $this->model->find($id); // ❌ bỏ lọc role
         if (!$existing) {
-            return $this->failNotFound('Không tìm thấy tài khoản admin');
+            return $this->failNotFound('Không tìm thấy tài khoản');
         }
 
         $data = $this->getF();
@@ -82,12 +108,13 @@ class UserController extends ResourceController
             unset($data['password']);
         }
 
-        // Tính thời hạn gói nếu có thay đổi
-        $data = $this->applyPackageDuration($data); // Không lưu
+        // Tính thời hạn gói nếu có thay đổi (nếu bạn dùng logic đó)
+        $data = $this->applyPackageDuration($data);
 
         $this->model->update($id, $data);
         return $this->respond(['id' => $id, 'message' => 'Đã cập nhật']);
     }
+
 
     public function delete($id = null)
     {

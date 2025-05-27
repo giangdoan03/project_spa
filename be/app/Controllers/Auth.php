@@ -63,9 +63,12 @@ class Auth extends Controller
             $user = $userModel->find($session->get('user_id'));
 
             if ($user) {
+                // Loại bỏ trường password nếu tồn tại
+                unset($user['password']);
+
                 return $this->response->setJSON([
                     'status' => 'success',
-                    'user'   => $user, // trả toàn bộ user record
+                    'user'   => $user,
                 ]);
             }
 
@@ -80,6 +83,7 @@ class Auth extends Controller
             'message' => 'Not logged in'
         ]);
     }
+
 
     public function logout(): ResponseInterface
     {

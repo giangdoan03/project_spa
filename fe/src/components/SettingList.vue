@@ -26,8 +26,16 @@
                                 </a-form-item>
 
                                 <a-form-item label="Trạng thái">
-                                    <a-input v-model:value="userInfo.status" />
+                                    <a-tag color="purple" v-if="userInfo.status === '3'">
+                                        VIP – còn {{ remainingDays(userInfo.package_end_date) }} ngày
+                                    </a-tag>
+                                    <a-tag color="red" v-else-if="userInfo.status === '4'">Hết hạn</a-tag>
+                                    <a-tag color="green" v-else-if="userInfo.status === '1'">
+                                        Đang hoạt động – còn {{ remainingDays(userInfo.package_end_date) }} ngày
+                                    </a-tag>
+                                    <a-tag v-else>Không rõ</a-tag>
                                 </a-form-item>
+
 
                                 <a-form-item>
                                     <a-checkbox v-model:checked="changePassword">Đổi mật khẩu</a-checkbox>
@@ -45,13 +53,43 @@
                                     <a-input-password v-model:value="passwordForm.confirm" placeholder="Nhập lại mật khẩu mới" />
                                 </a-form-item>
 
-                                <a-form-item label="Ảnh đại diện">
-                                    <a-image
-                                        :src="userInfo.avatar"
-                                        style="width: 100px; height: 100px; object-fit: cover"
-                                        v-if="userInfo.avatar"
-                                    />
+                                <a-form-item label="Ảnh đại diện / Ảnh logo">
+                                    <template v-if="isEditing">
+                                        <a-upload
+                                            list-type="picture-card"
+                                            :file-list="logoFileList"
+                                            :on-preview="handlePreview"
+                                            :on-remove="(file) => handleRemoveFile('logo', file)"
+                                            :before-upload="(file) => handleBeforeUploadSingle('logo', file)"
+                                            :max-count="1"
+                                        >
+                                            <div v-if="logoFileList.length === 0">
+                                                <upload-outlined />
+                                                <div style="margin-top: 8px">Tải ảnh</div>
+                                            </div>
+                                        </a-upload>
+                                    </template>
+                                    <template v-else>
+                                        <div v-if="userInfo.avatar">
+                                            <a-image
+                                                :src="userInfo.avatar"
+                                                style="width: 100px; height: 100px; object-fit: cover"
+                                            />
+                                        </div>
+                                        <div v-else>
+                                            <a-avatar
+                                                :size="{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }"
+                                                style="background-color: #f5f5f5; display: inline-flex; align-items: center; justify-content: center"
+                                            >
+                                                <template #icon>
+                                                    <AntDesignOutlined />
+                                                </template>
+                                            </a-avatar>
+                                        </div>
+                                    </template>
                                 </a-form-item>
+
+
                             </a-card>
                         </a-col>
                     </a-row>
@@ -102,6 +140,8 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { message } from 'ant-design-vue'
+import { AntDesignOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
 import {
     getSettings,
     createSetting,
@@ -109,7 +149,7 @@ import {
     updateSetting
 } from '../api/setting'
 
-import { getUser, updateUser, changePasswordAPI } from '../api/user'
+import { updateUser, changePasswordAPI, getCurrentUser } from '../api/user'
 import { useUserStore } from '../stores/user'
 
 const activeTab = ref('userInfo')
@@ -126,6 +166,12 @@ const settings = ref([])
 const loading = ref(false)
 const newSetting = ref({ id: null, key: '', value: '' })
 
+const isEditing = ref(true)
+
+const previewImage = ref('');
+const previewVisible = ref(false);
+const previewTitle = ref('');
+
 const columns = [
     { title: 'Key', dataIndex: 'key', key: 'key' },
     { title: 'Value', dataIndex: 'value', key: 'value' },
@@ -133,13 +179,77 @@ const columns = [
 ]
 
 onMounted(async () => {
-    const userId = userStore.user?.id
-    if (userId) {
-        const res = await getUser(userId)
+    try {
+        const res = await getCurrentUser() // ✅ không truyền tham số
         userInfo.value = res.data
+
+        // Nếu có avatar thì set preview luôn
+        if (userInfo.value.avatar) {
+            logoFileList.value = [
+                {
+                    uid: '-1',
+                    name: 'avatar',
+                    status: 'done',
+                    url: userInfo.value.avatar
+                }
+            ]
+        }
+    } catch (e) {
+        message.error('Không thể tải thông tin người dùng')
     }
+
     await fetchSettings()
 })
+
+
+import {uploadFile} from '../api/product'
+
+// Avatar upload
+const logoFileList = ref([])
+
+const handleBeforeUploadSingle = async (field, file) => {
+    const { data } = await uploadFile(file)
+
+    // ✅ Gán trực tiếp vào userInfo.avatar
+    userInfo.value.avatar = data.url
+
+    // ✅ Cập nhật file list để preview
+    logoFileList.value = [
+        {
+            uid: Date.now(),
+            name: file.name,
+            status: 'done',
+            url: data.url
+        }
+    ]
+
+    return false // Ngăn upload mặc định
+}
+
+
+const handleRemoveFile = (field, file) => {
+    if (field === 'logo') {
+        userInfo.value.avatar = null
+        logoFileList.value = []
+    }
+}
+
+const updateFileList = (field, url) => {
+    const item = {
+        uid: Date.now(),
+        name: 'Ảnh',
+        status: 'done',
+        url: url
+    }
+    if (field === 'logo') logoFileList.value = [item]
+}
+
+const handlePreview = (file) => {
+    previewImage.value = file.url || file.thumbUrl
+    previewVisible.value = true
+    previewTitle.value = file.name || ''
+}
+
 
 const fetchSettings = async () => {
     loading.value = true
@@ -153,6 +263,14 @@ const fetchSettings = async () => {
     }
 }
 
+const remainingDays = (endDate) => {
+    if (!endDate) return null
+    const today = dayjs()
+    const end = dayjs(endDate)
+    const diff = end.diff(today, 'day')
+    return diff >= 0 ? diff : 0
+}
+
 const edit = (item) => {
     newSetting.value = { ...item }
 }
@@ -161,7 +279,7 @@ const remove = async (id) => {
     try {
         await deleteSetting(id)
         message.success('Đã xoá')
-        fetchSettings()
+        await fetchSettings()
     } catch (err) {
         message.error('Lỗi khi xoá')
     }
@@ -173,7 +291,8 @@ const saveAll = async () => {
         await updateUser(userInfo.value.id, {
             name: userInfo.value.name,
             phone: userInfo.value.phone,
-            status: userInfo.value.status
+            status: userInfo.value.status,
+            avatar: userInfo.value.avatar
         })
 
         // Đổi mật khẩu nếu có chọn

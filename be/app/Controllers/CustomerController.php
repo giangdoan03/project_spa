@@ -19,7 +19,7 @@ class CustomerController extends ResourceController
         $page    = $this->request->getGet('page') ?? 1;
         $perPage = $this->request->getGet('per_page') ?? 10;
 
-        $query = $this->model->where('role', 'customer'); // ✅ chỉ lấy khách hàng
+        $query = $this->model->where('role', 'customer');
 
         if ($search = $this->request->getGet('search')) {
             $query->groupStart()
@@ -52,6 +52,11 @@ class CustomerController extends ResourceController
         $data  = $query->paginate($perPage, 'default', $page);
         $pager = $this->model->pager;
 
+        // ❌ Loại bỏ password khỏi từng record
+        foreach ($data as &$user) {
+            unset($user['password']);
+        }
+
         return $this->respond([
             'data'  => $data,
             'pager' => [
@@ -61,6 +66,7 @@ class CustomerController extends ResourceController
             ]
         ]);
     }
+
 
     public function create()
     {
@@ -120,7 +126,9 @@ class CustomerController extends ResourceController
             return $this->failValidationErrors($validation->getErrors());
         }
 
-        if (empty($data['password'])) {
+        if (!empty($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        } else {
             unset($data['password']);
         }
 
@@ -130,6 +138,7 @@ class CustomerController extends ResourceController
 
         return $this->respondUpdated(['id' => $id]);
     }
+
 
     public function delete($id = null)
     {
