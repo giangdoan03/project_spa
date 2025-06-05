@@ -66,37 +66,39 @@ class CustomerController extends ResourceController
 
             $user['packages'] = is_array($packages) ? $packages : [];
 
-            // Nếu có gói, lấy gói mới nhất
-            if (!empty($user['packages'])) {
-                $latest = $user['packages'][0];
+            $latestStatus = null;
+
+            foreach ($user['packages'] as &$package) {
                 $now = time();
+                $expireTime = strtotime($package['expires_at']);
 
-                if (!empty($latest['expires_at'])) {
-                    $expireTime = strtotime($latest['expires_at']);
-
-                    if ((int)$latest['is_paid'] === 0) {
-                        // ❌ Chưa thanh toán → Ngừng hoạt động
-                        if ((int)$user['status'] !== 2) {
-                            $this->model->update($user['id'], ['status' => 2]);
-                            $user['status'] = 2;
-                        }
-                    } elseif ($expireTime < $now) {
+                if ((int)$package['is_paid'] === 0) {
+                    // ❌ Chưa thanh toán
+                    $package['is_active'] = 0;
+                    $latestStatus = 2;
+                } else {
+                    if ($expireTime < $now) {
                         // 🛑 Đã thanh toán nhưng hết hạn
-                        if ((int)$user['status'] !== 4) {
-                            $this->model->update($user['id'], ['status' => 4]);
-                            $user['status'] = 4;
-                        }
+                        $package['is_active'] = 0;
+                        $latestStatus = 4;
                     } else {
                         // ✅ Đã thanh toán và còn hạn
-                        if ((int)$user['status'] !== 1) {
-                            $this->model->update($user['id'], ['status' => 1]);
-                            $user['status'] = 1;
-                        }
+                        $package['is_active'] = 1;
+                        $latestStatus = 1;
                     }
                 }
 
+                // Cập nhật lại trong DB nếu cần
+                $purchaseModel->update($package['id'], ['is_active' => $package['is_active']]);
+            }
+
+            // Cập nhật status người dùng nếu khác hiện tại
+            if ($latestStatus !== null && (int)$user['status'] !== $latestStatus) {
+                $this->model->update($user['id'], ['status' => $latestStatus]);
+                $user['status'] = $latestStatus;
             }
         }
+
 
 
 

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-page-header title="Quản lý khách hàng" />
+        <a-page-header title="Quản lý khách hàng" style="padding-left: 0"/>
 
         <!-- Bộ lọc -->
         <a-row :gutter="[16, 16]" style="margin-bottom: 16px;">
@@ -24,20 +24,20 @@
             </a-col>
         </a-row>
 
-        <div style="margin-bottom: 12px; display: flex; justify-content: space-between">
-            <a-button @click="exportExcel">Export</a-button>
-            <a-button type="primary" @click="openDrawer">Thêm khách hàng</a-button>
+        <div style="margin-bottom: 12px; display: flex; justify-content: flex-end">
+            <a-button type="primary" @click="openDrawer">
+                <template #icon><PlusOutlined /></template>
+                Thêm khách hàng
+            </a-button>
         </div>
 
-        <!-- Danh sách khách hàng -->
         <a-table
-            :columns="columns"
-            :data-source="customers"
-            :loading="loading"
-            row-key="id"
-            :pagination="pagination"
-            @change="handleTableChange"
-
+                :columns="columns"
+                :data-source="customers"
+                :loading="loading"
+                row-key="id"
+                :pagination="pagination"
+                @change="handleTableChange"
         >
             <template #bodyCell="{ column, record, index }">
                 <template v-if="column.key === 'avatar'">
@@ -47,10 +47,11 @@
                     {{ ((pagination?.current || 1) - 1) * (pagination?.pageSize || 10) + index + 1 }}
                 </template>
                 <template v-else-if="column.key === 'customer_status'">
-                    <a-tag :color="customerStatusColor(getDisplayStatus(record))">
-                        {{ statusLabel(getDisplayStatus(record)) }}
+                    <a-tag :color="getCustomerStatus(record) === 'Đang hoạt động' ? 'blue' : 'default'">
+                        {{ getCustomerStatus(record) }}
                     </a-tag>
                 </template>
+
                 <template v-else-if="column.key === 'payment_status'">
                     <a-tag :color="record.payment_status === 'paid' ? 'green' : 'orange'">
                         {{ record.payment_status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
@@ -59,23 +60,21 @@
                 <template v-else-if="column.key === 'package_start_date'">
                     {{ record.package_start_date ? formatDate(record.package_start_date) : '—' }}
                 </template>
-
                 <template v-else-if="column.key === 'package_end_date'">
-                    <span>
-                        {{ formatDate(record.package_end_date) }}
-                        <a-tag v-if="isExpired(record.package_end_date)" color="red" style="margin-left: 8px;">
-                            Hết hạn
-                        </a-tag>
-                    </span>
+                  <span>
+                    {{ formatDate(record.package_end_date) }}
+                    <a-tag v-if="isExpired(record.package_end_date)" color="red" style="margin-left: 8px;">
+                      Hết hạn
+                    </a-tag>
+                  </span>
                 </template>
                 <template v-else-if="column.key === 'action'">
                     <a-space>
-                        <a-tooltip title="Sửa">
+                        <a-tooltip title="Sửa khách hàng">
                             <a-button type="text" @click="editCustomer(record)">
                                 <template #icon><EditOutlined /></template>
                             </a-button>
                         </a-tooltip>
-
                         <a-popconfirm title="Bạn có chắc muốn xoá?" @confirm="deleteCustomer(record.id)">
                             <a-tooltip title="Xoá">
                                 <a-button type="text" danger>
@@ -83,15 +82,13 @@
                                 </a-button>
                             </a-tooltip>
                         </a-popconfirm>
-
-                        <a-tooltip title="Đăng ký mua gói">
-                            <a-button type="text" @click="registerPackage(record)">
-                                <template #icon><ShoppingCartOutlined /></template>
+                        <a-tooltip title="Xem chi tiết">
+                            <a-button type="text" @click="viewDetails(record)">
+                                <template #icon><EyeOutlined /></template>
                             </a-button>
                         </a-tooltip>
                     </a-space>
                 </template>
-
                 <template v-else>
                     {{ record[column.key] }}
                 </template>
@@ -100,116 +97,68 @@
 
         <!-- Drawer tạo/sửa khách hàng -->
         <a-drawer
-            :open="showDrawer"
-            title="Quản lý gói đã đăng ký"
-            @close="showDrawer = false"
-            width="500"
+                :open="drawerVisible"
+                :title="isEditing ? 'Sửa khách hàng' : 'Thêm khách hàng'"
+                @close="closeDrawer"
+                width="500"
         >
-            <div style="margin-bottom: 12px">
-                <strong>Khách hàng:</strong> {{ selectedCustomer?.name }}
-            </div>
+            <a-form ref="formRef" layout="vertical" :model="form">
+                <a-form-item label="Tên khách hàng" name="name" :rules="rules.name">
+                    <a-input v-model:value="form.name" />
+                </a-form-item>
 
-            <!-- Gói hiện tại -->
-            <div v-if="currentPackage" style="margin-bottom: 24px; padding: 12px; background: #f0f2f5; border-radius: 6px">
-                <h4>🎯 Gói hiện tại đang dùng:</h4>
-                <p><strong>{{ currentPackage.product_name }}</strong></p>
-                <p>Bắt đầu: {{ formatDate(currentPackage.starts_at) }}</p>
-                <p>Hết hạn: {{ formatDate(currentPackage.expires_at) }}</p>
-                <p>Thanh toán: {{ currentPackage.is_paid ? 'Đã thanh toán' : 'Chưa thanh toán' }}</p>
-            </div>
+                <a-form-item label="Email" name="email" :rules="rules.email">
+                    <a-input v-model:value="form.email" />
+                </a-form-item>
 
-            <a-form layout="vertical">
-                <a-form-item label="Gói đăng ký">
-                    <a-select v-model:value="form.product_name">
-                        <a-select-option value="Gói Premium">Gói Premium</a-select-option>
+                <a-form-item label="Số điện thoại" name="phone" :rules="rules.phone">
+                    <a-input v-model:value="form.phone" />
+                </a-form-item>
+
+                <a-form-item label="Tỉnh / Thành phố">
+                    <a-input v-model:value="form.city" />
+                </a-form-item>
+
+                <a-form-item label="Địa chỉ">
+                    <a-input v-model:value="form.address" />
+                </a-form-item>
+
+                <a-form-item label="Trạng thái" name="customer_status" :rules="rules.customer_status">
+                    <a-select v-model:value="form.customer_status" placeholder="Chọn trạng thái">
+                        <a-select-option :value="1">Đang hoạt động</a-select-option>
+                        <a-select-option :value="2">Ngừng hoạt động</a-select-option>
+                        <a-select-option :value="3">VIP</a-select-option>
                     </a-select>
                 </a-form-item>
 
-                <a-form-item label="Thời hạn gói (năm)">
-                    <a-input-number v-model:value="form.years" :min="1" :max="5" />
+
+                <a-form-item v-if="!isEditing" label="Mật khẩu" name="password" :rules="rules.password">
+                    <a-input-password v-model:value="form.password" />
+                </a-form-item>
+
+                <a-form-item v-if="!isEditing" label="Xác nhận mật khẩu" name="confirm_password" :rules="rules.confirm_password">
+                    <a-input-password v-model:value="form.confirm_password" />
+                </a-form-item>
+
+                <a-form-item v-if="isEditing">
+                    <a-checkbox v-model:checked="changePassword">Đổi mật khẩu</a-checkbox>
+                </a-form-item>
+
+                <a-form-item v-if="isEditing && changePassword" label="Mật khẩu mới" name="password" :rules="rules.password">
+                    <a-input-password v-model:value="form.password" />
+                </a-form-item>
+
+                <a-form-item v-if="isEditing && changePassword" label="Xác nhận mật khẩu" name="confirm_password" :rules="rules.confirm_password">
+                    <a-input-password v-model:value="form.confirm_password" />
                 </a-form-item>
 
                 <a-form-item>
-                    <a-checkbox v-model:checked="form.is_active">Kích hoạt ngay</a-checkbox>
+                    <a-button type="primary" block @click="handleSubmit">
+                        {{ isEditing ? 'Cập nhật' : 'Tạo mới' }}
+                    </a-button>
                 </a-form-item>
-
-                <a-form-item>
-                    <a-checkbox v-model:checked="form.is_paid">Đã thanh toán</a-checkbox>
-                </a-form-item>
-
-                <a-button
-                    type="primary"
-                    block
-                    @click="handleRegister"
-                    :disabled="!!currentPackage"
-                >
-                    Đăng ký gói mới
-                </a-button>
-
-                <p v-if="currentPackage" style="color: red; margin-top: 8px">
-                    ⚠️ Khách hàng đang có gói hoạt động. Không thể đăng ký gói mới.
-                </p>
             </a-form>
-
-            <div v-if="pastPackages.length" style="margin-top: 24px">
-                <h4>Lịch sử gói đã mua:</h4>
-                <a-timeline mode="left">
-                    <a-timeline-item v-for="(item, idx) in pastPackages" :key="idx">
-                        <p><strong>{{ item.product_name }}</strong></p>
-                        <p>Bắt đầu: {{ formatDate(item.starts_at) }}</p>
-                        <p>Hết hạn: {{ formatDate(item.expires_at) }}</p>
-                        <p>Thanh toán: {{ item.is_paid ? 'Đã thanh toán' : 'Chưa thanh toán' }}</p>
-                    </a-timeline-item>
-                </a-timeline>
-            </div>
         </a-drawer>
-
-<!--        <a-drawer-->
-<!--            :open="showDrawer"-->
-<!--            :title="formMode === 'update' ? 'Cập nhật gói đã mua' : 'Đăng ký mua gói'"-->
-<!--            @close="showDrawer = false"-->
-<!--            width="400"-->
-<!--        >-->
-<!--            <a-form layout="vertical">-->
-<!--                <a-form-item label="Khách hàng">-->
-<!--                    <a-input :value="selectedCustomer?.name" disabled />-->
-<!--                </a-form-item>-->
-
-<!--                <a-form-item label="Gói đăng ký">-->
-<!--                    <a-select v-model:value="form.product_name">-->
-<!--                        <a-select-option value="Gói Premium">Gói Premium</a-select-option>-->
-<!--                        <a-select-option value="Gói VIP" disabled>Gói VIP (Chưa mở)</a-select-option>-->
-<!--                    </a-select>-->
-<!--                </a-form-item>-->
-
-<!--                <a-form-item label="Thời hạn gói (năm)">-->
-<!--                    <a-input-number v-model:value="form.years" :min="1" :max="5" />-->
-<!--                </a-form-item>-->
-
-<!--                <a-form-item>-->
-<!--                    <a-checkbox v-model:checked="form.is_active">Kích hoạt ngay</a-checkbox>-->
-<!--                </a-form-item>-->
-
-<!--                <a-form-item>-->
-<!--                    <a-checkbox v-model:checked="form.is_paid">Đã thanh toán</a-checkbox>-->
-<!--                </a-form-item>-->
-
-<!--            </a-form>-->
-
-<!--            <template #footer>-->
-<!--                <a-space style="float: right;">-->
-<!--                    <a-button @click="showDrawer = false">Hủy</a-button>-->
-<!--                    <a-button type="primary" @click="formMode === 'update' ? handleUpdate() : handleRegister()">-->
-<!--                        {{ formMode === 'update' ? 'Cập nhật' : 'Kích hoạt' }}-->
-<!--                    </a-button>-->
-<!--                </a-space>-->
-<!--            </template>-->
-<!--        </a-drawer>-->
-
-
-
-
-
     </div>
 </template>
 
@@ -217,12 +166,16 @@
 import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 import { h } from 'vue'
 import { formatDate } from '../utils/formUtils.js'
 import {
     EditOutlined,
     DeleteOutlined,
-    ShoppingCartOutlined
+    ShoppingCartOutlined,
+    EyeOutlined,
+    PlusOutlined
 } from '@ant-design/icons-vue'
 import {
     getCustomers,
@@ -230,7 +183,6 @@ import {
     updateCustomer,
     deleteCustomer as deleteCustomerById
 } from '../api/customer'
-import {createPurchaseHistory, getPurchaseHistories, updatePurchaseHistory} from '../api/purchaseHistory'
 
 const customers = ref([])
 const loading = ref(false)
@@ -244,12 +196,9 @@ const form = ref({
 })
 const formRef = ref()
 const changePassword = ref(false)
-const showDrawer = ref(false)
+let showDrawer = ref(false)
 const filters = ref({ name: '', phone: '', email: '', city: '', dateRange: [] })
 const pagination = ref({ current: 1, pageSize: 10, total: 0 })
-const formMode = ref('create') // hoặc 'update'
-const existingPackage = ref(null)
-const selectedCustomer = ref({})
 
 
 const packageHistory = ref([])
@@ -263,12 +212,6 @@ const currentPackage = computed(() => {
     )
 })
 
-const pastPackages = computed(() => {
-    return packageHistory.value.filter((p) => p !== currentPackage.value)
-})
-
-
-
 const columns = [
     { title: 'STT', key: 'stt' },
     { title: 'Tên khách hàng', key: 'name', dataIndex: 'name' },
@@ -277,21 +220,9 @@ const columns = [
     { title: 'Địa chỉ', key: 'address', dataIndex: 'address' },
     { title: 'Tỉnh thành', key: 'city', dataIndex: 'city' },
     { title: 'Trạng thái KH', key: 'customer_status', dataIndex: 'customer_status_text' },
-    { title: 'Ngày bắt đầu', key: 'package_start_date', dataIndex: 'package_start_date' },
-    { title: 'Ngày hết hạn', key: 'package_end_date', dataIndex: 'package_end_date' },
-    { title: 'Thanh toán', key: 'payment_status', dataIndex: 'payment_status' },
-    { title: 'Ghi chú', key: 'note', dataIndex: 'note' },
     { title: 'Thao tác', key: 'action' },
 ]
 
-
-const statusOptions = [
-    { value: 0, label: 'Mới' },
-    { value: 1, label: 'Đang hoạt động' },
-    { value: 2, label: 'Ngừng hoạt động' },
-    { value: 3, label: 'VIP' },
-    { value: 4, label: 'Hết hạn' },
-]
 
 const rules = {
     name: [
@@ -345,80 +276,9 @@ const rules = {
     ]
 }
 
-const registerPackage = async (customer) => {
-    selectedCustomer.value = customer
-    showDrawer.value = true
-    form.value = {
-        years: 1,
-        product_name: 'Gói Premium',
-        is_active: true,
-        is_paid: false
-    }
-
-    try {
-        const res = await getPurchaseHistories({ customer_id: customer.id })
-        packageHistory.value = res.data.data || []
-    } catch (e) {
-        message.error('Không tải được lịch sử gói')
-    }
+const viewDetails = (record) => {
+    router.push(`/customers/${record.id}`)
 }
-
-
-
-
-const handleUpdate = async () => {
-    if (!existingPackage.value) return
-
-    try {
-        const payload = {
-            customer_id: selectedCustomer.value.id,
-            product_name: form.value.product_name,
-            quantity: form.value.years, // ✅ sửa đúng ở đây
-            is_active: form.value.is_active ? 1 : 0,
-            is_paid: form.value.is_paid ? 1 : 0
-        }
-
-        await updatePurchaseHistory(existingPackage.value.id, payload)
-        message.success('Cập nhật gói thành công')
-        showDrawer.value = false
-        await fetchCustomers()
-    } catch (e) {
-        console.error(e)
-        message.error('Lỗi khi cập nhật gói')
-    }
-}
-
-
-
-const handleRegister = async () => {
-    if (currentPackage.value) {
-        message.warning('Khách hàng đang có gói hoạt động. Không thể đăng ký mới.')
-        return
-    }
-
-    try {
-        const now = new Date()
-        const years = form.value.years || 1
-
-        const payload = {
-            customer_id: selectedCustomer.value.id,
-            product_name: form.value.product_name,
-            quantity: years,
-            is_active: form.value.is_active ? 1 : 0,
-            is_paid: form.value.is_paid ? 1 : 0,
-            starts_at: now.toISOString(),
-            expires_at: new Date(now.setFullYear(now.getFullYear() + years)).toISOString()
-        }
-
-        await createPurchaseHistory(payload)
-        message.success('Đăng ký gói thành công')
-        await registerPackage(selectedCustomer.value)
-    } catch (e) {
-        message.error('Lỗi khi đăng ký gói')
-    }
-}
-
-
 
 const fetchCustomers = async () => {
     loading.value = true
@@ -441,6 +301,7 @@ const fetchCustomers = async () => {
             return {
                 ...customer,
                 packages: Array.isArray(customer.packages) ? customer.packages : [],
+                status: Number(customer.status),
                 customer_status_text: statusLabel(Number(customer.status)),
                 customer_status: Number(customer.status),
                 package_start_date: latestPackage?.starts_at ?? null,
@@ -460,8 +321,15 @@ const fetchCustomers = async () => {
 }
 
 
-const isExpired = (dateStr) => {
-    return dayjs(dateStr).isBefore(dayjs(), 'day')
+function isExpired(dateString) {
+    if (!dateString) return true;
+    return new Date(dateString) < new Date(); // true nếu đã hết hạn
+}
+
+function getCustomerStatus(record) {
+    return record.payment_status === 'paid' && !isExpired(record.package_end_date)
+        ? 'Đang hoạt động'
+        : 'Ngừng hoạt động';
 }
 
 const getDisplayStatus = (record) => {
@@ -475,29 +343,52 @@ const getDisplayStatus = (record) => {
 
 const openDrawer = () => {
     isEditing.value = false
-    form.value = { customer_status: 0 }
+    form.value = {
+        name: '',
+        email: '',
+        phone: '',
+        city: '',
+        address: '',
+        customer_status: 2, // ✅ Ngừng hoạt động
+        password: '',
+        confirm_password: ''
+    }
     drawerVisible.value = true
 }
+
+
 
 const editCustomer = (record) => {
-    isEditing.value = true
-    let duration = undefined
+    isEditing.value = true;
+
+    let duration = undefined;
     if (record.package_start_date && record.package_end_date) {
-        const start = dayjs(record.package_start_date)
-        const end = dayjs(record.package_end_date)
-        const diffYears = end.diff(start, 'year')
-        duration = diffYears > 0 ? diffYears : undefined
+        const start = dayjs(record.package_start_date);
+        const end = dayjs(record.package_end_date);
+        const diffYears = end.diff(start, 'year');
+        duration = diffYears > 0 ? diffYears : undefined;
     }
+
+    // Ép kiểu chính xác và debug rõ
+    const status = Number(record.status);
+    console.log('🟦 record.status =', record.status, '| typeof =', typeof record.status);
 
     form.value = {
-        ...record,
+        id: record.id,
+        name: record.name,
+        email: record.email,
+        phone: record.phone,
+        city: record.city,
+        address: record.address,
         customer_status: Number(record.status),
         package_duration_years: duration
-    }
+    };
 
-    changePassword.value = false
-    drawerVisible.value = true
-}
+    changePassword.value = false;
+    drawerVisible.value = true;
+};
+
+
 
 const closeDrawer = () => {
     drawerVisible.value = false
@@ -514,27 +405,43 @@ const handleSubmit = () => {
 
 const saveCustomer = async () => {
     try {
-        if (form.value.package_duration_years) {
-            const startDate = dayjs()
-            const endDate = startDate.add(form.value.package_duration_years, 'year')
-
-            form.value.package_start_date = startDate.format('YYYY-MM-DD')
-            form.value.package_end_date = endDate.format('YYYY-MM-DD')
-        }
-
-        form.value.status = form.value.customer_status
-        delete form.value.package_duration_years
-
-        if (isEditing.value && !changePassword.value) {
-            delete form.value.password
-            delete form.value.confirm_password
-        }
-
         if (isEditing.value) {
-            await updateCustomer(form.value.id, form.value)
+            // ✳ Gộp dữ liệu cần gửi
+            const payload = {
+                name: form.value.name,
+                email: form.value.email,
+                phone: form.value.phone,
+                city: form.value.city,
+                address: form.value.address,
+                status: form.value.customer_status
+            }
+
+            // ✳ Nếu đang chọn đổi mật khẩu
+            if (changePassword.value) {
+                if (form.value.password) {
+                    payload.password = form.value.password
+                }
+                if (form.value.confirm_password) {
+                    payload.confirm_password = form.value.confirm_password
+                }
+            }
+
+            await updateCustomer(form.value.id, payload)
             message.success('Cập nhật thành công')
         } else {
-            await createCustomer(form.value)
+            // ✳ Gửi toàn bộ form khi thêm mới
+            const payload = {
+                name: form.value.name,
+                email: form.value.email,
+                phone: form.value.phone,
+                city: form.value.city,
+                address: form.value.address,
+                status: form.value.customer_status,
+                password: form.value.password,
+                confirm_password: form.value.confirm_password
+            }
+
+            await createCustomer(payload)
             message.success('Thêm thành công')
         }
 
@@ -546,6 +453,7 @@ const saveCustomer = async () => {
     }
 }
 
+
 const deleteCustomer = async (id) => {
     try {
         await deleteCustomerById(id)
@@ -553,27 +461,6 @@ const deleteCustomer = async (id) => {
         await fetchCustomers()
     } catch (e) {
         message.error('Không thể xoá khách hàng')
-    }
-}
-
-const customerStatusColor = (status) => {
-    switch (status) {
-        case 0:
-        case '0':
-        case 'new': return 'blue'
-        case 1:
-        case '1':
-        case 'active': return 'green'
-        case 2:
-        case '2':
-        case 'inactive': return 'orange'
-        case 3:
-        case '3':
-        case 'vip': return 'purple'
-        case 4:
-        case '4':
-        case 'expired': return 'red'
-        default: return 'default'
     }
 }
 
@@ -594,10 +481,5 @@ const handleTableChange = (pager) => {
     pagination.value.pageSize = pager.pageSize
     fetchCustomers()
 }
-
-const exportExcel = () => {
-    message.info('Đang phát triển chức năng export...')
-}
-
 fetchCustomers()
 </script>

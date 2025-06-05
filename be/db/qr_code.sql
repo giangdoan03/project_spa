@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 05, 2025 at 06:01 AM
--- Server version: 8.0.30
--- PHP Version: 8.1.10
+-- Generation Time: Jun 05, 2025 at 09:16 AM
+-- Server version: 8.4.3
+-- PHP Version: 8.3.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `giang_ci4`
+-- Database: `qr_code`
 --
 
 -- --------------------------------------------------------
@@ -153,13 +153,13 @@ CREATE TABLE `customers` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` int DEFAULT NULL,
-  `payment_status` enum('paid','unpaid') COLLATE utf8mb4_unicode_ci DEFAULT 'unpaid',
+  `payment_status` enum('paid','unpaid') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'unpaid',
   `is_expired` tinyint(1) DEFAULT '0',
   `package_id` int DEFAULT NULL,
   `package_start_date` date DEFAULT NULL,
   `package_end_date` date DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
-  `customer_status` enum('new','active','inactive','vip') COLLATE utf8mb4_unicode_ci DEFAULT 'new'
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `customer_status` enum('new','active','inactive','vip') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'new'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -609,17 +609,20 @@ CREATE TABLE `purchase_histories` (
 --
 
 INSERT INTO `purchase_histories` (`id`, `customer_id`, `product_name`, `amount`, `quantity`, `note`, `purchased_at`, `is_paid`, `is_active`, `starts_at`, `expires_at`, `created_at`, `updated_at`) VALUES
-(5, 7, 'Gói Premium', 0.00, 2, NULL, '2025-06-01 12:57:27', 1, 0, '2025-06-01 12:57:27', '2026-06-01 12:57:27', '2025-06-01 12:57:27', '2025-06-02 23:54:06'),
-(6, 7, 'Gói Premium', 0.00, 5, NULL, '2025-06-01 15:52:18', 0, 0, '2025-06-01 15:52:18', '2030-06-01 15:52:18', '2025-06-01 15:52:18', '2025-06-01 15:52:30'),
-(7, 7, 'Gói Premium', 0.00, 2, NULL, '2025-06-01 15:52:30', 0, 0, '2025-06-01 15:52:30', '2027-06-01 15:52:30', '2025-06-01 15:52:30', '2025-06-02 23:54:26'),
-(8, 8, 'Gói Premium', 0.00, 3, NULL, '2025-06-01 17:26:36', 1, 0, '2025-06-01 17:26:36', '2028-06-01 17:26:36', '2025-06-01 17:26:36', '2025-06-02 21:34:14'),
-(9, 10, 'Gói Premium', 0.00, 3, NULL, '2025-06-01 17:29:04', 1, 1, '2025-06-01 17:29:04', '2025-05-31 17:39:40', '2025-06-01 17:29:04', '2025-06-01 18:16:11'),
-(10, 9, 'Gói Premium', 0.00, 1, NULL, '2025-06-01 17:58:24', 1, 1, '2025-06-01 17:58:24', '2026-06-01 17:58:24', '2025-06-01 17:58:24', '2025-06-01 18:15:04'),
-(11, 11, 'Gói Premium', 0.00, 3, NULL, '2025-06-01 18:01:20', 0, 1, '2025-06-01 18:01:20', '2028-06-01 18:01:20', '2025-06-01 18:01:20', '2025-06-01 18:01:20'),
-(12, 7, 'Gói Premium', 0.00, 1, NULL, '2025-06-02 23:54:06', 0, 1, '2025-06-02 23:54:06', '2026-06-02 23:54:06', '2025-06-02 23:54:06', '2025-06-02 23:54:06'),
-(13, 7, 'Gói Premium', 0.00, 5, NULL, '2025-06-02 23:54:26', 0, 1, '2025-06-02 23:54:26', '2030-06-02 23:54:26', '2025-06-02 23:54:26', '2025-06-02 23:54:26'),
-(14, 8, 'Gói Premium', 0.00, 3, NULL, '2025-06-02 23:54:49', 0, 0, '2025-06-02 23:54:49', '2028-06-02 23:54:49', '2025-06-02 23:54:49', '2025-06-02 23:55:03'),
-(15, 8, 'Gói Premium', 0.00, 1, NULL, '2025-06-02 23:55:03', 1, 1, '2025-06-02 23:55:03', '2026-06-02 23:55:03', '2025-06-02 23:55:03', '2025-06-02 23:55:03');
+(5, 7, 'Gói Premium', 0.00, 2, NULL, '2025-06-01 12:57:27', 1, 1, '2025-06-01 12:57:27', '2026-06-01 12:57:27', '2025-06-01 12:57:27', '2025-06-05 16:16:36'),
+(6, 7, 'Gói Premium', 0.00, 5, NULL, '2025-06-01 15:52:18', 0, 0, '2025-06-01 15:52:18', '2030-06-01 15:52:18', '2025-06-01 15:52:18', '2025-06-05 16:16:36'),
+(7, 7, 'Gói Premium', 0.00, 2, NULL, '2025-06-01 15:52:30', 0, 0, '2025-06-01 15:52:30', '2027-06-01 15:52:30', '2025-06-01 15:52:30', '2025-06-05 16:16:36'),
+(8, 8, 'Gói Premium', 0.00, 3, NULL, '2025-06-01 17:26:36', 1, 1, '2025-06-01 17:26:36', '2028-06-01 17:26:36', '2025-06-01 17:26:36', '2025-06-05 16:16:36'),
+(9, 10, 'Gói Premium', 0.00, 3, NULL, '2025-06-01 17:29:04', 1, 0, '2025-06-01 17:29:04', '2025-05-31 17:39:40', '2025-06-01 17:29:04', '2025-06-05 16:16:36'),
+(10, 9, 'Gói Premium', 0.00, 1, NULL, '2025-06-01 17:58:24', 1, 1, '2025-06-01 17:58:24', '2026-06-01 17:58:24', '2025-06-01 17:58:24', '2025-06-05 16:16:36'),
+(11, 11, 'Gói Premium', 0.00, 3, NULL, '2025-06-01 18:01:20', 0, 0, '2025-06-01 18:01:20', '2028-06-01 18:01:20', '2025-06-01 18:01:20', '2025-06-05 16:16:36'),
+(12, 7, 'Gói Premium', 0.00, 1, NULL, '2025-06-02 23:54:06', 0, 0, '2025-06-02 23:54:06', '2026-06-02 23:54:06', '2025-06-02 23:54:06', '2025-06-05 16:16:36'),
+(13, 7, 'Gói Premium', 0.00, 5, NULL, '2025-06-02 23:54:26', 0, 0, '2025-06-02 23:54:26', '2030-06-02 23:54:26', '2025-06-02 23:54:26', '2025-06-05 16:16:36'),
+(14, 8, 'Gói Premium', 0.00, 3, NULL, '2025-06-02 23:54:49', 0, 0, '2025-06-02 23:54:49', '2028-06-02 23:54:49', '2025-06-02 23:54:49', '2025-06-05 16:16:36'),
+(15, 8, 'Gói Premium', 0.00, 1, NULL, '2025-06-02 23:55:03', 1, 1, '2025-06-02 23:55:03', '2026-06-02 23:55:03', '2025-06-02 23:55:03', '2025-06-05 16:16:36'),
+(16, 13, 'Gói Premium', 0.00, 1, NULL, '2025-06-05 15:56:28', 1, 1, '2025-06-05 15:56:28', '2026-06-05 15:56:28', '2025-06-05 15:56:28', '2025-06-05 16:16:36'),
+(17, 12, 'Gói Premium', 0.00, 1, NULL, '2025-06-05 15:58:35', 1, 1, '2025-06-05 15:58:35', '2026-06-05 15:58:35', '2025-06-05 15:58:35', '2025-06-05 16:16:36'),
+(18, 11, 'Gói Premium', 0.00, 4, NULL, '2025-06-05 15:59:53', 1, 1, '2025-06-05 15:59:53', '2029-06-05 15:59:53', '2025-06-05 15:59:53', '2025-06-05 16:16:36');
 
 -- --------------------------------------------------------
 
@@ -631,10 +634,10 @@ CREATE TABLE `qr_codes` (
   `id` int NOT NULL,
   `short_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` int NOT NULL,
-  `target_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `target_id` int DEFAULT NULL,
   `qr_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `qr_type` enum('free','paid') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'free',
+  `qr_type` enum('free','paid') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'free',
   `campaign` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT '1',
   `expires_at` datetime DEFAULT NULL,
@@ -697,19 +700,19 @@ INSERT INTO `qr_codes` (`id`, `short_code`, `user_id`, `target_type`, `target_id
 
 CREATE TABLE `qr_scan_logs` (
   `id` int NOT NULL,
-  `qr_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `qr_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `qr_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `qr_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `qr_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `qr_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tracking_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `short_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `qr_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `target_id` int DEFAULT NULL,
-  `object_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `object_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `object_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `object_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `os` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `app` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `app` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `device_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `browser` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -721,7 +724,7 @@ CREATE TABLE `qr_scan_logs` (
   `latitude` double DEFAULT NULL,
   `longitude` double DEFAULT NULL,
   `phone_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `customer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `customer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1045,7 +1048,8 @@ INSERT INTO `qr_scan_logs` (`id`, `qr_id`, `qr_name`, `qr_type`, `tracking_code`
 (328, 'oxzici8m', 'test ma qr', 'free', 'dW2j5ks4', NULL, 'http://qrcode.io/views/product.html?oxzici8m', 'product', 10, 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 'http://assets.labit365.com/image/1745481785_7e1b5ecc5e060c8a96fe.png', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'Windows 10', 'Chrome', 'Desktop', 'Chrome', '127.0.0.1', '', NULL, 1, 'VN', 'Hà Nội', NULL, NULL, '0910306652', 'Khách hàng #id_3', '2025-05-28 23:06:01', '2025-05-28 23:06:01'),
 (329, 'oxzici8m', 'test ma qr', 'free', '7x24QJwG', NULL, 'http://qrcode.io/views/product.html?oxzici8m', 'product', 10, 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 'http://assets.labit365.com/image/1745481785_7e1b5ecc5e060c8a96fe.png', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'Windows 10', 'Chrome', 'Desktop', 'Chrome', '127.0.0.1', '', NULL, 1, 'VN', 'Hà Nội', NULL, NULL, '0910306652', 'Khách hàng #id_3', '2025-05-28 23:06:22', '2025-05-28 23:06:22'),
 (330, 'oxzici8m', 'test ma qr', 'free', 'SroWRoka', NULL, 'http://qrcode.io/views/product.html?oxzici8m', 'product', 10, 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 'http://assets.labit365.com/image/1745481785_7e1b5ecc5e060c8a96fe.png', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'Windows 10', 'Chrome', 'Desktop', 'Chrome', '127.0.0.1', '', NULL, 1, 'VN', 'Hà Nội', NULL, NULL, '0910306652', 'Khách hàng #id_3', '2025-06-01 11:02:39', '2025-06-01 11:02:39'),
-(331, 'oxzici8m', 'test ma qr', 'free', 'dlS14sky', NULL, 'http://qrcode.io/views/product.html?oxzici8m', 'product', 10, 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 'http://assets.labit365.com/image/1745481785_7e1b5ecc5e060c8a96fe.png', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'Windows 10', 'Chrome', 'Desktop', 'Chrome', '127.0.0.1', '', NULL, 1, 'VN', 'Hà Nội', NULL, NULL, '0910306652', 'Khách hàng #id_3', '2025-06-01 11:02:58', '2025-06-01 11:02:58');
+(331, 'oxzici8m', 'test ma qr', 'free', 'dlS14sky', NULL, 'http://qrcode.io/views/product.html?oxzici8m', 'product', 10, 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 'http://assets.labit365.com/image/1745481785_7e1b5ecc5e060c8a96fe.png', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'Windows 10', 'Chrome', 'Desktop', 'Chrome', '127.0.0.1', '', NULL, 1, 'VN', 'Hà Nội', NULL, NULL, '0910306652', 'Khách hàng #id_3', '2025-06-01 11:02:58', '2025-06-01 11:02:58'),
+(332, 'oxzici8m', 'test ma qr', 'free', 'dbMNM0Hw', NULL, 'http://qrcode.io/views/product.html?oxzici8m', 'product', 10, 'Giường gấp văn phòng cao cấp gấp gọn 4 khúc H2Home khung hợp kim sơn tĩnh điện chắc chắn bảo hành 12 tháng', 'http://assets.labit365.com/image/1745481785_7e1b5ecc5e060c8a96fe.png', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36', 'Windows 10', 'Chrome', 'Desktop', 'Chrome', '127.0.0.1', '', NULL, 1, 'VN', 'Hà Nội', NULL, NULL, '0910306652', 'Khách hàng #id_3', '2025-06-05 13:50:39', '2025-06-05 13:50:39');
 
 -- --------------------------------------------------------
 
@@ -1188,10 +1192,10 @@ CREATE TABLE `users` (
   `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '1',
-  `role` enum('admin','customer') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'customer',
+  `role` enum('admin','customer') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'customer',
   `role_id` int DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `last_interaction` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1201,11 +1205,13 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `updated_at`, `name`, `phone`, `avatar`, `status`, `role`, `role_id`, `address`, `city`, `last_interaction`) VALUES
 (3, 'admin@example.com', '$2y$10$X0AYs8k7Dw8fbMqF9DzxiuBhQzGzu.ehudtC.2SWOjA4tsTZK0sYG', '2025-04-20 14:02:38', '2025-05-26 17:10:37', 'Admin', '0988888888', 'http://assets.giang.test/files/1748279435_dad3cfbf5ca25d45c62e.png', 1, 'admin', 1, NULL, NULL, NULL),
-(7, 'john@gmail.com', '$2y$10$Lhwsfx5y8r8HucBk104ApOlIilb.9yL6YdGEwLfjlHzGUYmdBRIBC', '2025-05-20 14:55:33', '2025-06-02 22:21:32', 'John Doe', '0912345678', 'http://assets.giang.test/files/1748279389_23bf67676026a2c14db4.jpg', 2, 'customer', NULL, 'tay mo', 'ha noi', NULL),
-(8, 'samsung@gmail.com', '$2y$10$nF2YB/m8otCfBgUyd/QIKe5j4Zm6pmqGN/LFrmRWzM2ZBtx0p7U3m', '2025-05-21 16:50:03', '2025-06-02 23:54:57', 'samsung', '0912345678', 'http://assets.giang.test/files/1748279470_a8bb49c7c783d253916b.png', 2, 'customer', NULL, 'tay mo', 'ha noi', NULL),
+(7, 'john@gmail.com', '$2y$10$2v4/oqgsxoozV3liS465m.NuJzAZsE8lABLNbXCLf.a79YK1n9rqK', '2025-05-20 14:55:33', '2025-06-05 16:16:08', 'John Doe', '0912345678', 'http://assets.giang.test/files/1748279389_23bf67676026a2c14db4.jpg', 1, 'customer', NULL, 'tay mo', 'ha noi', NULL),
+(8, 'samsung@gmail.com', '$2y$10$nF2YB/m8otCfBgUyd/QIKe5j4Zm6pmqGN/LFrmRWzM2ZBtx0p7U3m', '2025-05-21 16:50:03', '2025-06-05 13:49:24', 'samsung', '0912345678', 'http://assets.giang.test/files/1748279470_a8bb49c7c783d253916b.png', 1, 'customer', NULL, 'tay mo', 'ha noi', NULL),
 (9, 'trananh@gmail.com', '$2y$10$nNeGXdlbcDHKxHifYPsT2uz2lls4FPf2Nurx6t4Nisof.MyJ1MmSa', '2025-06-01 16:49:16', '2025-06-01 18:00:09', 'tran anh', '0912345688', NULL, 1, 'customer', NULL, 'doi can ba dinh', 'ha noi', NULL),
 (10, 'khachhangmoi1@gmail.com', '$2y$10$NpotBb/yT0w.bLF1vERfb./fvBRAfbXtgiQfAXkuRqZ0OhOS.4xoS', '2025-06-01 17:28:44', '2025-06-01 17:48:34', 'khách hàng mới 1', '0912345622', NULL, 4, 'customer', NULL, 'yen lang, dong da', 'ha noi', NULL),
-(11, 'khachhangmoi2@gmail.com', '$2y$10$O465xwdLuFvG.YB1eqCa6OQjNckRIQg7kdDjb4.G5UEMoqLgXe9U2', '2025-06-01 18:00:55', '2025-06-02 22:21:32', 'khách hàng mới 2', '0912345622', NULL, 2, 'customer', NULL, 'xuan thuy, cau giay', 'ha noi', NULL);
+(11, 'khachhangmoi2@gmail.com', '$2y$10$O465xwdLuFvG.YB1eqCa6OQjNckRIQg7kdDjb4.G5UEMoqLgXe9U2', '2025-06-01 18:00:55', '2025-06-02 22:21:32', 'khách hàng mới 2', '0912345622', NULL, 2, 'customer', NULL, 'xuan thuy, cau giay', 'ha noi', NULL),
+(12, 'khach3@gmail.com', '$2y$10$Ncowt9au3AthvxUdHYC2GeHcqOd8nEb/FZ/Ok1Z7VXNmlhTvgs5YG', '2025-06-05 15:38:24', '2025-06-05 15:55:22', 'khách 3', '0977507587', NULL, 1, 'customer', NULL, 'tây mỗ', 'hà nội', NULL),
+(13, 'khanh4@gmail.com', '$2y$10$ErEN.i72If.vE9sqTnpkjevLvlCtRVuNBkOW3V8/0bJgBbLQuiI3S', '2025-06-05 15:56:04', '2025-06-05 15:56:47', 'khach 4', '0977507587', NULL, 1, 'customer', NULL, 'tay mo', 'ha noi', NULL);
 
 --
 -- Indexes for dumped tables
@@ -1481,7 +1487,7 @@ ALTER TABLE `product_attributes`
 -- AUTO_INCREMENT for table `purchase_histories`
 --
 ALTER TABLE `purchase_histories`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `qr_codes`
@@ -1493,7 +1499,7 @@ ALTER TABLE `qr_codes`
 -- AUTO_INCREMENT for table `qr_scan_logs`
 --
 ALTER TABLE `qr_scan_logs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=332;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=333;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1529,7 +1535,7 @@ ALTER TABLE `surveys`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

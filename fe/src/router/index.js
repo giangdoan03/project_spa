@@ -152,6 +152,12 @@ const routes = [
                 meta: { breadcrumb: 'Khách hàng', parent: 'dashboard' }
             },
             {
+                path: 'customers/:id',
+                name: 'customer-detail',
+                component: () => import('../components/CustomerPackageList.vue'),
+                meta: { breadcrumb: 'Chi tiết khách hàng', parent: 'dashboard' }
+            },
+            {
                 path: '/settings',
                 name: 'settings',
                 component: () => import('../components/SettingList.vue'),

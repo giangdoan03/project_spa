@@ -29,7 +29,7 @@ import Sidebar from './Sidebar.vue'
 import Header from './Header.vue'
 import Content from './Content.vue'
 
-const collapsed = ref(false)
+let collapsed = ref(false)
 const selectedKeys = ref(['1'])
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)

@@ -200,7 +200,7 @@ const saveUser = async () => {
             message.success('Đã thêm người dùng')
         }
         closeCreateModal()
-        fetchUsers()
+        await fetchUsers()
     } catch (e) {
         message.error('Lỗi khi lưu người dùng')
     } finally {
@@ -221,7 +221,7 @@ const deleteUser = async (id) => {
     try {
         await deleteUserById(id)
         message.success('Đã xoá người dùng')
-        fetchUsers()
+        await fetchUsers()
     } catch (e) {
         message.error('Không thể xoá người dùng')
     } finally {
