@@ -49,7 +49,7 @@ $routes->group('api', function ($routes) {
     $routes->get('loyalty/winning-history', 'LoyaltyHistoryController::winning');
 
     $routes->resource('landing-pages', ['controller' => 'LandingPageController']);
-    $routes->resource('scan-history', ['controller' => 'ScanHistoryController']);
+
     $routes->resource('users', ['controller' => 'UserController']);
     $routes->post('users/update/(:num)', 'UserController::update/$1');
     $routes->post('users/change-password', 'UserController::changePassword');
@@ -79,6 +79,13 @@ $routes->group('api', function ($routes) {
 
     // 4. API tracking thủ công (nếu dùng fetch)
     $routes->post('qr-codes/track', 'QrCodeController::track');
+
+
+    $routes->get('statistics', 'StatisticsController::index');
+
+    $routes->get('scan-history/summary', 'ScanHistoryController::summary');
+
+    $routes->resource('scan-history', ['controller' => 'ScanHistoryController']);
 
 
 });

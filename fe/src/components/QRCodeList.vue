@@ -167,7 +167,14 @@ const columns = [
         }
     },
     { title: 'Tên mã QR', key: 'qr_name', dataIndex: 'qr_name' },
-    { title: 'Tên đối tượng', key: 'target_name', dataIndex: 'target_name' },
+    {
+        title: 'Tên đối tượng',
+        key: 'target_name',
+        dataIndex: 'target_name',
+        width: 200,
+        customRender: ({ text }) => h('a-tooltip', { title: text }, () => text),
+        className: 'no-wrap-header'
+    },
     { title: 'Kiểu', key: 'target_type', dataIndex: 'target_type' },
     { title: 'Nhật ký quét', key: 'scan_count', dataIndex: 'scan_count' },
     {
@@ -367,5 +374,13 @@ watch(() => route.query, () => {
 .title-no-pd-l-r {
     padding-left: 0;
     padding-right: 0;
+}
+/* CSS */
+.no-wrap-header a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 200px;
+    display: block;
 }
 </style>

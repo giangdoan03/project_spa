@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard">
-        <!-- Cards tổng quan -->
+        <!-- Cards -->
         <a-row :gutter="[16, 16]" class="card-row">
             <a-col
                 v-for="card in cards"
@@ -13,9 +13,7 @@
             >
                 <a-card :bordered="false" class="card" :class="card.class">
                     <div class="card-content">
-                        <div class="card-icon">
-                            <component :is="card.icon" />
-                        </div>
+                        <div class="card-icon"><component :is="card.icon" /></div>
                         <div class="card-value">{{ card.value }}</div>
                         <div class="card-title">{{ card.title }}</div>
                     </div>
@@ -23,164 +21,107 @@
             </a-col>
         </a-row>
 
+        <!-- Charts -->
+        <!-- Charts -->
+        <div class="charts mt-4">
+            <a-row :gutter="[16, 16]">
+                <a-col :xs="24" :md="12">
+                    <a-card title="Phân bố quốc gia" :bordered="false" class="chart-card">
+                        <PieChart style="height: 350px;" :data="scanSummary.by_country" labelField="country" />
+                    </a-card>
+                </a-col>
+                <a-col :xs="24" :md="12">
+                    <a-card title="Tổng số lần quét">
+                        <LineChart
+                            :labels="['Mar 2025', 'Apr 2025', 'May 2025', 'Jun 2025']"
+                            :datasets="[
+                              { name: 'Tổng số lần quét', data: [0, 18, 82, 0], color: '#52c41a' },
+                              { name: 'Tổng số thiết bị đã quét', data: [0, 2, 4, 0], color: '#1890ff' }
+                            ]"
+                                                />
+                    </a-card>
+                </a-col>
 
+                <a-col :xs="24" :md="12">
+                    <a-card title="Thiết bị truy cập" :bordered="false" class="chart-card">
+                        <BarChart :data="scanSummary.by_device" labelField="device_type" color="#1890ff" />
+                    </a-card>
+                </a-col>
+                <a-col :xs="24" :md="12">
+                    <a-card title="Trình duyệt" :bordered="false" class="chart-card">
+                        <BarChart :data="scanSummary.by_browser" labelField="browser" color="#52c41a" />
+                    </a-card>
+                </a-col>
+            </a-row>
+        </div>
 
-        <!-- Biểu đồ và danh sách -->
-        <a-row :gutter="[16, 16]" class="mt-4">
-            <a-col :xs="24" :lg="16">
-                <a-card title="Tình trạng quét" :bordered="false">
-                    <v-chart class="chart" :option="option" style="height: 300px;" />
-                </a-card>
-            </a-col>
-            <a-col :xs="24" :lg="8">
-                <a-card title="Danh sách doanh nghiệp" :bordered="false" class="list_company">
-                    <!-- Alert và Button -->
-                    <div style="display: flex; justify-content: space-between; align-items: center;" class="mb-2">
-                        <a-alert message="Không có kết nối" type="error" show-icon style="margin-bottom: 0;" />
-                        <a-button size="small" type="primary">Kết nối lại</a-button>
-                    </div>
-
-                    <!-- List -->
-                    <a-list
-                        :data-source="companies"
-                        item-layout="horizontal"
-                    >
-                        <template #renderItem="{ item }">
-                            <a-list-item>
-                                <template #actions>
-                                    <a-button size="small" style="border-color: #52c41a; color: #52c41a;">Quét QR Code</a-button>
-                                </template>
-                                <a-list-item-meta>
-                                    <template #avatar>
-                                        <a-avatar shape="square" size="large" src="https://placehold.co/100x100" />
-                                    </template>
-                                    <template #title>
-                                        {{ item.name }}
-                                    </template>
-                                    <template #description>
-                                        <div>Địa chỉ: {{ item.address }}</div>
-                                        <div style="font-size: 12px; color: #888; margin-top: 4px;">
-                                            <CalendarOutlined style="margin-right: 4px;" />
-                                            {{ item.created }}
-                                        </div>
-                                    </template>
-                                </a-list-item-meta>
-                            </a-list-item>
-                        </template>
-                    </a-list>
-
-
-                </a-card>
-            </a-col>
-
-        </a-row>
     </div>
 </template>
 
 <script setup>
 import {
-    AppstoreOutlined,
-    InboxOutlined,
-    BankOutlined,
-    QrcodeOutlined,
-    GiftOutlined,
-    FormOutlined
+    AppstoreOutlined, InboxOutlined, BankOutlined,
+    QrcodeOutlined, GiftOutlined, FormOutlined
 } from '@ant-design/icons-vue'
+import { ref, onMounted, computed } from 'vue'
+import { getStatistics } from '@/api/statistics'
+import { getScanSummary } from '@/api/scanHistory'
+import PieChart from '@/components/charts/PieChart.vue'
+import BarChart from '@/components/charts/BarChart.vue'
+import LineChart from '@/components/charts/LineChart.vue'
 
-import { ref, h } from 'vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
-import VChart from 'vue-echarts'
-
-use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent])
-
-import { CalendarOutlined } from '@ant-design/icons-vue'
-const cards = [
-    { title: 'GÓI DỊCH VỤ', value: 3, icon: AppstoreOutlined, class: 'service' },
-    { title: 'SẢN PHẨM', value: 2, icon: InboxOutlined, class: 'product' },
-    { title: 'DOANH NGHIỆP', value: 0, icon: BankOutlined, class: 'company' },
-    { title: 'QR CODE', value: 1, icon: QrcodeOutlined, class: 'qr-code' },
-    { title: 'QR CODE MIỄN PHÍ', value: 1, icon: GiftOutlined, class: 'free-qr-code' },
-    { title: 'KHẢO SÁT', value: 0, icon: FormOutlined, class: 'survey' }
-]
-
-
-const companies = ref([
-    { name: 'CÔNG TY TNHH XNK SEGO', address: 'Trà Vinh', created: '14/11/2023 07:55:36' },
-    { name: 'CÔNG TY TNHH XNK SEGO', address: 'Hà Đông, Hà Nội', created: '18/04/2023 15:10:45' },
-    { name: 'CÔNG TY TNHH XNK SEGO', address: 'Bà Rịa - Vũng Tàu', created: '31/03/2023 12:23:31' },
-])
-
-const renderItem = (item) => {
-    return h(
-        'a-list-item',
-        {},
-        {
-            default: () => [
-                h('div', { class: 'company-item' }, [
-                    // Avatar (thay bằng icon)
-                    h('div', { class: 'company-avatar' }, [
-                        h(BankOutlined, {
-                            style: {
-                                fontSize: '36px',
-                                color: '#1890ff'
-                            }
-                        })
-                    ]),
-
-                    // Info
-                    h('div', { class: 'company-info' }, [
-                        h('div', { class: 'company-name' }, item.name),
-                        h('div', { class: 'company-address' }, `Địa chỉ: ${item.address}`),
-                        h('div', { class: 'company-date' }, [
-                            h(CalendarOutlined, { style: 'margin-right: 4px;' }),
-                            item.created
-                        ])
-                    ]),
-
-                    // Action
-                    h('div', { class: 'company-action' }, [
-                        h('a-button', {
-                            size: 'small',
-                            style: { borderColor: '#52c41a', color: '#52c41a' }
-                        }, 'Quét QR Code')
-                    ])
-                ])
-            ]
-        }
-    )
-}
-
-use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent])
-
-const option = ref({
-    tooltip: {},
-    legend: { data: ['QR'] },
-    xAxis: { type: 'category', data: ['Trà Vinh', 'Hà Nội', 'Vũng Tàu', 'TP.HCM'] },
-    yAxis: { type: 'value' },
-    series: [{
-        name: 'QR',
-        type: 'bar',
-        data: [30, 50, 20, 40],
-        itemStyle: { color: '#1890ff' }
-    }]
+const stats = ref({
+    packages: 0, products: 0, businesses: 0,
+    qrcodes: 0, free_qrcodes: 0, surveys: 0
 })
 
+const scanSummary = ref({
+    by_country: [],
+    by_city: [],
+    by_device: [],
+    by_browser: []
+})
+
+const fetchStats = async () => {
+    try {
+        const res = await getStatistics()
+        stats.value = res.data
+    } catch (e) {
+        console.error('Lỗi thống kê:', e)
+    }
+}
+
+const fetchScanCharts = async () => {
+    try {
+        const res = await getScanSummary()
+        scanSummary.value = res.data
+    } catch (e) {
+        console.error('Lỗi thống kê quét mã:', e)
+    }
+}
+
+onMounted(() => {
+    fetchStats()
+    fetchScanCharts()
+})
+
+const cards = computed(() => [
+    { title: 'GÓI DỊCH VỤ', value: stats.value.packages, icon: AppstoreOutlined, class: 'service' },
+    { title: 'SẢN PHẨM', value: stats.value.products, icon: InboxOutlined, class: 'product' },
+    { title: 'DOANH NGHIỆP', value: stats.value.businesses, icon: BankOutlined, class: 'company' },
+    { title: 'QR CODE', value: stats.value.qrcodes, icon: QrcodeOutlined, class: 'qr-code' },
+    { title: 'QR CODE MIỄN PHÍ', value: stats.value.free_qrcodes, icon: GiftOutlined, class: 'free-qr-code' },
+    { title: 'KHẢO SÁT', value: stats.value.surveys, icon: FormOutlined, class: 'survey' }
+])
 </script>
 
 <style scoped>
-.mb-2 {
-    margin-bottom: 16px;
-}
-.chart {
-    width: 100%;
-}
 .dashboard {
     padding: 24px;
 }
-
+.mt-4 {
+    margin-top: 32px;
+}
 .card {
     border-radius: 10px;
     cursor: pointer;
@@ -190,135 +131,31 @@ const option = ref({
     text-align: center;
     padding: 24px 16px;
 }
-
 .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
-
 .card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-
 .card-icon {
     font-size: 48px;
     color: #1890ff;
     margin-bottom: 12px;
 }
-
-.card-value {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.card-title {
-    font-size: 14px;
-    color: #888;
-}
-
 .card-value {
     font-size: 22px;
     font-weight: bold;
     line-height: 1.2;
+    margin-bottom: 6px;
 }
-
-
-.mb-2 {
-    margin-bottom: 16px;
-}
-.mt-4 {
-    margin-top: 32px;
-}
-
-.company-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* Khi không đủ chỗ sẽ tự xuống dòng */
-}
-
-.company-info {
-    flex: 1;
-    min-width: 150px;
-}
-
-.company-name {
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.company-address {
+.card-title {
+    font-size: 14px;
     color: #888;
-    font-size: 12px;
 }
-
-.company-action {
-    margin-left: 8px;
-    margin-top: 8px;
-}
-@media (min-width: 576px) {
-    .company-action {
-        margin-top: 0;
-    }
-}
-.company-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.company-avatar {
-    flex: 0 0 60px;
-}
-
-.company-info {
-    flex: 1;
-    min-width: 150px;
-}
-
-.company-name {
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.company-address {
-    color: #888;
-    font-size: 12px;
-}
-
-.company-date {
-    font-size: 12px;
-    color: #888;
-    margin-top: 4px;
-}
-
-.company-action {
-    flex-shrink: 0;
-}
-
 .card :deep(.ant-card-body) {
     padding: 12px;
-}
-
-.list_company .ant-list-item {
-    padding-left: 0;
-    padding-right: 0;
-}
-
-@media (max-width: 576px) {
-    .company-action {
-        width: 100%;
-        text-align: right;
-    }
-}
-:deep(.ant-list-item .ant-list-item-action) {
-    margin-inline-start: 0 !important;
 }
 </style>

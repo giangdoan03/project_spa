@@ -16,3 +16,5 @@ export const createScanHistory = (data) => instance.post('/scan-history', data)
 
 // Xoá bản ghi lịch sử quét
 export const deleteScanHistory = (id) => instance.delete(`/scan-history/${id}`)
+
+export const getScanSummary = () => instance.get('/scan-history/summary')

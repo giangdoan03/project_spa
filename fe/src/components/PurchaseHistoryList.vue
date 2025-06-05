@@ -1,37 +1,37 @@
 <template>
     <div>
         <!-- Header -->
-        <a-page-header title="Thông tin gói của bạn"/>
+        <a-page-header title="Danh sách các gói đã đăng ký" />
 
-        <!-- Bảng thông tin -->
-        <a-table
-            :columns="columns"
-            :data-source="data"
-            :pagination="false"
-            bordered
-            rowKey="key"
-        />
+        <a-spin :spinning="loading">
+            <a-table
+                :columns="columns"
+                :data-source="packageData"
+                rowKey="id"
+                bordered
+                :pagination="{ pageSize: 10 }"
+                v-if="packageData.length > 0"
+            />
+
+            <a-empty v-else description="Chưa có gói nào được đăng ký" />
+        </a-spin>
     </div>
 </template>
 
 <script setup>
-import {ref, onMounted, computed} from 'vue'
-import {message} from 'ant-design-vue'
-import {formatDate} from '../utils/formUtils'
-import {getPurchaseHistories} from '../api/purchaseHistory'
+import { ref, onMounted, h, resolveComponent } from 'vue'
+import { message } from 'ant-design-vue'
+import { formatDate } from '../utils/formUtils'
+import { getPurchaseHistories } from '../api/purchaseHistory'
 
-const packageData = ref(null)
+const packageData = ref([])
 const loading = ref(false)
 
-const fetchPackage = async () => {
+const fetchPackages = async () => {
     try {
         loading.value = true
-        const res = await getPurchaseHistories({ per_page: 1 }) // chỉ lấy 1 gói mới nhất
-        if (res.data.data.length > 0) {
-            packageData.value = res.data.data[0]
-        } else {
-            message.warning('Chưa có gói nào được đăng ký')
-        }
+        const res = await getPurchaseHistories({ per_page: 100 })
+        packageData.value = res.data.data || []
     } catch (e) {
         console.error(e)
         message.error('Không thể tải thông tin gói')
@@ -40,46 +40,54 @@ const fetchPackage = async () => {
     }
 }
 
-onMounted(fetchPackage)
+onMounted(fetchPackages)
 
 const columns = [
-    {title: 'Trường thông tin', dataIndex: 'label', key: 'label'},
-    {title: 'Giá trị', dataIndex: 'value', key: 'value'}
-]
+    { title: 'STT', key: 'stt', customRender: ({ index }) => index + 1 },
+    { title: 'Người tạo', dataIndex: 'user_name', key: 'user_name' },
+    { title: 'Email', dataIndex: 'user_email', key: 'user_email' },
+    { title: 'Tên gói', dataIndex: 'product_name', key: 'product_name' },
+    {
+        title: 'Trạng thái',
+        key: 'status',
+        customRender: ({ record }) => {
+            const ATag = resolveComponent('a-tag')
+            const isExpired = new Date(record.expires_at) < new Date()
+            const isInactive = record.is_active == 0
 
-const data = computed(() => {
-    if (!packageData.value) return []
-
-    return [
-        {key: 'name', label: 'Tên người tạo', value: packageData.value.user_name},
-        {key: 'email', label: 'Email', value: packageData.value.user_email},
-        {key: 'product_name', label: 'Gói đã đăng ký', value: packageData.value.product_name},
-        {
-            key: 'status',
-            label: 'Trạng thái gói',
-            value: packageData.value.is_active ? 'Đang hoạt động' : 'Chưa kích hoạt'
-        },
-        {
-            key: 'payment_status',
-            label: 'Thanh toán',
-            value: packageData.value.is_paid ? 'Đã thanh toán' : 'Chưa thanh toán'
-        },
-        {
-            key: 'start_date',
-            label: 'Ngày bắt đầu',
-            value: formatDate(packageData.value.starts_at)
-        },
-        {
-            key: 'end_date',
-            label: 'Ngày hết hạn',
-            value: formatDate(packageData.value.expires_at)
-        },
-        {
-            key: 'note',
-            label: 'Ghi chú',
-            value: packageData.value.note || 'Không có ghi chú'
+            return h(ATag, {
+                color: isExpired || isInactive ? 'red' : 'green'
+            }, () => isExpired || isInactive ? 'Đã ngừng hoạt động' : 'Đang hoạt động')
         }
-    ]
-})
-</script>
+    },
 
+    {
+        title: 'Thanh toán',
+        key: 'is_paid',
+        customRender: ({ record }) => {
+            const ATag = resolveComponent('a-tag')
+            return h(ATag, {
+                color: record.is_paid ? 'blue' : 'orange'
+            }, () => record.is_paid ? 'Đã thanh toán' : 'Chưa thanh toán')
+        }
+    },
+    {
+        title: 'Ngày bắt đầu',
+        dataIndex: 'starts_at',
+        key: 'starts_at',
+        customRender: ({ text }) => formatDate(text)
+    },
+    {
+        title: 'Ngày hết hạn',
+        dataIndex: 'expires_at',
+        key: 'expires_at',
+        customRender: ({ text }) => formatDate(text)
+    },
+    {
+        title: 'Ghi chú',
+        dataIndex: 'note',
+        key: 'note',
+        customRender: ({ text }) => text || 'Không có'
+    }
+]
+</script>
