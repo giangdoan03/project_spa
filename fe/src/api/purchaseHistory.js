@@ -5,7 +5,7 @@ const instance = axios.create({
     withCredentials: true,
 })
 
-export const getPurchaseHistories = () => instance.get('/purchase-history')
+export const getPurchaseHistories = (params = {}) => instance.get('/purchase-history', { params })
 export const getPurchaseHistory = (id) => instance.get(`/purchase-history/${id}`)
 export const createPurchaseHistory = (data) => instance.post('/purchase-history', data)
 export const updatePurchaseHistory = (id, data) => instance.put(`/purchase-history/${id}`, data)
