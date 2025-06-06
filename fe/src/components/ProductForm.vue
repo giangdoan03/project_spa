@@ -119,20 +119,20 @@
 
             <a-tab-pane key="settings" tab="Cài đặt hiển thị">
                 <a-row :gutter="24">
-                    <a-col :span="16">
+                    <a-col :span="16" :xs="24" :sm="24" :md="16">
                         <a-form layout="vertical">
                             <!-- Giao diện mẫu -->
                             <a-card title="Chọn giao diện mẫu" style="margin-bottom: 24px;">
                                 <a-form-item>
                                     <a-row :gutter="16">
-                                        <a-col v-for="tpl in templateOptions" :key="tpl.id" :xs="24" :sm="12" :md="8"
+                                        <a-col v-for="tpl in templateOptions" :key="tpl.id" :xs="24" :sm="24" :md="24"
                                                :lg="8" style="margin-bottom: 16px">
                                             <a-card hoverable
                                                     :class="{ 'selected-card': settings.selectedTemplate === tpl.id, 'active-card': isActiveTemplate(tpl.id) }"
                                                     @click="selectTemplate(tpl)">
                                                 <template #cover>
                                                     <img :src="tpl.thumbnail" alt="template"
-                                                         style="height: 200px; object-fit: cover"/>
+                                                         style="object-fit: cover"/>
                                                 </template>
                                                 <a-card-meta :title="tpl.title" :description="tpl.description"/>
                                             </a-card>

@@ -267,7 +267,7 @@
                                                     @click="selectTemplate(tpl)">
                                                 <template #cover>
                                                     <img :src="tpl.thumbnail" alt="template"
-                                                         style="height: 200px; object-fit: cover"/>
+                                                         style="object-fit: cover"/>
                                                 </template>
                                                 <a-card-meta :title="tpl.title" :description="tpl.description"/>
                                             </a-card>

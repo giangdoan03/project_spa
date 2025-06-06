@@ -70,12 +70,14 @@ class ScanHistoryController extends ResourceController
         $json = $this->request->getJSON(true);
         $cleanData = [];
 
+        // Lọc key string hợp lệ
         foreach ($json ?? [] as $key => $value) {
             if (is_string($key)) {
                 $cleanData[$key] = $value;
             }
         }
 
+        // Thêm thông tin hệ thống
         $request = service('request');
         $cleanData['ip_address']  = $request->getIPAddress();
         $cleanData['user_agent']  = (string) $request->getUserAgent();
@@ -83,10 +85,10 @@ class ScanHistoryController extends ResourceController
         $cleanData['app']         = $request->getUserAgent()->getBrowser();
         $cleanData['created_at']  = date('Y-m-d H:i:s');
 
-        $user = $this->getUser();
-        if ($user) {
-            $cleanData['user_id'] = $user['id'];
-        }
+        // ❌ Không cần lấy user_id (người quét có thể là khách)
+        // Nếu muốn thêm user_id chỉ khi có session:
+        // $userId = session()->get('user_id');
+        // if ($userId) $cleanData['user_id'] = $userId;
 
         $db = db_connect();
         $db->table($this->table)->insert($cleanData);
@@ -94,6 +96,7 @@ class ScanHistoryController extends ResourceController
 
         return $this->respondCreated($cleanData);
     }
+
 
     public function delete($id = null)
     {
@@ -144,6 +147,17 @@ class ScanHistoryController extends ResourceController
     {
         $model = new \App\Models\UserModel();
         $userId = session()->get('user_id');
-        return $model->find($userId);
+
+        if (!$userId) {
+            throw new \RuntimeException('Chưa đăng nhập hoặc session hết hạn.');
+        }
+
+        $user = $model->find($userId);
+        if (!$user) {
+            throw new \RuntimeException('Người dùng không tồn tại trong hệ thống.');
+        }
+
+        return $user;
     }
+
 }
