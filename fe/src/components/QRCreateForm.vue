@@ -288,10 +288,14 @@ const selectItem = async (key) => {
     selectedKey.value = key
     form.value.target_type = key
 
+    const foundItem = qrTypes.find(item => item.key === key)
+    form.value.qr_type = foundItem?.pro ? 'pro' : 'free'  // 👈 Gán tự động tại đây
+
     await nextTick()
     const componentInstance = formComponentRef.value
     requireTarget.value = componentInstance?.requireTarget || false
 }
+
 
 const updateQrPreview = () => {
     if (!qrCode) return

@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\UserModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use App\Models\{QrCodeModel, QrScanLogModel};
 use CodeIgniter\API\ResponseTrait;
@@ -56,12 +57,26 @@ class QrCodeController extends BaseController
         $data = $this->request->getJSON(true);
         $userId = $this->getUserId();
 
-        // 👉 Kiểm tra trạng thái khách hàng
+        // 👉 Lấy thông tin user
         $user = model('App\Models\UserModel')->find($userId);
         if (!$user || $user['status'] != 1) {
             return $this->failForbidden('Tài khoản không đủ điều kiện tạo mã QR. Vui lòng liên hệ bộ phận kinh doanh hoặc quản trị viên.');
         }
 
+        // 👉 Giới hạn QR
+        $count = $this->model->where('user_id', $userId)->countAllResults();
+        $limit = 200; // Giới hạn mặc định
+
+        // Nếu có cột max_qr_limit trong bảng users thì lấy từ đó
+        if (!empty($user['max_qr_limit'])) {
+            $limit = (int)$user['max_qr_limit'];
+        }
+
+        if ($count >= $limit) {
+            return $this->failForbidden("Bạn đã đạt giới hạn {$limit} mã QR. Vui lòng liên hệ bộ phận kinh doanh để nâng cấp gói.");
+        }
+
+        // 👉 Tạo short_code và qr_id nếu chưa có
         if (empty($data['short_code'])) {
             $data['short_code'] = bin2hex(random_bytes(4));
         }
@@ -76,7 +91,6 @@ class QrCodeController extends BaseController
             $data['settings_json'] = json_encode($data['settings_json']);
         }
 
-        // 👇 Xử lý target_id cho các loại QR không cần đối tượng
         if (in_array($data['target_type'], self::QR_TYPES_NO_TARGET)) {
             $data['target_id'] = null;
         }
@@ -96,7 +110,9 @@ class QrCodeController extends BaseController
     }
 
 
-    /**
+
+
+/**
      * Cập nhật QR Code
      * @throws \ReflectionException
      */
@@ -108,7 +124,7 @@ class QrCodeController extends BaseController
 
         // 👇 Lấy thông tin user
         $userId = $this->getUserId();
-        $userModel = new \App\Models\UserModel();
+        $userModel = new UserModel();
         $user = $userModel->find($userId);
 
         // 👇 Chặn nếu tài khoản không hoạt động
@@ -134,7 +150,7 @@ class QrCodeController extends BaseController
 
 
 
-/**
+    /**
      * Xoá QR Code
      */
     public function delete(string $qr_id): ResponseInterface
