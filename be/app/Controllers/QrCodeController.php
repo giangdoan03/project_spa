@@ -56,6 +56,12 @@ class QrCodeController extends BaseController
         $data = $this->request->getJSON(true);
         $userId = $this->getUserId();
 
+        // 👉 Kiểm tra trạng thái khách hàng
+        $user = model('App\Models\UserModel')->find($userId);
+        if (!$user || $user['status'] != 1) {
+            return $this->failForbidden('Tài khoản không đủ điều kiện tạo mã QR. Vui lòng liên hệ bộ phận kinh doanh hoặc quản trị viên.');
+        }
+
         if (empty($data['short_code'])) {
             $data['short_code'] = bin2hex(random_bytes(4));
         }
@@ -89,6 +95,7 @@ class QrCodeController extends BaseController
         ]);
     }
 
+
     /**
      * Cập nhật QR Code
      * @throws \ReflectionException
@@ -98,6 +105,16 @@ class QrCodeController extends BaseController
         $data = $this->request->getJSON(true);
         $qr = $this->getOwnedQR($qr_id);
         if ($qr instanceof ResponseInterface) return $qr;
+
+        // 👇 Lấy thông tin user
+        $userId = $this->getUserId();
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->find($userId);
+
+        // 👇 Chặn nếu tài khoản không hoạt động
+        if (!$user || $user['status'] != 1) {
+            return $this->failForbidden('Tài khoản không đủ điều kiện cập nhật mã QR. Vui lòng liên hệ bộ phận kinh doanh hoặc quản trị viên.');
+        }
 
         if (isset($data['settings_json']) && is_array($data['settings_json'])) {
             $data['settings_json'] = json_encode($data['settings_json']);
@@ -116,7 +133,8 @@ class QrCodeController extends BaseController
     }
 
 
-    /**
+
+/**
      * Xoá QR Code
      */
     public function delete(string $qr_id): ResponseInterface
@@ -167,15 +185,17 @@ class QrCodeController extends BaseController
      */
     public function list(): ResponseInterface
     {
-        $userId = $this->getUserId(); // 👈 Lấy user_id từ session đăng nhập
+        $user = $this->getUser(); // 👈 Lấy toàn bộ thông tin user từ session
+        $userId = $user['id'];
+        $role = $user['role'] ?? 'customer';
+
         $search = $this->request->getGet('search');
         $type = $this->request->getGet('type');
 
-        $builder = $this->model->where('user_id', $userId); // 👈 Luôn lọc theo user_id
-
         $builder = $this->model;
 
-        if ($userId) {
+        // 👇 Nếu không phải admin thì chỉ được thấy mã của chính mình
+        if ($role !== 'admin') {
             $builder = $builder->where('user_id', $userId);
         }
 
@@ -195,26 +215,47 @@ class QrCodeController extends BaseController
         foreach ($data as &$item) {
             $item['target_name'] = '';
 
-            if ($item['target_type'] === 'product') {
-                $product = model('ProductModel')->find($item['target_id']);
-                $item['target_name'] = $product['name'] ?? '';
-            } elseif ($item['target_type'] === 'store') {
-                $store = model('StoreModel')->find($item['target_id']);
-                $item['target_name'] = $store['name'] ?? '';
-            } elseif ($item['target_type'] === 'event') {
-                $event = model('EventModel')->find($item['target_id']);
-                $item['target_name'] = $event['name'] ?? '';
-            } elseif ($item['target_type'] === 'person') {
-                $person = model('PersonModel')->find($item['target_id']);
-                $item['target_name'] = $person['name'] ?? '';
-            } elseif ($item['target_type'] === 'business') {
-                $business = model('BusinessModel')->find($item['target_id']);
-                $item['target_name'] = $business['name'] ?? '';
+            switch ($item['target_type']) {
+                case 'product':
+                    $target = model('ProductModel')->find($item['target_id']);
+                    break;
+                case 'store':
+                    $target = model('StoreModel')->find($item['target_id']);
+                    break;
+                case 'event':
+                    $target = model('EventModel')->find($item['target_id']);
+                    break;
+                case 'person':
+                    $target = model('PersonModel')->find($item['target_id']);
+                    break;
+                case 'business':
+                    $target = model('BusinessModel')->find($item['target_id']);
+                    break;
+                default:
+                    $target = null;
             }
+
+            $item['target_name'] = $target['name'] ?? '';
         }
 
         return $this->respond($data);
     }
+
+    protected function getUser(): array
+    {
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            throw new \RuntimeException('Chưa đăng nhập.');
+        }
+
+        $user = model('UserModel')->find($userId);
+        if (!$user) {
+            throw new \RuntimeException('Người dùng không tồn tại.');
+        }
+
+        return $user;
+    }
+
 
     // 👉 Thêm hàm helper này vào trong class
     private function safeJsonDecode($value)
@@ -448,8 +489,9 @@ class QrCodeController extends BaseController
     {
         $data = $this->request->getJSON(true);
 
-        $qrId = $data['code'] ?? null;
+        $qrId = $data['qr_id'] ?? null;
         $track = $data['track'] ?? null;
+        $target_type = $data['target_type'] ?? null;
         $shortCode = $data['short_code'] ?? null;
         $qrUrl = $data['qr_url'] ?? null;
         $type = $data['type'] ?? null;
@@ -490,6 +532,17 @@ class QrCodeController extends BaseController
 
         $isUnique = $existing ? 0 : 1;
 
+        $qrCode = model('QrCodeModel')
+            ->where('qr_id', $data['qr_id'] ?? '')
+            ->orWhere('short_code', $data['short_code'] ?? '')
+            ->first();
+
+        if (!$qrCode) {
+            return $this->failNotFound('QR không tồn tại');
+        }
+
+        $ownerId = (int) $qr['user_id'];  // đại lý tạo QR
+
         model('QrScanLogModel')->insert([
             'qr_id'         => $qrId,
             'tracking_code' => $track,
@@ -497,6 +550,7 @@ class QrCodeController extends BaseController
             'qr_url'        => $qrUrl,
             'type'          => $type,
             'target_id'     => $targetId,
+            'target_type'   => $target_type,
             'user_agent'    => $userAgent,
             'os'            => $os,
             'browser'       => $browser,
@@ -510,6 +564,7 @@ class QrCodeController extends BaseController
             'latitude'      => $latitude,
             'longitude'     => $longitude,
             'phone_number'  => $phone,
+            'user_id'       => $ownerId,
             'created_at'    => date('Y-m-d H:i:s')
         ]);
 

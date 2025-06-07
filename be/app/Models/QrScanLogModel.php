@@ -27,7 +27,8 @@ class QrScanLogModel extends Model
         'latitude',
         'longitude',
         'phone_number',
-        'created_at'
+        'created_at',
+        'user_id',
     ];
     protected $useTimestamps = false;
     public $timestamps = false;

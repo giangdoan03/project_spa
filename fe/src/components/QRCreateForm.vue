@@ -436,7 +436,13 @@ const handleSubmit = async () => {
 
     } catch (err) {
         console.error('Lỗi:', err.response?.data || err.message)
-        message.error(isEditMode.value ? 'Cập nhật thất bại!' : 'Tạo mã QR thất bại!')
+
+        const apiMessage =
+            err.response?.data?.messages?.error ||
+            err.response?.data?.message ||
+            err.message
+
+        message.error(apiMessage)
     }
 }
 

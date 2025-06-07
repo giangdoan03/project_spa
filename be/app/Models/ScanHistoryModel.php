@@ -14,6 +14,7 @@ class ScanHistoryModel extends Model
         'tracking_code',
         'short_code',       // thêm nếu dùng
         'target_id',
+        'target_type',
         'type',
         'qr_url',
         'user_agent',

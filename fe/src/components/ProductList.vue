@@ -255,6 +255,7 @@ const columns = [
         title: 'Tên sản phẩm',
         dataIndex: 'name',
         key: 'name',
+        width: 300,
         customRender: ({ text }) => text || 'Không có tên'
     },
     { title: 'SKU', dataIndex: 'sku', key: 'sku' },

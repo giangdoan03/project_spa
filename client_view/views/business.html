@@ -130,6 +130,7 @@
     async function loadBusinessQR() {
         try {
             const json = await callApi(`/qr-codes/detail/${qrId}`);
+
             if (!json.qr || !json.target || json.qr.target_type !== 'business') {
                 output.innerHTML = `<p class="text-center text-red-600 mt-10">Không tìm thấy doanh nghiệp hoặc QR không hợp lệ.</p>`;
                 return;
@@ -138,12 +139,12 @@
             const tplSource = document.getElementById('business-template').innerHTML;
             const template = Handlebars.compile(tplSource);
 
-            const businessData = {
-                business: json.target
-            };
+            output.innerHTML = template({ business: json.target });
 
-            output.innerHTML = template(businessData);
+            // Gửi log tracking QR
+            setTimeout(() => sendScanLog({ qr: json.qr, target: json.target }), 500);
 
+            // Swiper
             new Swiper('.swiper-selected-products_company', {
                 pagination: { el: '.swiper-pagination' },
                 slidesPerView: 'auto',

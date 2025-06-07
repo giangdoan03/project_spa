@@ -180,52 +180,13 @@
     const output = document.getElementById("output");
 
 
-    function detectOS() {
-        const ua = navigator.userAgent
-        if (ua.includes("Win")) return "Windows"
-        if (ua.includes("Mac")) return "MacOS"
-        if (ua.includes("Linux")) return "Linux"
-        if (/Android/.test(ua)) return "Android"
-        if (/iPhone|iPad|iPod/.test(ua)) return "iOS"
-        return "Không rõ"
-    }
-
-    function detectDeviceType() {
-        const isMobile = /Mobi|Android/i.test(navigator.userAgent)
-        return isMobile ? 'Mobile' : 'Desktop'
-    }
-
-    function detectBrowser() {
-        const ua = navigator.userAgent
-        if (ua.includes("Chrome")) return "Chrome"
-        if (ua.includes("Firefox")) return "Firefox"
-        if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari"
-        return "Khác"
-    }
-
-    async function getPublicIP() {
-        try {
-            const res = await fetch('https://api.ipify.org?format=json')
-            const data = await res.json()
-            return data.ip
-        } catch (e) {
-            console.error('IP fetch failed', e)
-            return null
-        }
-    }
-
-
-    function generateTrackingCode(length = 8) {
-        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    }
-
-
     async function loadProductQR() {
         const output = document.getElementById("output");
 
         try {
             const json = await callApi(`/qr-codes/detail/${qrId}`);
+
+            console.log('json', json)
 
             // Kiểm tra dữ liệu hợp lệ
             if (!json.qr || !json.target || json.qr.target_type !== 'product') {
@@ -255,45 +216,8 @@
             output.innerHTML = template(productData);
 
             // Gửi log scan sau 500ms
-            setTimeout(async () => {
-                try {
-                    const payload = {
-                        qr_id: qrId,
-                        tracking_code: generateTrackingCode(),
-                        target_id: json.target.id,
-                        type: json.qr.target_type,
-                        qr_url: window.location.href,
-                        user_agent: navigator.userAgent,
-                        os: detectOS(),
-                        device_type: detectDeviceType(),
-                        browser: detectBrowser(),
-                        ip_address: await getPublicIP(),
-                        referer: document.referrer,
-                        country: 'VN',
-                        city: 'Hà Nội',
-                        latitude: null,
-                        longitude: null,
-                        phone_number: json.target.contact_phone || null,
-                        // ✅ Gửi thêm các trường phụ trợ
-                        qr_name: json.qr.qr_name,
-                        qr_type: json.qr.qr_type,
-                        object_name: json.target.name,
-                        object_image: json.target.avatar?.[0] || null,
-                        customer: 'Khách hàng #id_' + json.qr.user_id,
-                    };
+            setTimeout(() => sendScanLog({ qr: json.qr, target: json.target }), 500);
 
-                    const res = await fetch('http://api.giang.test/api/scan-history', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload),
-                    });
-
-                    const result = await res.json();
-                    console.log('Scan logged:', result);
-                } catch (error) {
-                    console.error('Scan API failed:', error);
-                }
-            }, 500);
 
             // Khởi tạo các Swiper sau khi render
             const initSwiper = (selector) => {

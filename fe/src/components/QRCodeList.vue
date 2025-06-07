@@ -74,6 +74,12 @@
                     </a-row>
                 </template>
 
+                <template v-if="column.key === 'target_type'">
+                    <a-tag :color="getColor(record.target_type)">
+                        {{ getLabel(record.target_type) }}
+                    </a-tag>
+                </template>
+
                 <template v-if="column.key === 'qr'">
                     <div :data-qr-id="record.qr_id" style="width: 60px; height: 60px;"></div>
                 </template>
@@ -176,6 +182,7 @@ const columns = [
         className: 'no-wrap-header'
     },
     { title: 'Kiểu', key: 'target_type', dataIndex: 'target_type' },
+
     { title: 'Nhật ký quét', key: 'scan_count', dataIndex: 'scan_count' },
     {
         title: 'Tạo lúc',
@@ -188,6 +195,29 @@ const columns = [
 
 const allowedHosts = import.meta.env.VITE_ALLOWED_HOSTS?.split(',') || []
 const defaultQRUrl = import.meta.env.VITE_DEFAULT_QR_URL || 'https://labit365.com'
+
+const getColor = (type) => {
+    const map = {
+        product: 'blue',
+        store: 'purple',
+        event: 'green',
+        person: 'volcano',
+        business: 'gold',
+    }
+    return map[type] || 'blue' // mặc định màu xanh cho các loại khác
+}
+
+const getLabel = (type) => {
+    const map = {
+        product: 'Sản phẩm',
+        store: 'Cửa hàng',
+        event: 'Sự kiện',
+        person: 'Cá nhân',
+        business: 'Doanh nghiệp',
+    }
+    return map[type] || type // vẫn giữ nguyên nhãn mặc định là chính tên type
+}
+
 
 const httpOnlyUrl = (url) => {
     const isLocal = allowedHosts.includes(window.location.hostname)
