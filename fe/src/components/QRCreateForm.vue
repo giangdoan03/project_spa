@@ -585,4 +585,8 @@ const goBackToList = () => {
     .btn_download {
         margin-top: 24px;
     }
+    .preview {
+        width: 300px;
+        margin: 0 auto;
+    }
 </style>

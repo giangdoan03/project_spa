@@ -248,8 +248,6 @@
                                 </div>
                             </a-card>
 
-
-
                             <!-- Khảo sát + nút đặt hàng -->
                             <a-card title="Khảo sát" style="margin-bottom: 24px;">
                                 <a-form-item>
@@ -309,7 +307,6 @@
         </a-modal>
     </div>
 </template>
-
 
 <script setup>
     import {ref, onMounted, computed} from 'vue'
@@ -903,10 +900,25 @@
             // 👇 Sản phẩm liên quan
             if (settings.value.relatedProducts === 'selected') {
                 selectedProductIds.value = settings.value.selectedProducts || []
-                productList.value = allProducts.value.filter(p => selectedProductIds.value.includes(p.id))
-            } else if (settings.value.relatedProducts === 'all') {
                 productList.value = allProducts.value
+                    .filter(p => selectedProductIds.value.includes(p.id))
+                    .map(p => {
+                        const coverImage = p.images?.find(img => img.isCover)
+                        return {
+                            ...p,
+                            avatar: coverImage ? coverImage.preview : null
+                        }
+                    })
+            } else if (settings.value.relatedProducts === 'all') {
+                productList.value = allProducts.value.map(p => {
+                    const coverImage = p.images?.find(img => img.isCover)
+                    return {
+                        ...p,
+                        avatar: coverImage ? coverImage.preview : null
+                    }
+                })
             }
+
 
             // 👇 Công ty liên quan
             if (settings.value.company === 'selected') {

@@ -60,7 +60,7 @@
 .relatedCompaniesSwiper .swiper-slide,
 .swiper-selected-products_company .swiper-slide
 {
-    width: auto !important;
+    /*width: auto !important;*/
     flex-shrink: 0;
 }
 

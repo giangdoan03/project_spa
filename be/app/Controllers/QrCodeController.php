@@ -34,18 +34,27 @@ class QrCodeController extends BaseController
     private function getOwnedQR($qr_id): object|array
     {
         $userId = $this->getUserId();
-        $qr = $this->model->where('qr_id', $qr_id)->first();
 
+        // 👉 Lấy thông tin QR
+        $qr = $this->model->where('qr_id', $qr_id)->first();
         if (!$qr) {
             return $this->failNotFound('Không tìm thấy mã QR');
         }
 
-        if ($qr['user_id'] != $userId) {
+        // 👉 Lấy thông tin user
+        $user = model('App\Models\UserModel')->find($userId);
+        if (!$user) {
+            return $this->failForbidden('Không xác định được người dùng');
+        }
+
+        // 👉 Chỉ admin mới được xem tất cả
+        if ($user['role'] !== 'admin' && $qr['user_id'] != $userId) {
             return $this->failForbidden('Bạn không có quyền với mã QR này');
         }
 
         return $qr;
     }
+
 
     /**
      * Tạo QR Code mới

@@ -172,7 +172,7 @@ const columns = [
             ])
         }
     },
-    { title: 'Tên mã QR', key: 'qr_name', dataIndex: 'qr_name' },
+    { title: 'Tên mã QR', key: 'qr_name', dataIndex: 'qr_name', width: 150 },
     {
         title: 'Tên đối tượng',
         key: 'target_name',

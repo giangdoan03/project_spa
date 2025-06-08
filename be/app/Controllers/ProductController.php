@@ -138,7 +138,9 @@ class ProductController extends ResourceController
     }
 
 
-
+    /**
+     * @throws \ReflectionException
+     */
     public function create()
     {
         $userId = $this->getUserId();
