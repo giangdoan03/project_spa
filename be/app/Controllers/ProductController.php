@@ -224,6 +224,10 @@ class ProductController extends ResourceController
         $productModel = new ProductModel();
         $attributeModel = new ProductAttributeModel();
 
+        // Lấy thông tin user để kiểm tra role
+        $user = model('App\Models\UserModel')->find($userId);
+        $isAdmin = $user && $user['role'] === 'admin';
+
         $data = $this->request->getJSON(true);
 
         // Kiểm tra quyền sở hữu sản phẩm
@@ -231,9 +235,11 @@ class ProductController extends ResourceController
         if (!$product) {
             return $this->failNotFound('Sản phẩm không tồn tại');
         }
-        if ($product['user_id'] != $userId) {
+        // Nếu không phải admin thì kiểm tra quyền sở hữu
+        if (!$isAdmin && $product['user_id'] != $userId) {
             return $this->failForbidden('Bạn không có quyền sửa sản phẩm này');
         }
+
 
         // ✅ Trường hợp chỉ cập nhật ảnh (images) => bỏ qua validate
         if (isset($data['images']) && count($data) === 1) {
