@@ -20,16 +20,10 @@ class PurchaseHistoryController extends ResourceController
         $perPage = $this->request->getGet('per_page') ?? 10;
         $page = $this->request->getGet('page') ?? 1;
         $search = $this->request->getGet('search');
-        $userId = $this->request->getGet('customer_id'); // vẫn nhận customer_id nhưng hiểu là user_id
+        $userId = $this->request->getGet('customer_id');
 
         $builder = $this->model
-            ->select('
-                purchase_histories.*,
-                users.name as user_name,
-                users.email as user_email,
-                users.phone as user_phone,
-                users.avatar as user_avatar
-            ')
+            ->select('purchase_histories.*, users.name as user_name, users.email as user_email, users.phone as user_phone, users.avatar as user_avatar')
             ->join('users', 'users.id = purchase_histories.customer_id', 'left');
 
         if ($currentUser['role'] === 'admin' && !empty($userId)) {
@@ -62,18 +56,16 @@ class PurchaseHistoryController extends ResourceController
     {
         $currentUser = $this->getUser();
 
-        $data = $this->model
-            ->select('
-                purchase_histories.*,
-                users.name as user_name,
-                users.email as user_email,
-                users.phone as user_phone,
-                users.avatar as user_avatar
-            ')
+        $builder = $this->model
+            ->select('purchase_histories.*, users.name as user_name, users.email as user_email, users.phone as user_phone, users.avatar as user_avatar')
             ->join('users', 'users.id = purchase_histories.customer_id', 'left')
-            ->where('purchase_histories.id', $id)
-            ->where('purchase_histories.customer_id', $currentUser['id']) // chỉ xem của mình
-            ->first();
+            ->where('purchase_histories.id', $id);
+
+        if ($currentUser['role'] !== 'admin') {
+            $builder->where('purchase_histories.customer_id', $currentUser['id']);
+        }
+
+        $data = $builder->first();
 
         return $data
             ? $this->respond($data)
@@ -85,8 +77,18 @@ class PurchaseHistoryController extends ResourceController
         $data = $this->request->getJSON(true);
         $currentUser = $this->getUser();
 
-        // customer_id chính là user hiện tại
-        $data['customer_id'] = $currentUser['id'];
+        if ($currentUser['role'] === 'admin') {
+            if (empty($data['customer_id'])) {
+                return $this->failValidationErrors('Vui lòng chọn khách hàng cần đăng ký gói.');
+            }
+
+            $customer = model('App\Models\UserModel')->find($data['customer_id']);
+            if (!$customer) {
+                return $this->failNotFound('Khách hàng không tồn tại.');
+            }
+        } else {
+            $data['customer_id'] = $currentUser['id'];
+        }
 
         if (!empty($data['is_active']) && $data['is_active']) {
             $existing = $this->model
@@ -137,6 +139,20 @@ class PurchaseHistoryController extends ResourceController
             return $this->failNotFound('Không tìm thấy lịch sử mua hàng phù hợp.');
         }
 
+        if (!empty($data['extend_years'])) {
+            $years = (int) $data['extend_years'];
+
+            // Nếu gói đã hết hạn thì bắt đầu từ hôm nay, ngược lại thì cộng dồn
+            $baseTime = strtotime($existing['expires_at']) > time()
+                ? strtotime($existing['expires_at']) // còn hạn thì cộng dồn
+                : time(); // hết hạn thì tính từ bây giờ
+
+            $data['expires_at'] = date('Y-m-d H:i:s', strtotime("+{$years} year", $baseTime));
+            // ✅ Cộng dồn hoặc trừ vào số lượng năm
+            $data['quantity'] = ($existing['quantity'] ?? 0) + $years;
+            unset($data['extend_years']);
+        }
+
         $data['updated_at'] = date('Y-m-d H:i:s');
         $data['updated_by'] = $currentUser['id'];
 
@@ -151,10 +167,15 @@ class PurchaseHistoryController extends ResourceController
     public function delete($id = null)
     {
         $currentUser = $this->getUser();
-        $existing = $this->model
-            ->where('id', $id)
-            ->where('customer_id', $currentUser['id'])
-            ->first();
+
+        if ($currentUser['role'] === 'admin') {
+            $existing = $this->model->find($id);
+        } else {
+            $existing = $this->model
+                ->where('id', $id)
+                ->where('customer_id', $currentUser['id'])
+                ->first();
+        }
 
         if (!$existing) {
             return $this->failNotFound('Không tìm thấy lịch sử mua hàng');

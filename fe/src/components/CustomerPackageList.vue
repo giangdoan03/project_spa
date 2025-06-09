@@ -15,6 +15,7 @@
                     <template #icon><ShoppingCartOutlined /></template>
                     Mua thêm gói
                 </a-button>
+                <a-button v-if="currentPackage" type="default" @click="editPackage(currentPackage)">Gia hạn gói</a-button>
             </a-space>
 
             <a-table
@@ -26,31 +27,21 @@
                     size="small"
             >
                 <template #bodyCell="{ column, record }">
-                    <!-- Trạng thái thanh toán -->
                     <template v-if="column.key === 'is_paid'">
                         <a-tag :color="record.is_paid === '1' ? 'green' : 'red'">
                             {{ record.is_paid === '1' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
                         </a-tag>
                     </template>
 
-                    <!-- Trạng thái kích hoạt -->
                     <template v-else-if="column.key === 'is_active'">
-                        <a-tag v-if="record.is_paid === '0'" color="default">
-                            Chưa kích hoạt
-                        </a-tag>
-                        <a-tag v-else-if="isExpired(record.expires_at)" color="red">
-                            Đã hết hạn
-                        </a-tag>
-                        <a-tag v-else color="blue">
-                            Đã kích hoạt
-                        </a-tag>
+                        <a-tag v-if="record.is_paid === '0'" color="default">Chưa kích hoạt</a-tag>
+                        <a-tag v-else-if="isExpired(record.expires_at)" color="red">Đã hết hạn</a-tag>
+                        <a-tag v-else color="blue">Đã kích hoạt</a-tag>
                     </template>
 
-                    <!-- Hiển thị ngày có định dạng -->
                     <template v-else-if="['purchased_at', 'starts_at', 'expires_at'].includes(column.key)">
                         <span>
                           {{ formatDate(record[column.key]) }}
-                            <!-- Nếu là expires_at và đã hết hạn, hiển thị thêm tag đỏ -->
                           <a-tag
                                   v-if="column.key === 'expires_at' && isExpired(record.expires_at)"
                                   color="red"
@@ -61,16 +52,14 @@
                         </span>
                     </template>
 
-                    <!-- Mặc định -->
                     <template v-else>
                         {{ record[column.key] }}
                     </template>
                 </template>
-
             </a-table>
         </div>
 
-        <a-drawer :open="showDrawer" title="Đăng ký gói mới" @close="showDrawer = false" width="500">
+        <a-drawer :open="showDrawer" :title="isEditing ? 'Gia hạn gói hiện tại' : 'Đăng ký gói mới'" @close="showDrawer = false" width="500">
             <div style="margin-bottom: 12px">
                 <strong>Khách hàng:</strong> {{ customer?.name }}
             </div>
@@ -102,13 +91,9 @@
                     <a-checkbox v-model:checked="form.is_paid">Đã thanh toán</a-checkbox>
                 </a-form-item>
 
-                <a-button type="primary" block @click="handleRegister" :disabled="!!currentPackage">
-                    Đăng ký gói mới
+                <a-button type="primary" block @click="isEditing ? handleExtend() : handleRegister()">
+                    {{ isEditing ? 'Gia hạn gói' : 'Đăng ký gói mới' }}
                 </a-button>
-
-                <p v-if="currentPackage" style="color: red; margin-top: 8px">
-                    ⚠️ Khách hàng đang có gói hoạt động. Không thể đăng ký gói mới.
-                </p>
             </a-form>
         </a-drawer>
     </div>
@@ -119,7 +104,7 @@
     import { useRoute } from 'vue-router'
     import { formatDate } from '@/utils/formUtils'
     import { getCustomer } from '@/api/customer'
-    import { getPurchaseHistories, createPurchaseHistory } from '@/api/purchaseHistory'
+    import { getPurchaseHistories, createPurchaseHistory, updatePurchaseHistory } from '@/api/purchaseHistory'
     import { message } from 'ant-design-vue'
     import { ShoppingCartOutlined } from '@ant-design/icons-vue'
     import dayjs from 'dayjs'
@@ -127,6 +112,7 @@
     const route = useRoute()
     const customer = ref(null)
     const showDrawer = ref(false)
+    const isEditing = ref(false)
     const form = ref({
         years: 1,
         product_name: 'Gói Premium',
@@ -137,9 +123,6 @@
 
     const currentPackage = computed(() =>
         packageHistory.value.find(p => p.is_active == 1 && p.is_paid == 1 && dayjs(p.expires_at).isAfter(dayjs()))
-    )
-    const pastPackages = computed(() =>
-        packageHistory.value.filter(p => p !== currentPackage.value)
     )
 
     const columns = [
@@ -169,6 +152,7 @@
             is_active: true,
             is_paid: false
         }
+        isEditing.value = false
         showDrawer.value = true
 
         try {
@@ -177,6 +161,17 @@
         } catch (e) {
             message.error('Không tải được lịch sử gói')
         }
+    }
+
+    const editPackage = (pkg) => {
+        form.value = {
+            years: 1,
+            product_name: pkg.product_name,
+            is_active: pkg.is_active == 1,
+            is_paid: pkg.is_paid == 1
+        }
+        isEditing.value = true
+        showDrawer.value = true
     }
 
     const handleRegister = async () => {
@@ -203,14 +198,31 @@
             message.success('Đăng ký gói thành công')
 
             await registerPackage(customer.value)
-
-            // ✅ Cập nhật lại bảng
-            customer.value.packages = packageHistory.value
-
-            // ✅ Đóng drawer nếu muốn
+            customer.value.packages = [...packageHistory.value]
             showDrawer.value = false
         } catch (e) {
             message.error('Lỗi khi đăng ký gói')
+        }
+    }
+
+    const handleExtend = async () => {
+        try {
+            const years = form.value.years || 1
+
+            const payload = {
+                extend_years: years,
+                is_paid: form.value.is_paid ? 1 : 0,
+                is_active: form.value.is_active ? 1 : 0
+            }
+
+            await updatePurchaseHistory(currentPackage.value.id, payload)
+            message.success('Gia hạn gói thành công')
+
+            await registerPackage(customer.value)
+            customer.value.packages = [...packageHistory.value]
+            showDrawer.value = false
+        } catch (e) {
+            message.error('Lỗi khi gia hạn gói')
         }
     }
 
@@ -219,5 +231,4 @@
         if (!dateStr) return false;
         return new Date(dateStr) < new Date();
     }
-
 </script>
