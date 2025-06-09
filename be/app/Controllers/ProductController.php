@@ -40,6 +40,10 @@ class ProductController extends ResourceController
     {
         $userId = $this->getUserId();
 
+        // Lấy thông tin người dùng
+        $user = model('App\Models\UserModel')->find($userId);
+        $isAdmin = $user && $user['role'] === 'admin';
+
         log_message('debug', 'SESSION USER_ID in index: ' . $userId);
 
         $productModel = new ProductModel();
@@ -47,8 +51,12 @@ class ProductController extends ResourceController
         $page = $this->request->getGet('page') ?? 1;
         $search = $this->request->getGet('search');
 
-        $builder = $productModel->where('deleted_at', null)
-            ->where('user_id', $userId);
+        $builder = $productModel->where('deleted_at', null);
+
+        // Nếu không phải admin thì chỉ xem sản phẩm của chính mình
+        if (!$isAdmin) {
+            $builder->where('user_id', $userId);
+        }
 
         if ($search) {
             $builder->groupStart()
@@ -70,6 +78,7 @@ class ProductController extends ResourceController
                     $product[$field] = [];
                 }
             }
+
             unset($product['image']);
 
             // Gán attributes
@@ -83,6 +92,7 @@ class ProductController extends ResourceController
             'pager' => $productModel->pager->getDetails(),
         ]);
     }
+
 
 
     public function show($id = null)
