@@ -88,6 +88,8 @@ class ProductController extends ResourceController
     public function show($id = null)
     {
         $userId = $this->getUserId(); // Dùng được ngay
+        $user = model('App\Models\UserModel')->find($userId);
+        $isAdmin = $user && $user['role'] === 'admin';
 
         $productModel = new ProductModel();
         $product = $productModel->getProductWithAttributes($id);
@@ -96,8 +98,8 @@ class ProductController extends ResourceController
             return $this->failNotFound('Product not found');
         }
 
-        // Kiểm tra quyền sở hữu sản phẩm
-        if ($product['user_id'] != $userId) {
+        // ❌ Nếu không phải admin thì mới kiểm tra quyền sở hữu
+        if (!$isAdmin && $product['user_id'] != $userId) {
             return $this->failForbidden('Bạn không có quyền xem sản phẩm này');
         }
 
