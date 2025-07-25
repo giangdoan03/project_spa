@@ -173,19 +173,27 @@
 </template>
 <script setup>
 import { ref, watch, onMounted, computed, nextTick } from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-const route = useRoute()
-import QRCodeStyling from 'qr-code-styling'
+import { useRoute, useRouter } from 'vue-router'
 import { h } from 'vue'
-import {createQR, updateQR, getQR } from '@/api/qrcode'
-import {uploadFile} from '../api/product'
-import {message} from 'ant-design-vue'
+import QRCodeStyling from 'qr-code-styling'
+import { createQR, updateQR, getQR } from '@/api/qrcode'
+import { uploadFile } from '../api/product'
+import { message } from 'ant-design-vue'
+
+const route = useRoute()
+const router = useRouter()
 const isEditMode = computed(() => !!route.params.qr_id)
 const downloadFormat = ref('png')
-
 const requireTarget = ref(false)
 const formComponentRef = ref()
 const QR_BASE_URL = import.meta.env.VITE_QR_BASE
+
+// ✅ Hàm build URL đúng định dạng
+const buildQrUrl = () => {
+    const id = form.value.short_code || form.value.qr_id
+    const type = form.value.target_type || selectedKey.value || 'store'
+    return `${QR_BASE_URL}/views/${type}.html?${id}`
+}
 
 import {
     LinkOutlined, FontSizeOutlined, MessageOutlined, ContactsOutlined, CalendarOutlined,
@@ -194,7 +202,6 @@ import {
     ShopOutlined, ShoppingOutlined, UserOutlined, ApartmentOutlined, FlagOutlined, ArrowLeftOutlined, PlusOutlined
 } from '@ant-design/icons-vue'
 
-// Giả sử các form đã import đúng ở đây:
 import UrlForm from '@/components/forms/UrlForm.vue'
 import TextForm from '@/components/forms/TextForm.vue'
 import SmsForm from '@/components/forms/SmsForm.vue'
@@ -205,10 +212,6 @@ import EventForm from '@/components/forms/EventForm.vue'
 import PersonForm from '@/components/forms/PersonForm.vue'
 import Persons from "@/components/templates/persons/index.js";
 
-
-const router = useRouter()
-
-
 const formMap = {
     url: UrlForm,
     text: TextForm,
@@ -218,9 +221,7 @@ const formMap = {
     event: EventForm,
     person: PersonForm,
     business: CompanyForm,
-    // thêm các form còn lại tại đây
 }
-
 
 const qrTypes = [
     { key: 'url', label: 'Liên kết/URL', icon: LinkOutlined, pro: false },
@@ -246,6 +247,9 @@ const qrTypes = [
 ]
 
 const logoFile = ref(null)
+const previewImage = ref('')
+const previewVisible = ref(false)
+const previewTitle = ref('')
 
 const handleBeforeUploadSingle = async (field, file) => {
     const { data } = await uploadFile(file)
@@ -259,21 +263,17 @@ const handleBeforeUploadSingle = async (field, file) => {
     return false
 }
 
-
 const handleRemoveFile = () => {
     form.value.settings.image = ''
     logoFile.value = null
 }
-
-const previewImage = ref('')
-const previewVisible = ref(false)
-const previewTitle = ref('')
 
 const handlePreview = async (file) => {
     previewImage.value = file.url || file.thumbUrl
     previewVisible.value = true
     previewTitle.value = file.name || ''
 }
+
 const downloadQRCode = () => {
     if (qrCode) {
         qrCode.download({
@@ -287,26 +287,19 @@ const selectedKey = ref('url')
 const selectItem = async (key) => {
     selectedKey.value = key
     form.value.target_type = key
-
     const foundItem = qrTypes.find(item => item.key === key)
-    form.value.qr_type = foundItem?.pro ? 'pro' : 'free'  // 👈 Gán tự động tại đây
+    form.value.qr_type = foundItem?.pro ? 'pro' : 'free'
 
     await nextTick()
     const componentInstance = formComponentRef.value
     requireTarget.value = componentInstance?.requireTarget || false
 }
 
-
 const updateQrPreview = () => {
     if (!qrCode) return
-
-    const dataValue = requireTarget.value
-        ? `${import.meta.env.VITE_QR_BASE}/${form.value.short_code || form.value.qr_id}`
-        : form.value.settings.data;
-
     qrCode.update({
         ...form.value.settings,
-        data: dataValue
+        data: buildQrUrl()
     })
 }
 
@@ -363,37 +356,28 @@ let qrCode = null
 watch(form, () => {
     if (!qrCode || !form.value.short_code) return
     updateQrPreview()
-
     const config = {
         ...form.value.settings,
-        data: `${import.meta.env.VITE_QR_BASE}/${form.value.qr_id}`
-    };
-
-
+        data: buildQrUrl()
+    }
     qrCode.update(config)
 }, { deep: true })
-
-
 
 const generateUniqueQrId = () => {
     return Math.random().toString(36).substring(2, 10)
 }
 
 const handleSubmit = async () => {
-    if (requireTarget.value) {
-        if (!form.value.target_id) {
-            message.warning('Vui lòng chọn đối tượng trước')
-            return
-        }
-    } else {
-        if (!form.value.settings?.data) {
-            message.warning('Vui lòng nhập nội dung QR')
-            return
-        }
+    if (requireTarget.value && !form.value.target_id) {
+        message.warning('Vui lòng chọn đối tượng trước')
+        return
     }
 
+    if (!requireTarget.value && !form.value.settings?.data) {
+        message.warning('Vui lòng nhập nội dung QR')
+        return
+    }
 
-    // Tạo qr_id nếu chưa có (chỉ khi tạo mới)
     if (!isEditMode.value && !form.value.qr_id) {
         form.value.qr_id = generateUniqueQrId()
     }
@@ -401,9 +385,7 @@ const handleSubmit = async () => {
     const payload = {
         ...form.value,
         target_type: selectedKey.value,
-        qr_url: requireTarget.value
-            ? `${QR_BASE_URL}/${form.value.qr_id || 'placeholder'}`
-            : `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}`,
+        qr_url: buildQrUrl(),
         settings_json: JSON.stringify(form.value.settings)
     }
 
@@ -411,52 +393,39 @@ const handleSubmit = async () => {
         if (isEditMode.value) {
             await updateQR(route.params.qr_id, payload)
             message.success('Cập nhật mã QR thành công!')
-            updateQrPreview() // 👈 cập nhật preview động
-
-            // ✅ Cập nhật QR preview đúng kiểu
+            updateQrPreview()
             qrCode.update({
                 ...form.value.settings,
-                data: requireTarget.value ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}` : form.value.settings.data
+                data: buildQrUrl()
             })
-
         } else {
             const res = await createQR(payload)
             const createdQrId = res.data?.qr_id
             const createdShortCode = res.data?.short_code
-
             message.success('Tạo mã QR thành công!')
+
             form.value.qr_id = createdQrId
             form.value.short_code = createdShortCode
 
-            // ✅ Cập nhật QR preview đúng kiểu
-
             qrCode.update({
                 ...form.value.settings,
-                data: requireTarget.value ? `${QR_BASE_URL}/${form.value.short_code || form.value.qr_id}` : form.value.settings.data
+                data: buildQrUrl()
             })
-            updateQrPreview() // 👈 cập nhật preview động
+            updateQrPreview()
             await router.push(`/my-qr-codes/${createdQrId}/edit`)
         }
-
     } catch (err) {
         console.error('Lỗi:', err.response?.data || err.message)
-
-        const apiMessage =
-            err.response?.data?.messages?.error ||
-            err.response?.data?.message ||
-            err.message
-
+        const apiMessage = err.response?.data?.messages?.error || err.response?.data?.message || err.message
         message.error(apiMessage)
     }
 }
-
 
 onMounted(async () => {
     if (isEditMode.value) {
         try {
             const res = await getQR(route.params.qr_id)
             const data = res.data?.data
-
             if (data) {
                 form.value = {
                     ...form.value,
@@ -472,7 +441,7 @@ onMounted(async () => {
                         uid: Date.now().toString(),
                         name: form.value.settings.image.split('/').pop(),
                         status: 'done',
-                        url: form.value.settings.image,
+                        url: form.value.settings.image
                     }
                 }
 
@@ -482,16 +451,12 @@ onMounted(async () => {
             message.error('Không thể tải thông tin mã QR')
         }
     } else {
-        // 👇 Tạo mã qr_id tạm để dùng cho preview QR
         form.value.qr_id = generateUniqueQrId()
     }
 
-    // ✅ Init QR code sau khi đã có qr_id
     qrCode = new QRCodeStyling({
         ...form.value.settings,
-        data: requireTarget.value
-            ? `${QR_BASE_URL}/${form.value.qr_id || 'placeholder'}`
-            : form.value.settings.data
+        data: buildQrUrl()
     })
 
     qrCode.append(qrRef.value)
@@ -500,13 +465,11 @@ onMounted(async () => {
 const goBackToList = () => {
     router.push({
         path: '/my-qr-codes',
-        query: {
-            ...route.query // giữ nguyên page, search, type
-        }
+        query: { ...route.query }
     })
 }
-
 </script>
+
 
 <style>
     .qr_code_image .ant-card-body{

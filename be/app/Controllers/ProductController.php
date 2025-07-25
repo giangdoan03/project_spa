@@ -214,6 +214,9 @@ class ProductController extends ResourceController
     }
 
 
+    /**
+     * @throws \ReflectionException
+     */
     public function update($id = null)
     {
         $session = session();
@@ -305,8 +308,10 @@ class ProductController extends ResourceController
     }
 
 
-
-    public function toggleStatus($id = null)
+    /**
+     * @throws \ReflectionException
+     */
+    public function toggleStatus($id = null): ResponseInterface
     {
         $session = session();
         $userId = $session->get('user_id'); // 👈 Lấy user_id từ session
@@ -352,7 +357,7 @@ class ProductController extends ResourceController
         return $this->respondDeleted(['message' => 'Product soft deleted successfully']);
     }
 
-    public function export()
+    public function export(): ResponseInterface
     {
         $productModel = new ProductModel();
         $products = $productModel->where('deleted_at', null)->findAll();
@@ -475,7 +480,7 @@ class ProductController extends ResourceController
         exit;
     }
 
-    public function restore($id = null)
+    public function restore($id = null): ResponseInterface
     {
         $productModel = new ProductModel();
         $product = $productModel->onlyDeleted()->find($id);
@@ -489,7 +494,7 @@ class ProductController extends ResourceController
         return $this->respond(['message' => 'Product restored successfully']);
     }
 
-    public function exportSelected()
+    public function exportSelected(): ResponseInterface
     {
         $ids = $this->request->getJSON(true)['ids'] ?? [];
 

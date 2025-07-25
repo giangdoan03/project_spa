@@ -19,7 +19,7 @@ class ProductModel extends Model
 
     protected $useTimestamps = true;
 
-    public function getProductWithAttributes($id = null)
+    public function getProductWithAttributes($id = null): ?array
     {
         $builder = $this->db->table($this->table);
         $builder->select('*')->where('id', $id);

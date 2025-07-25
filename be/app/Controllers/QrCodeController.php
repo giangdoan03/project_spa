@@ -510,6 +510,9 @@ class QrCodeController extends BaseController
     }
 
 
+    /**
+     * @throws \ReflectionException
+     */
     public function track(): ResponseInterface
     {
         $data = $this->request->getJSON(true);
@@ -617,11 +620,11 @@ class QrCodeController extends BaseController
 
     private function detectBrowser(string $userAgent): string
     {
-        if (strpos($userAgent, 'Chrome') !== false) return 'Chrome';
-        if (strpos($userAgent, 'Firefox') !== false) return 'Firefox';
-        if (strpos($userAgent, 'Safari') !== false && strpos($userAgent, 'Chrome') === false) return 'Safari';
-        if (strpos($userAgent, 'Edge') !== false) return 'Edge';
-        if (strpos($userAgent, 'MSIE') !== false || strpos($userAgent, 'Trident') !== false) return 'Internet Explorer';
+        if (str_contains($userAgent, 'Chrome')) return 'Chrome';
+        if (str_contains($userAgent, 'Firefox')) return 'Firefox';
+        if (str_contains($userAgent, 'Safari')) return 'Safari';
+        if (str_contains($userAgent, 'Edge')) return 'Edge';
+        if (str_contains($userAgent, 'MSIE') || str_contains($userAgent, 'Trident')) return 'Internet Explorer';
         return 'Khác';
     }
 
@@ -642,6 +645,9 @@ class QrCodeController extends BaseController
         return 'Desktop';
     }
 
+    /**
+     * @throws RandomException
+     */
     public function redirectWithTrack($shortCode): RedirectResponse
     {
         $link = model('QrLinkModel')->where('short_code', $shortCode)->first();
@@ -654,6 +660,9 @@ class QrCodeController extends BaseController
         return redirect()->to("/scan/{$trackCode}?type=scan&code={$shortCode}");
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function handleScan($trackCode): string|RedirectResponse
     {
         $shortCode = $this->request->getGet('code');
@@ -667,7 +676,7 @@ class QrCodeController extends BaseController
         }
 
         // Ghi tracking log
-        $logModel = new \App\Models\QrScanLogModel();
+        $logModel = new QrScanLogModel();
         $logModel->insert([
             'qr_id'         => $link['qr_id'],
             'tracking_code' => $trackCode,
