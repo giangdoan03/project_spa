@@ -190,7 +190,7 @@ const QR_BASE_URL = import.meta.env.VITE_QR_BASE
 
 // ✅ Hàm build URL đúng định dạng
 const buildQrUrl = () => {
-    const id = form.value.short_code || form.value.qr_id
+    const id = form.value.qr_id
     const type = form.value.target_type || selectedKey.value || 'store'
     return `${QR_BASE_URL}/views/${type}.html?${id}`
 }
