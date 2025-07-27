@@ -322,7 +322,7 @@ const form = ref({
         margin: 0,
         data: '',
         dotsOptions: {
-            color: '#800053',
+            color: '#000000',
             type: 'extra-rounded'
         },
         cornersSquareOptions: {
@@ -334,7 +334,7 @@ const form = ref({
             color: '#000000'
         },
         backgroundOptions: {
-            color: '#eeeeee'
+            color: '#ffffff'
         },
         imageOptions: {
             imageSize: 0.4,

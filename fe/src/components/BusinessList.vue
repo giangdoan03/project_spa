@@ -4,6 +4,14 @@
             <a-input v-model:value="search" placeholder="Tên, SĐT hoặc Mã số thuế..." @pressEnter="fetchBusinesses" />
             <a-button type="primary" @click="fetchBusinesses">Tìm kiếm</a-button>
             <a-button type="primary" @click="goToCreate">Thêm mới</a-button>
+            <a-button
+                type="primary"
+                danger
+                :disabled="!selectedRowKeys.length"
+                @click="confirmDeleteSelected"
+            >
+                Xoá đã chọn ({{ selectedRowKeys.length }})
+            </a-button>
         </a-space>
 
         <a-table
@@ -13,6 +21,7 @@
             row-key="id"
             :loading="loading"
             @change="handleTableChange"
+            :row-selection="rowSelection"
         >
             <template #bodyCell="{ column, record }">
                 <!-- Hiển thị ảnh đại diện -->
@@ -47,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBusinesses, deleteBusiness as apiDeleteBusiness } from '../api/business'
 import { message } from 'ant-design-vue'
@@ -74,6 +83,16 @@ const columns = [
     { title: 'Thời gian cập nhật', dataIndex: 'updated_at', key: 'updated_at', customRender: ({ text }) => formatDate(text) },
     { title: 'Hành động', key: 'action' },
 ]
+
+const selectedRowKeys = ref([])
+
+const rowSelection = computed(() => ({
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: (selectedKeys) => {
+        selectedRowKeys.value = selectedKeys
+    }
+}))
+
 
 const fetchBusinesses = async () => {
     loading.value = true
@@ -116,9 +135,25 @@ const deleteBusiness = async (id) => {
     try {
         await apiDeleteBusiness(id)
         message.success('Đã xoá doanh nghiệp')
-        fetchBusinesses()
+        await fetchBusinesses()
     } catch (error) {
         message.error('Lỗi xoá doanh nghiệp')
+    }
+}
+
+const confirmDeleteSelected = async () => {
+    if (!selectedRowKeys.value.length) return
+
+    const confirmed = window.confirm(`Xác nhận xoá ${selectedRowKeys.value.length} doanh nghiệp?`)
+    if (!confirmed) return
+
+    try {
+        await Promise.all(selectedRowKeys.value.map(id => apiDeleteBusiness(id)))
+        message.success(`Đã xoá ${selectedRowKeys.value.length} doanh nghiệp`)
+        selectedRowKeys.value = []
+        await fetchBusinesses()
+    } catch (e) {
+        message.error('Lỗi xoá hàng loạt')
     }
 }
 

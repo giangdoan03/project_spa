@@ -12,6 +12,14 @@
             <a-button type="primary" @click="fetchProducts">Tìm kiếm</a-button>
             <a-button type="primary" @click="goToCreate">Thêm sản phẩm</a-button>
             <a-button type="primary" @click="openImportModal">Import sản phẩm</a-button>
+            <a-button
+                type="primary"
+                danger
+                :disabled="!selectedRowKeys.length"
+                @click="confirmDeleteSelected"
+            >
+                Xoá đã chọn ({{ selectedRowKeys.length }})
+            </a-button>
 
         </a-space>
 
@@ -22,15 +30,21 @@
             row-key="id"
             :loading="loading"
             @change="handleTableChange"
+            :row-selection="rowSelection"
         >
             <template #bodyCell="{ column, record }">
                 <!-- Cột ảnh đại diện -->
                 <template v-if="column.key === 'avatar'">
-                    <img v-if="getAvatarUrl(record.images)"
-                         :src="getAvatarUrl(record.images)"
-                         alt="Avatar"
-                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                    <a-image
+                        v-if="getAvatarUrl(record.images)"
+                        :src="getAvatarUrl(record.images)"
+                        :width="50"
+                        :height="50"
+                        :preview="true"
+                        style="object-fit: cover; border-radius: 4px"
+                    />
                 </template>
+
 
                 <!-- Cột trạng thái -->
                 <template v-if="column.key === 'status'">
@@ -90,6 +104,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getProducts, deleteProduct as apiDeleteProduct, updateProductStatus, importProducts } from '../api/product'
 import { message } from 'ant-design-vue'
+import { formatDate } from '../utils/formUtils'
 
 const router = useRouter()
 const route = useRoute()
@@ -101,6 +116,31 @@ const search = ref(route.query.search || '')
 const currentPage = ref(parseInt(route.query.page) || 1)
 const pageSize = ref(10)
 const totalItems = ref(0)
+
+const selectedRowKeys = ref([])
+
+const rowSelection = computed(() => ({
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: (selectedKeys) => {
+        selectedRowKeys.value = selectedKeys
+    }
+}))
+
+const confirmDeleteSelected = async () => {
+    try {
+        if (!selectedRowKeys.value.length) return
+
+        const confirmed = window.confirm(`Xác nhận xoá ${selectedRowKeys.value.length} sản phẩm?`)
+        if (!confirmed) return
+
+        await Promise.all(selectedRowKeys.value.map(id => apiDeleteProduct(id)))
+        message.success(`Đã xoá ${selectedRowKeys.value.length} sản phẩm`)
+        selectedRowKeys.value = []
+        await fetchProducts()
+    } catch (error) {
+        message.error('Lỗi xoá hàng loạt')
+    }
+}
 
 const pagination = computed(() => ({
     current: currentPage.value,
@@ -233,21 +273,6 @@ const formatCurrency = (value) => {
         currency: 'VND'
     }).format(value)
 }
-
-const formatDate = (value) => {
-    if (!value) return ''
-    const date = new Date(value)
-    return date.toLocaleString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    })
-}
-
 const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Ảnh đại diện', dataIndex: 'avatar', key: 'avatar' },

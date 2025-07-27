@@ -21,6 +21,14 @@
                         <a-select-option value="store">Cửa hàng</a-select-option>
                         <a-select-option value="event">Sự kiện</a-select-option>
                     </a-select>
+                    <a-button
+                        type="primary"
+                        danger
+                        :disabled="!selectedRowKeys.length"
+                        @click="confirmDeleteSelected"
+                    >
+                        Xoá đã chọn ({{ selectedRowKeys.length }})
+                    </a-button>
                 </a-space>
             </a-col>
 
@@ -45,8 +53,20 @@
                 total: totalItems,
                 onChange: onPageChange
             }"
+            :row-selection="rowSelection"
         >
             <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'qr'">
+                    <a-image
+                        v-if="qrImageMap[record.qr_id]"
+                        :src="qrImageMap[record.qr_id]"
+                        :width="80"
+                        :height="80"
+                        :preview="true"
+                        style="object-fit: cover; border-radius: 4px"
+                    />
+                    <div v-else style="width: 80px; height: 80px; background: #f5f5f5; border-radius: 4px;" />
+                </template>
                 <template v-if="column.key === 'qr_url'">
                     <a-row type="flex" align="middle" :style="{ gap: '6px' }">
                         <a-tooltip :title="buildQrLink(record)">
@@ -80,9 +100,9 @@
                     </a-tag>
                 </template>
 
-                <template v-if="column.key === 'qr'">
-                    <div :data-qr-id="record.qr_id" style="width: 60px; height: 60px;"></div>
-                </template>
+<!--                <template v-if="column.key === 'qr'">-->
+<!--                    <div :data-qr-id="record.qr_id" style="width: 60px; height: 60px;"></div>-->
+<!--                </template>-->
 
                 <template v-if="column.key === 'target_name'">
                     <a :href="getTargetEditUrl(record)" style="color: #1677ff">
@@ -116,18 +136,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { getQRList, deleteQR } from '@/api/qrcode'
-import { PlusOutlined } from '@ant-design/icons-vue'
+import {computed, h, nextTick, ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {message} from 'ant-design-vue'
+import {deleteQR, getQRList} from '@/api/qrcode'
+import {CopyOutlined, PlusOutlined} from '@ant-design/icons-vue'
 import QRCodeStyling from 'qr-code-styling'
-import { CopyOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-
-
-import { h } from 'vue'
-import { Tooltip } from 'ant-design-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -142,6 +157,31 @@ const pageSize = 10
 const qrInstances = ref({})
 
 const currentPage = computed(() => parseInt(route.query.page || '1'))
+
+
+const selectedRowKeys = ref([])
+
+const rowSelection = computed(() => ({
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: (keys) => {
+        selectedRowKeys.value = keys
+    }
+}))
+
+const confirmDeleteSelected = async () => {
+    if (!selectedRowKeys.value.length) return
+
+    try {
+        await Promise.all(selectedRowKeys.value.map(id => deleteQR(id)))
+        message.success(`Đã xoá ${selectedRowKeys.value.length} mã QR`)
+        selectedRowKeys.value = []
+        await fetchQRCodes()
+        await renderAllQRCodes()
+    } catch (err) {
+        message.error('Lỗi khi xoá hàng loạt')
+    }
+}
+
 
 const columns = [
     { title: 'Mã', key: 'qr', dataIndex: 'qr_image_url' },
@@ -195,6 +235,9 @@ const columns = [
 
 const allowedHosts = import.meta.env.VITE_ALLOWED_HOSTS?.split(',') || []
 const defaultQRUrl = import.meta.env.VITE_DEFAULT_QR_URL || 'https://labit365.com'
+
+
+const qrImageMap = ref({}) // qr_id => dataUrl base64 image
 
 const getColor = (type) => {
     const map = {
@@ -384,12 +427,34 @@ const appendQRCode = (el, record) => {
 
 const renderAllQRCodes = async () => {
     await nextTick()
-    qrCodes.value.forEach(record => {
-        const container = document.querySelector(`[data-qr-id="${record.qr_id}"]`)
-        if (container && !qrInstances.value[record.qr_id]) {
-            appendQRCode(container, record)
+
+    for (const record of qrCodes.value) {
+        if (qrImageMap.value[record.qr_id]) continue
+
+        try {
+            const config = typeof record.settings_json === 'string'
+                ? JSON.parse(record.settings_json)
+                : record.settings_json
+
+            const qr = new QRCodeStyling({
+                ...config,
+                width: 250,
+                height: 250,
+                data: record.qr_url
+            })
+
+            qrImageMap.value[record.qr_id] = await qr.getRawData('png') // hoặc 'jpeg'
+                .then(blob => {
+                    return new Promise(resolve => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => resolve(reader.result)
+                        reader.readAsDataURL(blob)
+                    })
+                })
+        } catch (e) {
+            console.error('QR render failed', record.qr_id, e)
         }
-    })
+    }
 }
 
 // Re-fetch khi route.query thay đổi

@@ -4,6 +4,14 @@
             <a-input v-model:value="search" placeholder="Tìm kiếm sự kiện..." @pressEnter="fetchEvents" />
             <a-button type="primary" @click="fetchEvents">Tìm kiếm</a-button>
             <a-button type="primary" @click="goToCreate">Tạo mới</a-button>
+            <a-button
+                type="primary"
+                danger
+                :disabled="!selectedRowKeys.length"
+                @click="confirmDeleteSelected"
+            >
+                Xoá đã chọn ({{ selectedRowKeys.length }})
+            </a-button>
         </a-space>
 
         <a-table
@@ -13,6 +21,7 @@
             :loading="loading"
             row-key="id"
             @change="handleTableChange"
+            :row-selection="rowSelection"
         >
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'banner'">
@@ -32,17 +41,40 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed} from 'vue'
 import { useRouter } from 'vue-router'
 import { getEvents, deleteEvent as apiDeleteEvent } from '../api/event'
 import { message } from 'ant-design-vue'
-import { formatDate } from '../utils/formUtils' // hoặc '../utils/date' tùy vào vị trí file
+import { formatDate } from '../utils/formUtils'
 
 const router = useRouter()
 const events = ref([])
 const loading = ref(false)
 const search = ref('')
 const pagination = ref({ current: 1, pageSize: 10, total: 0 })
+
+const selectedRowKeys = ref([])
+
+const rowSelection = computed(() => ({
+    selectedRowKeys: selectedRowKeys.value,
+    onChange: (keys) => {
+        selectedRowKeys.value = keys
+    }
+}))
+
+const confirmDeleteSelected = async () => {
+    if (!selectedRowKeys.value.length) return
+
+    try {
+        await Promise.all(selectedRowKeys.value.map(id => apiDeleteEvent(id)))
+        message.success(`Đã xoá ${selectedRowKeys.value.length} sự kiện`)
+        selectedRowKeys.value = []
+        await fetchEvents()
+    } catch (e) {
+        message.error('Lỗi xoá hàng loạt')
+    }
+}
+
 
 const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
@@ -83,7 +115,7 @@ const deleteEvent = async (id) => {
     try {
         await apiDeleteEvent(id)
         message.success('Đã xoá sự kiện')
-        fetchEvents()
+        await fetchEvents()
     } catch (e) {
         message.error('Xoá thất bại')
     }
