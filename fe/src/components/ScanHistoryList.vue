@@ -24,13 +24,17 @@
                 </template>
 
                 <template v-else-if="column.key === 'object_image'">
-                    <img
-                            :src="record.object_image || 'https://placehold.co/100x100'"
-                            alt="Ảnh"
-                            style="width: 50px; height: 50px; object-fit: cover;"
-                            @error="event => event.target.src = 'https://placehold.co/100x100'"
+                    <a-image
+                        :src="record.object_image || 'https://placehold.co/100x100'"
+                        :width="100"
+                        :height="80"
+                        :preview="true"
+                        :fallback="'https://placehold.co/100x100'"
+                        alt="Ảnh"
+                        style="object-fit: cover"
                     />
                 </template>
+
 
 
                 <template v-else-if="column.key === 'type'">

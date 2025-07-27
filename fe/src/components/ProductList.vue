@@ -38,8 +38,8 @@
                     <a-image
                         v-if="getAvatarUrl(record.images)"
                         :src="getAvatarUrl(record.images)"
-                        :width="50"
-                        :height="50"
+                        :width="100"
+                        :height="80"
                         :preview="true"
                         style="object-fit: cover; border-radius: 4px"
                     />

@@ -26,12 +26,15 @@
             <template #bodyCell="{ column, record }">
                 <!-- Hiển thị ảnh đại diện -->
                 <template v-if="column.key === 'logo'">
-                    <img
+                    <a-image
                         v-if="record.logo && Array.isArray(record.logo) && record.logo.length > 0"
                         :src="record.logo[0]"
+                        :height="80"
+                        :preview="true"
                         alt="Logo"
-                        style="height: 40px;"
+                        style="object-fit: contain"
                     />
+
                 </template>
 
                 <!-- Hiển thị trạng thái -->

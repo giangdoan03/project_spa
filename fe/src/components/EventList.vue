@@ -25,8 +25,16 @@
         >
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'banner'">
-                    <img :src="record.banner" alt="banner" style="width: 60px; height: 40px; object-fit: cover" />
+                    <a-image
+                        :src="record.banner"
+                        :width="100"
+                        :height="80"
+                        :preview="true"
+                        alt="banner"
+                        style="object-fit: cover"
+                    />
                 </template>
+
                 <template v-if="column.key === 'action'">
                     <a-space>
                         <a-button type="link" @click="goToEdit(record.id)">Sửa</a-button>
