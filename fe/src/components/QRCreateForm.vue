@@ -189,11 +189,20 @@ const formComponentRef = ref()
 const QR_BASE_URL = import.meta.env.VITE_QR_BASE
 
 // ✅ Hàm build URL đúng định dạng
+const NO_VIEW_TYPES = ['url', 'sms', 'vcard', 'calendar', 'phone', 'email', 'map', 'wifi', 'custom-url', 'app-store', 'image', 'pdf', 'audio', 'video']
+
 const buildQrUrl = () => {
     const id = form.value.qr_id
     const type = form.value.target_type || selectedKey.value || 'store'
+
+    if (NO_VIEW_TYPES.includes(type)) {
+        // Trả về đúng dữ liệu cần encode trực tiếp
+        return form.value.settings?.data || ''
+    }
+
     return `${QR_BASE_URL}/views/${type}.html?${id}`
 }
+
 
 import {
     LinkOutlined, FontSizeOutlined, MessageOutlined, ContactsOutlined, CalendarOutlined,

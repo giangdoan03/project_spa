@@ -35,8 +35,6 @@
                     />
                 </template>
 
-
-
                 <template v-else-if="column.key === 'type'">
                     <a-tag :color="getTypeColor(record.type)">
                         {{ getTypeLabel(record.type) }}
